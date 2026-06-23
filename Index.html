@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  </head>
+
+<body>
+  <div class="shell">
+    <div class="masthead">
+      <div class="mast-id">
+        <img class="logo" src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="Logo perusahaan">
+        <div class="mast-text">
+          <div class="eyebrow">Marketing Team</div>
+          <h1>Office Desk</h1>
+        </div>
+      </div>
+      <div class="mast-actions">
+        <div class="mast-clock" id="mastClock">—</div>
+        <a class="list-link" id="dbLink" href="list.html">
+           Database
+        </a>
+      </div>
+    </div>
+    
+    </div>
+
+  <script>
+    // MASUKKAN URL WEB APP GAS-MU DI SINI
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4nQtMFch9K-Pt4bsNKDeoaTxOtPKx12oNicJ55WHdsyRQH2wdNa0r0ftThDE4F9ligQ/exec';
+
+    const typeInputs = document.querySelectorAll('input[name="type"]');
+    const taskSection = document.getElementById('taskSection');
+    const reminderSection = document.getElementById('reminderSection');
+    const form = document.getElementById('reminderForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnLabel = document.getElementById('btnLabel');
+    const successModal = document.getElementById('successModal');
+    const successText = document.getElementById('successText');
+    const errorToast = document.getElementById('errorToast');
+    const reminderDate = document.getElementById('date');
+    const stamp = document.getElementById('stamp');
+    const stampText = document.getElementById('stampText');
+    const mastClock = document.getElementById('mastClock');
+
+    // Helper functions (todayValue, setDefaults, updateClock, toggleFields, showSuccess, showError, setLoading) 
+    // Tetap sama seperti versi original
+    // ...
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const data = Object.fromEntries(new FormData(form));
+      setLoading(true);
+
+      // Menggunakan fetch untuk menembak API GAS
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        // Menggunakan text/plain agar tidak terkena bloking CORS Preflight di GAS
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8', 
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(res => {
+        setLoading(false);
+        if (res.success) {
+          showSuccess(res.message || 'Reminder berhasil disimpan ke database');
+          form.reset();
+          document.getElementById('typeTask').checked = true;
+          setDefaults();
+          toggleFields();
+        } else {
+          showError(res.message || 'Gagal menyimpan data');
+        }
+      })
+      .catch(err => {
+        setLoading(false);
+        showError(err.message || String(err));
+      });
+    });
+
+    setDefaults();
+    toggleFields();
+    updateClock();
+    setInterval(updateClock, 30000);
+  </script>
+</body>
+</html>
