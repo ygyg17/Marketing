@@ -1,10 +1,447 @@
 <!DOCTYPE html>
 <html>
 <head>
-  </head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Warm minimalist palette to complement the gold */
+      --bg: #fafaf9; /* Very subtle warm off-white */
+      --surface: #ffffff;
+      --ink: #292524; /* Warm dark gray/charcoal for text */
+      --muted: #78716c; /* Warm medium gray for secondary text */
+      --line: #e7e5e4; /* Soft border color */
+      
+      /* Brand Colors */
+      --color-brand: #BA8F2E; /* Provided Gold */
+      --color-brand-hover: #9c7726; /* Darker Gold for hover states */
+      --color-brand-light: rgba(186, 143, 46, 0.08); /* Faint Gold for backgrounds */
+      --color-success: #10b981; 
+      --color-error: #ef4444;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      padding: 40px 16px 60px;
+    }
+
+    .shell { 
+      width: 100%; 
+      max-width: 580px;
+      margin: 0 auto; 
+    }
+
+    /* ---- Masthead ---- */
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mast-id { display: flex; align-items: center; gap: 16px; }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: var(--surface);
+      padding: 8px;
+      border: 1px solid var(--line);
+    }
+
+    .mast-text .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--color-brand);
+      font-weight: 700;
+    }
+
+    .mast-text h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -.01em;
+      line-height: 1;
+      margin-top: 4px;
+    }
+
+    .mast-clock {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--muted);
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    .mast-clock b { color: var(--ink); font-weight: 500; }
+
+    .mast-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .list-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-brand);
+      text-decoration: none;
+      background: transparent;
+      border: 1px solid var(--color-brand);
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: .2s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .list-link:hover {
+      background: var(--color-brand);
+      color: #fff;
+    }
+
+    /* ---- Form Container ---- */
+    .ticket-top {
+      position: relative;
+      margin-bottom: 36px;
+    }
+
+    .ticket-top h2 {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--ink);
+      max-width: 400px;
+      letter-spacing: -.01em;
+    }
+
+    .ticket-top p {
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      max-width: 420px;
+    }
+
+    /* Badge (Formerly Stamp) */
+    .stamp {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 6px 14px;
+      border: 1px solid var(--color-brand);
+      border-radius: 20px;
+      color: var(--color-brand);
+      background: var(--color-brand-light);
+      transition: all .3s ease;
+    }
+
+    .stamp.spin { 
+      transform: scale(1.05); 
+      background: var(--color-brand);
+      color: #fff;
+    }
+
+    .stamp span {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .field { margin-bottom: 22px; }
+
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    label {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      margin-bottom: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-wrap .icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: var(--color-brand);
+      pointer-events: none;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: 6px;
+      padding: 14px 14px 14px 40px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      color: var(--ink);
+      outline: none;
+      transition: .2s ease;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+      padding-left: 14px;
+      line-height: 1.5;
+    }
+
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .input-wrap.has-caret::after {
+      content: "";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--color-brand);
+      box-shadow: 0 0 0 3px var(--color-brand-light);
+    }
+
+    .hidden { display: none; }
+
+    /* Type toggle pills */
+    .type-toggle {
+      display: flex;
+      gap: 12px;
+    }
+
+    .type-toggle input { display: none; }
+
+    .type-toggle label {
+      flex: 1;
+      margin: 0;
+      justify-content: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      transition: .2s ease;
+      user-select: none;
+    }
+
+    .type-toggle input:checked + label {
+      border-color: var(--color-brand);
+      color: var(--color-brand);
+      background: var(--color-brand-light);
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      padding: 16px;
+      margin-top: 16px;
+      background: var(--color-brand);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: .2s ease;
+    }
+
+    .btn:hover { background: var(--color-brand-hover); }
+    .btn:active { transform: scale(0.99); }
+    .btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .75s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+      font-size: 10.5px;
+      letter-spacing: .05em;
+      margin-top: 40px;
+    }
+
+    /* ---- modal ---- */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(41, 37, 36, 0.4); /* Elegant warm dark overlay */
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: .25s ease;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .modal.show { opacity: 1; visibility: visible; }
+
+    .modal-box {
+      width: min(92vw, 320px);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,.08);
+      transform: scale(.95) translateY(10px);
+      animation: pop .3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes pop { to { transform: scale(1) translateY(0); } }
+
+    .check {
+      width: 56px; height: 56px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--color-success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .modal-box h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+
+    .modal-box p {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .error-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--color-error);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 6px;
+      box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2);
+      opacity: 0;
+      visibility: hidden;
+      transition: .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 10000;
+      max-width: min(92vw, 400px);
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .error-toast.show { 
+      opacity: 1; 
+      visibility: visible; 
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* WhatsApp Button - Kept green for UI recognition, but styled minimally */
+    .wa-float {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 9998;
+      background: #25D366;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 18px;
+      border-radius: 999px;
+      box-shadow: 0 8px 20px rgba(37, 211, 102, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      transition: .2s ease;
+    }
+    
+    .wa-float:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(37, 211, 102, 0.3);
+    }
+
+    .wa-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    @media (max-width: 600px) {
+      .field-grid { grid-template-columns: 1fr; }
+      .ticket-top h2 { font-size: 22px; max-width: 260px; }
+      .masthead { flex-wrap: wrap; border-bottom: none; margin-bottom: 24px; padding-bottom: 0; }
+      .mast-clock { display: none; }
+    }
+  </style>
+</head>
 
 <body>
   <div class="shell">
+
     <div class="masthead">
       <div class="mast-id">
         <img class="logo" src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="Logo perusahaan">
@@ -15,13 +452,127 @@
       </div>
       <div class="mast-actions">
         <div class="mast-clock" id="mastClock">—</div>
+    
         <a class="list-link" id="dbLink" href="list.html">
            Database
         </a>
       </div>
     </div>
-    
+
+    <div>
+      <div class="ticket-top">
+        <div class="stamp" id="stamp">
+          <span id="stampText">TASK</span>
+        </div>
+        <h2>Drop it here,<br>the bot picks it up.</h2>
+        <p>Catat task atau reminder sekali, lalu notifikasi otomatis terkirim ke WhatsApp di tanggal yang kamu tentukan.</p>
+      </div>
+
+      <div class="ticket-body">
+        <form id="reminderForm">
+
+          <div class="field">
+            <label>Jenis Entri</label>
+            <div class="type-toggle">
+              <input type="radio" id="typeTask" name="type" value="Task List" checked>
+              <label for="typeTask"> Task List</label>
+              <input type="radio" id="typeReminder" name="type" value="Reminder">
+              <label for="typeReminder"> Reminder</label>
+            </div>
+          </div>
+
+          <div id="taskSection">
+            <div class="field">
+              <label for="taskName">Task Name</label>
+              <div class="input-wrap">
+                <span class="icon"></span>
+                <input id="taskName" name="taskName" type="text" placeholder="Contoh: Follow up client besok" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="deadline">Deadline</label>
+              <div class="input-wrap">
+                <span class="icon"></span>
+                <input id="deadline" name="deadline" type="date">
+              </div>
+            </div>
+
+             <div class="field-grid">
+              <div class="field">
+                <label for="status">Status</label>
+                <div class="input-wrap has-caret">
+                  <span class="icon"></span>
+                  <select id="status" name="status">
+                    <option value="">Pilih status</option>
+                    <option value="Not started">Not started</option>
+                    <option value="In progress">In progress</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="priority">Priority</label>
+                <div class="input-wrap has-caret">
+                  <span class="icon"></span>
+                  <select id="priority" name="priority">
+                    <option value="">Pilih priority</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Urgent">Urgent</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="note">Note</label>
+              <textarea id="note" name="note" placeholder="Tambahkan note jika ada..."></textarea>
+             </div>
+          </div>
+
+          <div id="reminderSection" class="hidden">
+            <div class="field">
+              <label for="reminderName">Reminder Name</label>
+              <div class="input-wrap">
+                <span class="icon"></span>
+                <input id="reminderName" name="reminderName" type="text" placeholder="Contoh: Kirim reminder meeting" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="date">Date</label>
+              <div class="input-wrap">
+                <span class="icon"></span>
+                <input id="date" name="date" type="date">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn" id="submitBtn">
+            <span id="btnLabel">Simpan</span>
+          </button>
+        </form>
+       </div>
     </div>
+
+    <div class="footer">POWERED BY YOGI CHATBOT · WA AUTO-NOTIFY</div>
+  </div>
+
+  <a class="wa-float" href="https://wa.me/6281776452000" target="_blank" rel="noopener">
+    <span class="wa-dot"></span>
+    WA Bot
+  </a>
+
+  <div id="successModal" class="modal">
+    <div class="modal-box">
+      <div class="check"></div>
+      <h2>Tersimpan</h2>
+      <p id="successText">Reminder berhasil disimpan ke database</p>
+    </div>
+  </div>
+
+  <div id="errorToast" class="error-toast"></div>
 
   <script>
     // MASUKKAN URL WEB APP GAS-MU DI SINI
@@ -41,20 +592,70 @@
     const stampText = document.getElementById('stampText');
     const mastClock = document.getElementById('mastClock');
 
-    // Helper functions (todayValue, setDefaults, updateClock, toggleFields, showSuccess, showError, setLoading) 
-    // Tetap sama seperti versi original
-    // ...
+    function todayValue() {
+      return new Date().toISOString().split('T')[0];
+    }
 
+    function setDefaults() {
+      reminderDate.value = todayValue();
+      document.getElementById('deadline').value = '';
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const date = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+      const time = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      mastClock.innerHTML = date + '<br><b>' + time + '</b>';
+    }
+
+    function toggleFields() {
+      const type = document.querySelector('input[name="type"]:checked').value;
+
+      stamp.classList.add('spin');
+      setTimeout(() => stamp.classList.remove('spin'), 350);
+
+      if (type === 'Task List') {
+        taskSection.classList.remove('hidden');
+        reminderSection.classList.add('hidden');
+        stampText.textContent = 'TASK';
+      } else {
+        taskSection.classList.add('hidden');
+        reminderSection.classList.remove('hidden');
+        stampText.textContent = 'REMIND';
+      }
+    }
+
+    function showSuccess(message) {
+      successText.textContent = message || 'Reminder berhasil disimpan ke database';
+      successModal.classList.add('show');
+      setTimeout(() => successModal.classList.remove('show'), 2500);
+    }
+
+    function showError(message) {
+      errorToast.textContent = message || 'Terjadi kesalahan';
+      errorToast.classList.add('show');
+      setTimeout(() => errorToast.classList.remove('show'), 3200);
+    }
+
+    function setLoading(isLoading) {
+      submitBtn.disabled = isLoading;
+      if (isLoading) {
+        btnLabel.innerHTML = '<span class="spinner"></span> Menyimpan...';
+      } else {
+        btnLabel.textContent = 'Simpan';
+      }
+    }
+
+    typeInputs.forEach(el => el.addEventListener('change', toggleFields));
+    
     form.addEventListener('submit', function(e) {
       e.preventDefault();
 
       const data = Object.fromEntries(new FormData(form));
       setLoading(true);
 
-      // Menggunakan fetch untuk menembak API GAS
       fetch(SCRIPT_URL, {
         method: 'POST',
-        // Menggunakan text/plain agar tidak terkena bloking CORS Preflight di GAS
         headers: {
           'Content-Type': 'text/plain;charset=utf-8', 
         },
