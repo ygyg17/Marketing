@@ -409,7 +409,11 @@
       // Tambahkan tombol Selesai HANYA untuk Task yang statusnya belum Done
       let actionHtml = '';
       if (isTask && item.status !== 'Done') {
-         actionHtml = `<button onclick="markAsDone('${item.id}')" style="margin-top: 10px; padding: 6px 12px; background: var(--ok); color: white; border: none; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer;">✓ Tandai Selesai</button>`;
+         actionHtml = `
+           <div class="row-actions">
+             <button class="btn-done" onclick="markAsDone('${item.id}')">✓ Tandai Selesai</button>
+           </div>
+         `;
       }
         
       return (
