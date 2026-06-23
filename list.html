@@ -1,10 +1,304 @@
 <!DOCTYPE html>
 <html>
 <head>
-  </head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Warm minimalist palette matching the gold accent */
+      --bg: #fafaf9;
+      --surface: #ffffff;
+      --ink: #292524;        
+      --muted: #78716c;      
+      --line: #e7e5e4;       
+      
+      /* Primary Brand Color based on image_817187.png */
+      --color-brand: #BA8F2E;
+      --color-brand-hover: #9c7726;   
+      --color-brand-light: rgba(186, 143, 46, 0.08); 
+
+      /* Status & Priority Colors (Muted for elegance) */
+      --ok: #10b981;
+      --ok-light: rgba(16, 185, 129, 0.1);
+      --warn: #f59e0b;
+      --warn-light: rgba(245, 158, 11, 0.1);
+      --urgent: #ef4444;
+      --urgent-light: rgba(239, 68, 68, 0.1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      padding: 40px 16px 60px;
+    }
+
+    .shell { width: 100%; max-width: 700px; margin: 0 auto; }
+
+    /* ---- Masthead ---- */
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 24px;
+      padding: 0 4px;
+    }
+
+    .mast-text .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--color-brand);
+      font-weight: 700;
+    }
+
+    .mast-text h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -.01em;
+      line-height: 1;
+      margin-top: 4px;
+    }
+
+    .back-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-brand);
+      text-decoration: none;
+      background: transparent;
+      border: 1px solid var(--color-brand);
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: .2s ease;
+      white-space: nowrap;
+    }
+
+    .back-link:hover {
+      background: var(--color-brand);
+      color: #fff;
+    }
+
+    /* ---- Filter Toolbar ---- */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    /* Hide scrollbar for clean look */
+    .toolbar::-webkit-scrollbar { display: none; }
+    .toolbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .chip {
+      flex: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--line);
+      cursor: pointer;
+      transition: .2s ease;
+      user-select: none;
+    }
+
+    .chip.active {
+      background: var(--color-brand-light);
+      color: var(--color-brand);
+      border-color: var(--color-brand);
+    }
+
+    /* ---- Board Container ---- */
+    .board {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.03);
+      overflow: hidden;
+    }
+
+    .board-head {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .board-head h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .board-head .count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .list { padding: 10px 14px 18px; }
+
+    /* ---- Empty / Loading / Error States ---- */
+    .empty, .loading, .error-state {
+      padding: 60px 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty .big, .loading .big, .error-state .big {
+      font-size: 32px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .empty p, .loading p, .error-state p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: .05em;
+    }
+
+    .error-state { color: var(--urgent); }
+    .error-state .big { opacity: 1; }
+
+    .spinner-lg {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--line);
+      border-top-color: var(--color-brand);
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- Row Items ---- */
+    .row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 12px;
+      border-radius: 8px;
+      transition: .2s ease;
+    }
+
+    .row + .row { border-top: 1px solid var(--line); border-radius: 0; }
+    
+    .row:hover { background: var(--bg); }
+
+    .row-badge {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      margin-top: 2px;
+      border: 1px solid transparent;
+    }
+
+    .row-badge.task { 
+      background: var(--bg); 
+      border-color: var(--line);
+    }
+    
+    .row-badge.reminder { 
+      background: var(--color-brand-light); 
+      color: var(--color-brand);
+      border-color: var(--color-brand-light);
+    }
+
+    .row-main { flex: 1; min-width: 0; }
+
+    .row-title {
+      font-weight: 600;
+      font-size: 14.5px;
+      color: var(--ink);
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .row-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    /* ---- Status Pills ---- */
+    .pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .pill.date { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+    
+    .pill.status-not-started { background: #f5f5f4; color: #57534e; }
+    .pill.status-in-progress { background: var(--color-brand-light); color: var(--color-brand); }
+    
+    .pill.priority-low { background: var(--ok-light); color: var(--ok); }
+    .pill.priority-medium { background: var(--warn-light); color: var(--warn); }
+    .pill.priority-urgent { background: var(--urgent-light); color: var(--urgent); }
+
+    .row-note {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      word-break: break-word;
+      background: var(--bg);
+      padding: 10px 12px;
+      border-radius: 6px;
+      border-left: 2px solid var(--line);
+    }
+
+    .footer {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+      font-size: 10.5px;
+      letter-spacing: .05em;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 600px) {
+      .masthead { flex-wrap: wrap; margin-bottom: 20px; }
+      .row { padding: 14px 8px; }
+    }
+  </style>
+</head>
 
 <body>
   <div class="shell">
+
     <div class="masthead">
       <div class="mast-text">
         <div class="eyebrow">Marketing Ops</div>
@@ -13,7 +307,27 @@
       <a class="back-link" href="index.html">Form Input</a>
     </div>
 
+    <div class="toolbar" id="toolbar">
+      <div class="chip active" data-filter="all">Semua</div>
+      <div class="chip" data-filter="Task List"> Task</div>
+      <div class="chip" data-filter="Reminder"> Reminder</div>
     </div>
+
+    <div class="board">
+      <div class="board-head">
+        <h2>Antrian Aktif</h2>
+        <span class="count" id="countLabel">memuat...</span>
+      </div>
+      <div class="list" id="list">
+        <div class="loading">
+          <div class="spinner-lg"></div>
+          <p>LOADING...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">POWERED BY YOGI CHATBOT · SYNCED WITH NOTION</div>
+  </div>
 
   <script>
     // MASUKKAN URL WEB APP GAS-MU DI SINI
@@ -25,12 +339,84 @@
     const countLabel = document.getElementById('countLabel');
     const toolbar = document.getElementById('toolbar');
 
-    // Helper functions (escapeHtml, formatDate, slug, renderRow, render)
-    // Tetap sama seperti versi original
-    // ...
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function slug(str) {
+      return (str || '').toLowerCase().replace(/\s+/g, '-');
+    }
+
+    function renderRow(item) {
+      const isTask = item.type === 'Task List';
+      const badgeClass = isTask ? 'task' : 'reminder';
+      const badgeIcon = isTask ? '' : '';
+
+      let metaHtml = '';
+      if (item.deadline) {
+        metaHtml += '<span class="pill date">' + escapeHtml(formatDate(item.deadline)) + '</span>';
+      }
+      if (item.status) {
+        metaHtml += '<span class="pill status-' + slug(item.status) + '">' + escapeHtml(item.status) + '</span>';
+      }
+      if (item.priority) {
+        metaHtml += '<span class="pill priority-' + slug(item.priority) + '">' + escapeHtml(item.priority) + '</span>';
+      }
+
+      const noteHtml = item.note
+        ? '<div class="row-note">' + escapeHtml(item.note) + '</div>'
+        : '';
+        
+      return (
+        '<div class="row">' +
+          '<div class="row-badge ' + badgeClass + '">' + badgeIcon + '</div>' +
+          '<div class="row-main">' +
+            '<div class="row-title">' + escapeHtml(item.taskName || '(tanpa nama)') + '</div>' +
+            '<div class="row-meta">' + metaHtml + '</div>' +
+            noteHtml +
+          '</div>' +
+        '</div>'
+      );
+    }
+
+    function render() {
+      const filtered = activeFilter === 'all'
+        ? allItems
+        : allItems.filter(function (i) { return i.type === activeFilter; });
+        
+      countLabel.textContent = filtered.length + ' item';
+
+      if (!filtered.length) {
+        listEl.innerHTML =
+          '<div class="empty"><div class="big"></div><p>BELUM ADA ENTRI DI KATEGORI INI</p></div>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(renderRow).join('');
+    }
+
+    toolbar.addEventListener('click', function (e) {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+
+      toolbar.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      activeFilter = chip.dataset.filter;
+      render();
+    });
 
     function loadReminders() {
-      // Menggunakan fetch dengan parameter action=getReminders
+      // Menggunakan fetch untuk menembak API GAS menggunakan HTTP GET
       fetch(SCRIPT_URL + '?action=getReminders')
         .then(response => response.json())
         .then(res => {
@@ -49,16 +435,6 @@
           countLabel.textContent = 'error';
         });
     }
-
-    toolbar.addEventListener('click', function (e) {
-      const chip = e.target.closest('.chip');
-      if (!chip) return;
-
-      toolbar.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('active'); });
-      chip.classList.add('active');
-      activeFilter = chip.dataset.filter;
-      render();
-    });
 
     loadReminders();
   </script>
