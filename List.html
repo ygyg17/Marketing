@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  </head>
+
+<body>
+  <div class="shell">
+    <div class="masthead">
+      <div class="mast-text">
+        <div class="eyebrow">Marketing Ops</div>
+        <h1>Reminder List</h1>
+      </div>
+      <a class="back-link" href="index.html">Form Input</a>
+    </div>
+
+    </div>
+
+  <script>
+    // MASUKKAN URL WEB APP GAS-MU DI SINI
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4nQtMFch9K-Pt4bsNKDeoaTxOtPKx12oNicJ55WHdsyRQH2wdNa0r0ftThDE4F9ligQ/exec';
+
+    let allItems = [];
+    let activeFilter = 'all';
+    const listEl = document.getElementById('list');
+    const countLabel = document.getElementById('countLabel');
+    const toolbar = document.getElementById('toolbar');
+
+    // Helper functions (escapeHtml, formatDate, slug, renderRow, render)
+    // Tetap sama seperti versi original
+    // ...
+
+    function loadReminders() {
+      // Menggunakan fetch dengan parameter action=getReminders
+      fetch(SCRIPT_URL + '?action=getReminders')
+        .then(response => response.json())
+        .then(res => {
+          if (res.success) {
+            allItems = res.data || [];
+            render();
+          } else {
+            throw new Error(res.message);
+          }
+        })
+        .catch(err => {
+          listEl.innerHTML =
+            '<div class="error-state"><div class="big"></div><p>' +
+            escapeHtml(err.message || String(err)) +
+            '</p></div>';
+          countLabel.textContent = 'error';
+        });
+    }
+
+    toolbar.addEventListener('click', function (e) {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+
+      toolbar.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      activeFilter = chip.dataset.filter;
+      render();
+    });
+
+    loadReminders();
+  </script>
+</body>
+</html>
