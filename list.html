@@ -289,6 +289,35 @@
       margin-top: 40px;
     }
 
+/* ---- Action Buttons ---- */
+    .row-actions {
+      display: flex;
+      justify-content: flex-end; /* Mendorong tombol ke kanan */
+      margin-top: 12px;
+    }
+
+    .btn-done {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    /* Efek hover minimalis: garis dan teks berubah jadi warna dark gray (ink) */
+    .btn-done:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+      background: var(--surface);
+    }
+    
     @media (max-width: 600px) {
       .masthead { flex-wrap: wrap; margin-bottom: 20px; }
       .row { padding: 14px 8px; }
