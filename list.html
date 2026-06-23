@@ -376,17 +376,57 @@
       const noteHtml = item.note
         ? '<div class="row-note">' + escapeHtml(item.note) + '</div>'
         : '';
+
+      // Tambahkan tombol Selesai HANYA untuk Task yang statusnya belum Done
+      let actionHtml = '';
+      if (isTask && item.status !== 'Done') {
+         actionHtml = `<button onclick="markAsDone('${item.id}')" style="margin-top: 10px; padding: 6px 12px; background: var(--ok); color: white; border: none; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer;">✓ Tandai Selesai</button>`;
+      }
         
       return (
-        '<div class="row">' +
+        '<div class="row" id="row-' + item.id + '">' +
           '<div class="row-badge ' + badgeClass + '">' + badgeIcon + '</div>' +
           '<div class="row-main">' +
             '<div class="row-title">' + escapeHtml(item.taskName || '(tanpa nama)') + '</div>' +
             '<div class="row-meta">' + metaHtml + '</div>' +
             noteHtml +
+            actionHtml + 
           '</div>' +
         '</div>'
       );
+    }
+
+    // Fungsi baru untuk mengirim request update ke Backend GAS
+    function markAsDone(notionId) {
+      // Ubah teks tombol jadi loading (opsional)
+      const row = document.getElementById('row-' + notionId);
+      if(row) row.style.opacity = '0.5';
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8', 
+        },
+        body: JSON.stringify({
+          action: 'updateStatus',
+          id: notionId,
+          status: 'Done'
+        })
+      })
+      .then(response => response.json())
+      .then(res => {
+        if (res.success) {
+          // Refresh list setelah berhasil
+          loadReminders();
+        } else {
+          alert('Gagal update: ' + res.message);
+          if(row) row.style.opacity = '1';
+        }
+      })
+      .catch(err => {
+        alert('Terjadi kesalahan: ' + err.message);
+        if(row) row.style.opacity = '1';
+      });
     }
 
     function render() {
