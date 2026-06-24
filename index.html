@@ -720,6 +720,8 @@
         <h1 class="panel-heading">Drop it here,<br>bot yang urus sisanya.</h1>
         <p class="panel-sub">Catat task atau reminder — notifikasi otomatis dikirim ke WhatsApp sesuai tanggal yang kamu set.</p>
 
+        <form id="mainForm">
+
         <!-- Type toggle -->
         <div class="type-row">
           <input type="radio" id="typeTask" name="type" value="Task List" checked>
@@ -734,8 +736,6 @@
           <span class="divider-label" id="divLabel">Detail Task</span>
           <div class="divider-line"></div>
         </div>
-
-        <form id="mainForm">
           <!-- TASK FIELDS -->
           <div id="taskFields">
             <div class="field">
@@ -976,7 +976,22 @@
 
     mainForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      const data = Object.fromEntries(new FormData(mainForm));
+      const type = document.querySelector('input[name="type"]:checked').value;
+      const isTask = type === 'Task List';
+
+      // Build payload manually — only include fields for the active type
+      const data = { type };
+      if (isTask) {
+        data.taskName = document.getElementById('taskName').value;
+        data.deadline  = document.getElementById('deadline').value;
+        data.status    = document.getElementById('status').value;
+        data.priority  = document.getElementById('priority').value;
+        data.note      = document.getElementById('note').value;
+      } else {
+        data.reminderName = document.getElementById('reminderName').value;
+        data.date         = document.getElementById('remDate').value;
+      }
+
       setSubmitLoading(true);
 
       fetch(SCRIPT_URL, {
@@ -1178,10 +1193,10 @@
       const payload = { action: 'updateItem', id, type };
       if (isTask) {
         payload.taskName = document.getElementById('editTaskName').value;
-        payload.deadline = document.getElementById('editDeadline').value;
-        payload.status = document.getElementById('editStatus').value;
+        payload.deadline = document.getElementById('editDeadline').value || '';
+        payload.status   = document.getElementById('editStatus').value;
         payload.priority = document.getElementById('editPriority').value;
-        payload.note = document.getElementById('editNote').value;
+        payload.note     = document.getElementById('editNote').value;
       } else {
         payload.reminderName = document.getElementById('editRemName').value;
         payload.date = document.getElementById('editRemDate').value;
