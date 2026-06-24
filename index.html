@@ -10,18 +10,25 @@
   <style>
     :root {
       /* Warm minimalist palette to complement the gold */
-      --bg: #fafaf9; /* Very subtle warm off-white */
+      --bg: #fafaf9;
       --surface: #ffffff;
-      --ink: #292524; /* Warm dark gray/charcoal for text */
-      --muted: #78716c; /* Warm medium gray for secondary text */
-      --line: #e7e5e4; /* Soft border color */
-      
+      --ink: #292524;
+      --muted: #78716c;
+      --line: #e7e5e4;
+
       /* Brand Colors */
-      --color-brand: #BA8F2E; /* Provided Gold */
-      --color-brand-hover: #9c7726; /* Darker Gold for hover states */
-      --color-brand-light: rgba(186, 143, 46, 0.08); /* Faint Gold for backgrounds */
-      --color-success: #10b981; 
+      --color-brand: #BA8F2E;
+      --color-brand-hover: #9c7726;
+      --color-brand-light: rgba(186, 143, 46, 0.08);
+      --color-success: #10b981;
       --color-error: #ef4444;
+
+      --ok: #10b981;
+      --ok-light: rgba(16, 185, 129, 0.1);
+      --warn: #f59e0b;
+      --warn-light: rgba(245, 158, 11, 0.1);
+      --urgent: #ef4444;
+      --urgent-light: rgba(239, 68, 68, 0.1);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,10 +41,10 @@
       padding: 40px 16px 60px;
     }
 
-    .shell { 
-      width: 100%; 
-      max-width: 580px;
-      margin: 0 auto; 
+    .shell {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
     }
 
     /* ---- Masthead ---- */
@@ -91,33 +98,20 @@
 
     .mast-clock b { color: var(--ink); font-weight: 500; }
 
-    .mast-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+    /* ---- Two column layout ---- */
+    .layout {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 32px;
+      align-items: flex-start;
     }
 
-    .list-link {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--color-brand);
-      text-decoration: none;
-      background: transparent;
-      border: 1px solid var(--color-brand);
-      padding: 8px 14px;
-      border-radius: 6px;
-      transition: .2s ease;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    .col-form {
+      position: sticky;
+      top: 40px;
     }
 
-    .list-link:hover {
-      background: var(--color-brand);
-      color: #fff;
-    }
+    .col-list { min-width: 0; }
 
     /* ---- Form Container ---- */
     .ticket-top {
@@ -142,7 +136,6 @@
       max-width: 420px;
     }
 
-    /* Badge (Formerly Stamp) */
     .stamp {
       position: absolute;
       top: 0;
@@ -155,8 +148,8 @@
       transition: all .3s ease;
     }
 
-    .stamp.spin { 
-      transform: scale(1.05); 
+    .stamp.spin {
+      transform: scale(1.05);
       background: var(--color-brand);
       color: #fff;
     }
@@ -241,12 +234,7 @@
 
     .hidden { display: none; }
 
-    /* Type toggle pills */
-    .type-toggle {
-      display: flex;
-      gap: 12px;
-    }
-
+    .type-toggle { display: flex; gap: 12px; }
     .type-toggle input { display: none; }
 
     .type-toggle label {
@@ -294,6 +282,23 @@
     .btn:active { transform: scale(0.99); }
     .btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
 
+    .btn-ghost {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px;
+      margin-top: 10px;
+      background: var(--surface);
+      color: var(--muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+
     .spinner {
       width: 16px; height: 16px;
       border: 2px solid rgba(255,255,255,.3);
@@ -313,11 +318,11 @@
       margin-top: 40px;
     }
 
-    /* ---- modal ---- */
+    /* ---- success / error feedback ---- */
     .modal {
       position: fixed;
       inset: 0;
-      background: rgba(41, 37, 36, 0.4); /* Elegant warm dark overlay */
+      background: rgba(41, 37, 36, 0.4);
       backdrop-filter: blur(4px);
       display: flex;
       align-items: center;
@@ -391,13 +396,13 @@
       line-height: 1.5;
     }
 
-    .error-toast.show { 
-      opacity: 1; 
-      visibility: visible; 
+    .error-toast.show {
+      opacity: 1;
+      visibility: visible;
       transform: translateX(-50%) translateY(0);
     }
 
-    /* WhatsApp Button - Kept green for UI recognition, but styled minimally */
+    /* WhatsApp Button */
     .wa-float {
       position: fixed;
       right: 20px;
@@ -417,17 +422,244 @@
       font-family: 'JetBrains Mono', monospace;
       transition: .2s ease;
     }
-    
+
     .wa-float:hover {
       transform: translateY(-2px);
       box-shadow: 0 12px 24px rgba(37, 211, 102, 0.3);
     }
 
-    .wa-dot {
-      width: 8px;
-      height: 8px;
+    .wa-dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+
+    /* ============ LIST (right column) ============ */
+    .board {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.03);
+      overflow: hidden;
+    }
+
+    .board-head {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .board-head h2 { font-size: 16px; font-weight: 600; color: var(--ink); }
+
+    .board-head .count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .list { padding: 10px 14px 18px; }
+
+    .empty, .loading, .error-state {
+      padding: 60px 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty .big, .loading .big, .error-state .big {
+      font-size: 32px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .empty p, .loading p, .error-state p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      letter-spacing: .05em;
+    }
+
+    .error-state { color: var(--urgent); }
+    .error-state .big { opacity: 1; }
+
+    .spinner-lg {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--line);
+      border-top-color: var(--color-brand);
       border-radius: 50%;
-      background: #fff;
+      margin: 0 auto 16px;
+      animation: spin .8s linear infinite;
+    }
+
+    .row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 12px;
+      border-radius: 8px;
+      transition: .2s ease;
+      cursor: pointer;
+    }
+
+    .row + .row { border-top: 1px solid var(--line); border-radius: 0; }
+
+    .row:hover { background: var(--bg); }
+
+    .row-badge {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      margin-top: 2px;
+      border: 1px solid transparent;
+    }
+
+    .row-badge.task { background: var(--bg); border-color: var(--line); }
+
+    .row-badge.reminder {
+      background: var(--color-brand-light);
+      color: var(--color-brand);
+      border-color: var(--color-brand-light);
+    }
+
+    .row-main { flex: 1; min-width: 0; }
+
+    .row-title {
+      font-weight: 600;
+      font-size: 14.5px;
+      color: var(--ink);
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .row-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+    .pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .pill.date { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+    .pill.status-not-started { background: #f5f5f4; color: #57534e; }
+    .pill.status-in-progress { background: var(--color-brand-light); color: var(--color-brand); }
+    .pill.priority-low { background: var(--ok-light); color: var(--ok); }
+    .pill.priority-medium { background: var(--warn-light); color: var(--warn); }
+    .pill.priority-urgent { background: var(--urgent-light); color: var(--urgent); }
+
+    .row-note {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      word-break: break-word;
+      background: var(--bg);
+      padding: 10px 12px;
+      border-radius: 6px;
+      border-left: 2px solid var(--line);
+    }
+
+    .row-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+
+    .btn-done, .btn-edit {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .btn-done:hover { border-color: var(--ink); color: var(--ink); background: var(--surface); }
+    .btn-edit:hover { border-color: var(--color-brand); color: var(--color-brand); background: var(--color-brand-light); }
+
+    /* ---- Edit modal ---- */
+    .edit-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(41, 37, 36, 0.45);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: .2s ease;
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .edit-modal.show { opacity: 1; visibility: visible; }
+
+    .edit-box {
+      width: min(92vw, 440px);
+      max-height: 88vh;
+      overflow-y: auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 28px 26px;
+      box-shadow: 0 24px 48px rgba(0,0,0,.12);
+      transform: scale(.96) translateY(8px);
+      animation: pop .25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .edit-box-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .edit-box-head h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .edit-close {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 1;
+      transition: .2s ease;
+    }
+
+    .edit-close:hover { color: var(--ink); border-color: var(--ink); }
+
+    .edit-actions { display: flex; gap: 10px; margin-top: 8px; }
+    .edit-actions .btn { margin-top: 0; }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-secondary:hover { background: var(--bg); border-color: var(--ink); }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .col-form { position: static; }
     }
 
     @media (max-width: 600px) {
@@ -435,6 +667,7 @@
       .ticket-top h2 { font-size: 22px; max-width: 260px; }
       .masthead { flex-wrap: wrap; border-bottom: none; margin-bottom: 24px; padding-bottom: 0; }
       .mast-clock { display: none; }
+      .row { padding: 14px 8px; }
     }
   </style>
 </head>
@@ -450,113 +683,129 @@
           <h1>Office Desk</h1>
         </div>
       </div>
-      <div class="mast-actions">
-        <div class="mast-clock" id="mastClock">—</div>
-    
-        <a class="list-link" id="dbLink" href="list.html">
-           Database
-        </a>
-      </div>
+      <div class="mast-clock" id="mastClock">—</div>
     </div>
 
-    <div>
-      <div class="ticket-top">
-        <div class="stamp" id="stamp">
-          <span id="stampText">TASK</span>
+    <div class="layout">
+
+      <!-- ===== LEFT: FORM ===== -->
+      <div class="col-form">
+        <div class="ticket-top">
+          <div class="stamp" id="stamp">
+            <span id="stampText">TASK</span>
+          </div>
+          <h2>Drop it here,<br>the bot picks it up.</h2>
+          <p>Catat task atau reminder sekali, lalu notifikasi otomatis terkirim ke WhatsApp di tanggal yang kamu tentukan.</p>
         </div>
-        <h2>Drop it here,<br>the bot picks it up.</h2>
-        <p>Catat task atau reminder sekali, lalu notifikasi otomatis terkirim ke WhatsApp di tanggal yang kamu tentukan.</p>
+
+        <div class="ticket-body">
+          <form id="reminderForm">
+
+            <div class="field">
+              <label>Jenis Entri</label>
+              <div class="type-toggle">
+                <input type="radio" id="typeTask" name="type" value="Task List" checked>
+                <label for="typeTask"> Task List</label>
+                <input type="radio" id="typeReminder" name="type" value="Reminder">
+                <label for="typeReminder"> Reminder</label>
+              </div>
+            </div>
+
+            <div id="taskSection">
+              <div class="field">
+                <label for="taskName">Task Name</label>
+                <div class="input-wrap">
+                  <span class="icon"></span>
+                  <input id="taskName" name="taskName" type="text" placeholder="Contoh: Follow up client besok" autocomplete="off">
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="deadline">Deadline</label>
+                <div class="input-wrap">
+                  <span class="icon"></span>
+                  <input id="deadline" name="deadline" type="date">
+                </div>
+              </div>
+
+               <div class="field-grid">
+                <div class="field">
+                  <label for="status">Status</label>
+                  <div class="input-wrap has-caret">
+                    <span class="icon"></span>
+                    <select id="status" name="status">
+                      <option value="">Pilih status</option>
+                      <option value="Not started">Not started</option>
+                      <option value="In progress">In progress</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="priority">Priority</label>
+                  <div class="input-wrap has-caret">
+                    <span class="icon"></span>
+                    <select id="priority" name="priority">
+                      <option value="">Pilih priority</option>
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Urgent">Urgent</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="note">Note</label>
+                <textarea id="note" name="note" placeholder="Tambahkan note jika ada..."></textarea>
+               </div>
+            </div>
+
+            <div id="reminderSection" class="hidden">
+              <div class="field">
+                <label for="reminderName">Reminder Name</label>
+                <div class="input-wrap">
+                  <span class="icon"></span>
+                  <input id="reminderName" name="reminderName" type="text" placeholder="Contoh: Kirim reminder meeting" autocomplete="off">
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="date">Date</label>
+                <div class="input-wrap">
+                  <span class="icon"></span>
+                  <input id="date" name="date" type="date">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+              <span id="btnLabel">Simpan</span>
+            </button>
+          </form>
+         </div>
+
+        <div class="footer">POWERED BY YOGI CHATBOT · WA AUTO-NOTIFY</div>
       </div>
 
-      <div class="ticket-body">
-        <form id="reminderForm">
-
-          <div class="field">
-            <label>Jenis Entri</label>
-            <div class="type-toggle">
-              <input type="radio" id="typeTask" name="type" value="Task List" checked>
-              <label for="typeTask"> Task List</label>
-              <input type="radio" id="typeReminder" name="type" value="Reminder">
-              <label for="typeReminder"> Reminder</label>
+      <!-- ===== RIGHT: LIST ===== -->
+      <div class="col-list">
+        <div class="board">
+          <div class="board-head">
+            <h2>Antrian Aktif</h2>
+            <span class="count" id="countLabel">memuat...</span>
+          </div>
+          <div class="list" id="list">
+            <div class="loading">
+              <div class="spinner-lg"></div>
+              <p>LOADING...</p>
             </div>
           </div>
+        </div>
+        <div class="footer">SYNCED WITH NOTION · KLIK ITEM UNTUK EDIT</div>
+      </div>
 
-          <div id="taskSection">
-            <div class="field">
-              <label for="taskName">Task Name</label>
-              <div class="input-wrap">
-                <span class="icon"></span>
-                <input id="taskName" name="taskName" type="text" placeholder="Contoh: Follow up client besok" autocomplete="off">
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="deadline">Deadline</label>
-              <div class="input-wrap">
-                <span class="icon"></span>
-                <input id="deadline" name="deadline" type="date">
-              </div>
-            </div>
-
-             <div class="field-grid">
-              <div class="field">
-                <label for="status">Status</label>
-                <div class="input-wrap has-caret">
-                  <span class="icon"></span>
-                  <select id="status" name="status">
-                    <option value="">Pilih status</option>
-                    <option value="Not started">Not started</option>
-                    <option value="In progress">In progress</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="priority">Priority</label>
-                <div class="input-wrap has-caret">
-                  <span class="icon"></span>
-                  <select id="priority" name="priority">
-                    <option value="">Pilih priority</option>
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Urgent">Urgent</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="note">Note</label>
-              <textarea id="note" name="note" placeholder="Tambahkan note jika ada..."></textarea>
-             </div>
-          </div>
-
-          <div id="reminderSection" class="hidden">
-            <div class="field">
-              <label for="reminderName">Reminder Name</label>
-              <div class="input-wrap">
-                <span class="icon"></span>
-                <input id="reminderName" name="reminderName" type="text" placeholder="Contoh: Kirim reminder meeting" autocomplete="off">
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="date">Date</label>
-              <div class="input-wrap">
-                <span class="icon"></span>
-                <input id="date" name="date" type="date">
-              </div>
-            </div>
-          </div>
-
-          <button type="submit" class="btn" id="submitBtn">
-            <span id="btnLabel">Simpan</span>
-          </button>
-        </form>
-       </div>
     </div>
-
-    <div class="footer">POWERED BY YOGI CHATBOT · WA AUTO-NOTIFY</div>
   </div>
 
   <a class="wa-float" href="https://wa.me/6281776452000" target="_blank" rel="noopener">
@@ -564,6 +813,7 @@
     WA Bot
   </a>
 
+  <!-- Success / error feedback for the create form -->
   <div id="successModal" class="modal">
     <div class="modal-box">
       <div class="check"></div>
@@ -574,10 +824,100 @@
 
   <div id="errorToast" class="error-toast"></div>
 
+  <!-- Edit modal -->
+  <div id="editModal" class="edit-modal">
+    <div class="edit-box">
+      <div class="edit-box-head">
+        <h3 id="editTitle">Edit Item</h3>
+        <button type="button" class="edit-close" id="editClose">&times;</button>
+      </div>
+
+      <form id="editForm">
+        <input type="hidden" id="editId" name="id">
+        <input type="hidden" id="editType" name="type">
+
+        <div id="editTaskFields">
+          <div class="field">
+            <label for="editTaskName">Task Name</label>
+            <div class="input-wrap">
+              <span class="icon"></span>
+              <input id="editTaskName" name="taskName" type="text" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="editDeadline">Deadline</label>
+            <div class="input-wrap">
+              <span class="icon"></span>
+              <input id="editDeadline" name="deadline" type="date">
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <div class="field">
+              <label for="editStatus">Status</label>
+              <div class="input-wrap has-caret">
+                <span class="icon"></span>
+                <select id="editStatus" name="status">
+                  <option value="Not started">Not started</option>
+                  <option value="In progress">In progress</option>
+                  <option value="Done">Done</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="editPriority">Priority</label>
+              <div class="input-wrap has-caret">
+                <span class="icon"></span>
+                <select id="editPriority" name="priority">
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Urgent">Urgent</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="editNote">Note</label>
+            <textarea id="editNote" name="note"></textarea>
+          </div>
+        </div>
+
+        <div id="editReminderFields" class="hidden">
+          <div class="field">
+            <label for="editReminderName">Reminder Name</label>
+            <div class="input-wrap">
+              <span class="icon"></span>
+              <input id="editReminderName" name="reminderName" type="text" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="editDate">Date</label>
+            <div class="input-wrap">
+              <span class="icon"></span>
+              <input id="editDate" name="date" type="date">
+            </div>
+          </div>
+        </div>
+
+        <div class="edit-actions">
+          <button type="button" class="btn btn-secondary" id="editCancel">Batal</button>
+          <button type="submit" class="btn" id="editSubmitBtn">
+            <span id="editBtnLabel">Simpan Perubahan</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     // MASUKKAN URL WEB APP GAS-MU DI SINI
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4nQtMFch9K-Pt4bsNKDeoaTxOtPKx12oNicJ55WHdsyRQH2wdNa0r0ftThDE4F9ligQ/exec';
 
+    /* ============ Create form (left column) ============ */
     const typeInputs = document.querySelectorAll('input[name="type"]');
     const taskSection = document.getElementById('taskSection');
     const reminderSection = document.getElementById('reminderSection');
@@ -587,7 +927,7 @@
     const successModal = document.getElementById('successModal');
     const successText = document.getElementById('successText');
     const errorToast = document.getElementById('errorToast');
-    const reminderDate = document.getElementById('date');
+    const reminderDateInput = document.getElementById('date');
     const stamp = document.getElementById('stamp');
     const stampText = document.getElementById('stampText');
     const mastClock = document.getElementById('mastClock');
@@ -597,7 +937,7 @@
     }
 
     function setDefaults() {
-      reminderDate.value = todayValue();
+      reminderDateInput.value = todayValue();
       document.getElementById('deadline').value = '';
     }
 
@@ -647,8 +987,8 @@
     }
 
     typeInputs.forEach(el => el.addEventListener('change', toggleFields));
-    
-    form.addEventListener('submit', function(e) {
+
+    form.addEventListener('submit', function (e) {
       e.preventDefault();
 
       const data = Object.fromEntries(new FormData(form));
@@ -656,34 +996,275 @@
 
       fetch(SCRIPT_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8', 
-        },
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(data)
       })
-      .then(response => response.json())
-      .then(res => {
-        setLoading(false);
-        if (res.success) {
-          showSuccess(res.message || 'Reminder berhasil disimpan ke database');
-          form.reset();
-          document.getElementById('typeTask').checked = true;
-          setDefaults();
-          toggleFields();
-        } else {
-          showError(res.message || 'Gagal menyimpan data');
-        }
-      })
-      .catch(err => {
-        setLoading(false);
-        showError(err.message || String(err));
-      });
+        .then(response => response.json())
+        .then(res => {
+          setLoading(false);
+          if (res.success) {
+            showSuccess(res.message || 'Reminder berhasil disimpan ke database');
+            form.reset();
+            document.getElementById('typeTask').checked = true;
+            setDefaults();
+            toggleFields();
+            loadReminders();
+          } else {
+            showError(res.message || 'Gagal menyimpan data');
+          }
+        })
+        .catch(err => {
+          setLoading(false);
+          showError(err.message || String(err));
+        });
     });
 
+    /* ============ List (right column) ============ */
+    let allItems = [];
+    const listEl = document.getElementById('list');
+    const countLabel = document.getElementById('countLabel');
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function slug(str) {
+      return (str || '').toLowerCase().replace(/\s+/g, '-');
+    }
+
+    function renderRow(item) {
+      const isTask = item.type === 'Task List';
+      const badgeClass = isTask ? 'task' : 'reminder';
+      const badgeIcon = isTask ? '' : '';
+
+      let metaHtml = '';
+      if (item.deadline) {
+        metaHtml += '<span class="pill date">' + escapeHtml(formatDate(item.deadline)) + '</span>';
+      }
+      if (item.status) {
+        metaHtml += '<span class="pill status-' + slug(item.status) + '">' + escapeHtml(item.status) + '</span>';
+      }
+      if (item.priority) {
+        metaHtml += '<span class="pill priority-' + slug(item.priority) + '">' + escapeHtml(item.priority) + '</span>';
+      }
+
+      const noteHtml = item.note
+        ? '<div class="row-note">' + escapeHtml(item.note) + '</div>'
+        : '';
+
+      let actionHtml = '<div class="row-actions">';
+      actionHtml += '<button type="button" class="btn-edit" data-edit-id="' + item.id + '">Edit</button>';
+      if (isTask && item.status !== 'Done') {
+        actionHtml += '<button type="button" class="btn-done" data-done-id="' + item.id + '">Tandai Selesai</button>';
+      }
+      actionHtml += '</div>';
+
+      return (
+        '<div class="row" id="row-' + item.id + '" data-row-id="' + item.id + '">' +
+          '<div class="row-badge ' + badgeClass + '">' + badgeIcon + '</div>' +
+          '<div class="row-main">' +
+            '<div class="row-title">' + escapeHtml(item.taskName || '(tanpa nama)') + '</div>' +
+            '<div class="row-meta">' + metaHtml + '</div>' +
+            noteHtml +
+            actionHtml +
+          '</div>' +
+        '</div>'
+      );
+    }
+
+    function render() {
+      countLabel.textContent = allItems.length + ' item';
+
+      if (!allItems.length) {
+        listEl.innerHTML =
+          '<div class="empty"><div class="big"></div><p>BELUM ADA ENTRI</p></div>';
+        return;
+      }
+
+      listEl.innerHTML = allItems.map(renderRow).join('');
+    }
+
+    // Klik tombol "Tandai Selesai"
+    listEl.addEventListener('click', function (e) {
+      const doneBtn = e.target.closest('[data-done-id]');
+      if (doneBtn) {
+        e.stopPropagation();
+        markAsDone(doneBtn.getAttribute('data-done-id'));
+        return;
+      }
+
+      const editBtn = e.target.closest('[data-edit-id]');
+      if (editBtn) {
+        e.stopPropagation();
+        openEditModal(editBtn.getAttribute('data-edit-id'));
+        return;
+      }
+
+      // Klik di mana saja pada row -> buka edit juga
+      const row = e.target.closest('.row');
+      if (row) {
+        openEditModal(row.getAttribute('data-row-id'));
+      }
+    });
+
+    function markAsDone(notionId) {
+      const row = document.getElementById('row-' + notionId);
+      if (row) row.style.opacity = '0.5';
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'updateStatus', id: notionId, status: 'Done' })
+      })
+        .then(response => response.json())
+        .then(res => {
+          if (res.success) {
+            loadReminders();
+          } else {
+            showError('Gagal update: ' + res.message);
+            if (row) row.style.opacity = '1';
+          }
+        })
+        .catch(err => {
+          showError('Terjadi kesalahan: ' + err.message);
+          if (row) row.style.opacity = '1';
+        });
+    }
+
+    function loadReminders() {
+      fetch(SCRIPT_URL + '?action=getReminders')
+        .then(response => response.json())
+        .then(res => {
+          if (res.success) {
+            allItems = res.data || [];
+            render();
+          } else {
+            throw new Error(res.message);
+          }
+        })
+        .catch(err => {
+          listEl.innerHTML =
+            '<div class="error-state"><div class="big"></div><p>' +
+            escapeHtml(err.message || String(err)) +
+            '</p></div>';
+          countLabel.textContent = 'error';
+        });
+    }
+
+    /* ============ Edit modal ============ */
+    const editModal = document.getElementById('editModal');
+    const editForm = document.getElementById('editForm');
+    const editTitle = document.getElementById('editTitle');
+    const editTaskFields = document.getElementById('editTaskFields');
+    const editReminderFields = document.getElementById('editReminderFields');
+    const editSubmitBtn = document.getElementById('editSubmitBtn');
+    const editBtnLabel = document.getElementById('editBtnLabel');
+    const editClose = document.getElementById('editClose');
+    const editCancel = document.getElementById('editCancel');
+
+    function openEditModal(id) {
+      const item = allItems.find(i => String(i.id) === String(id));
+      if (!item) return;
+
+      document.getElementById('editId').value = item.id;
+      document.getElementById('editType').value = item.type;
+
+      const isTask = item.type === 'Task List';
+      editTitle.textContent = isTask ? 'Edit Task' : 'Edit Reminder';
+      editTaskFields.classList.toggle('hidden', !isTask);
+      editReminderFields.classList.toggle('hidden', isTask);
+
+      if (isTask) {
+        document.getElementById('editTaskName').value = item.taskName || '';
+        document.getElementById('editDeadline').value = item.deadline || '';
+        document.getElementById('editStatus').value = item.status || 'Not started';
+        document.getElementById('editPriority').value = item.priority || 'Low';
+        document.getElementById('editNote').value = item.note || '';
+      } else {
+        document.getElementById('editReminderName').value = item.taskName || '';
+        document.getElementById('editDate').value = item.deadline || '';
+      }
+
+      editModal.classList.add('show');
+    }
+
+    function closeEditModal() {
+      editModal.classList.remove('show');
+    }
+
+    editClose.addEventListener('click', closeEditModal);
+    editCancel.addEventListener('click', closeEditModal);
+    editModal.addEventListener('click', function (e) {
+      if (e.target === editModal) closeEditModal();
+    });
+
+    function setEditLoading(isLoading) {
+      editSubmitBtn.disabled = isLoading;
+      editBtnLabel.innerHTML = isLoading
+        ? '<span class="spinner"></span> Menyimpan...'
+        : 'Simpan Perubahan';
+    }
+
+    editForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const id = document.getElementById('editId').value;
+      const type = document.getElementById('editType').value;
+      const isTask = type === 'Task List';
+
+      const payload = { action: 'updateItem', id: id, type: type };
+
+      if (isTask) {
+        payload.taskName = document.getElementById('editTaskName').value;
+        payload.deadline = document.getElementById('editDeadline').value;
+        payload.status = document.getElementById('editStatus').value;
+        payload.priority = document.getElementById('editPriority').value;
+        payload.note = document.getElementById('editNote').value;
+      } else {
+        payload.reminderName = document.getElementById('editReminderName').value;
+        payload.date = document.getElementById('editDate').value;
+      }
+
+      setEditLoading(true);
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+        .then(response => response.json())
+        .then(res => {
+          setEditLoading(false);
+          if (res.success) {
+            closeEditModal();
+            showSuccess(res.message || 'Perubahan berhasil disimpan');
+            loadReminders();
+          } else {
+            showError(res.message || 'Gagal menyimpan perubahan');
+          }
+        })
+        .catch(err => {
+          setEditLoading(false);
+          showError(err.message || String(err));
+        });
+    });
+
+    /* ============ Init ============ */
     setDefaults();
     toggleFields();
     updateClock();
     setInterval(updateClock, 30000);
+    loadReminders();
   </script>
 </body>
 </html>
