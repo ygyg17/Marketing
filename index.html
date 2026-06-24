@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
   <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,942 +9,910 @@
 
   <style>
     :root {
-      /* Warm minimalist palette to complement the gold */
       --bg: #fafaf9;
       --surface: #ffffff;
-      --ink: #292524;
+      --ink: #1c1917;
+      --ink-2: #44403c;
       --muted: #78716c;
       --line: #e7e5e4;
+      --line-2: #d6d3d1;
 
-      /* Brand Colors */
-      --color-brand: #BA8F2E;
-      --color-brand-hover: #9c7726;
-      --color-brand-light: rgba(186, 143, 46, 0.08);
-      --color-success: #10b981;
-      --color-error: #ef4444;
+      --gold: #BA8F2E;
+      --gold-hover: #9c7726;
+      --gold-dim: rgba(186,143,46,0.10);
+      --gold-border: rgba(186,143,46,0.30);
 
-      --ok: #10b981;
-      --ok-light: rgba(16, 185, 129, 0.1);
-      --warn: #f59e0b;
-      --warn-light: rgba(245, 158, 11, 0.1);
-      --urgent: #ef4444;
-      --urgent-light: rgba(239, 68, 68, 0.1);
+      --ok: #15803d;
+      --ok-bg: #f0fdf4;
+      --warn: #b45309;
+      --warn-bg: #fffbeb;
+      --urgent: #b91c1c;
+      --urgent-bg: #fef2f2;
+      --info-bg: #f5f5f4;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
     body {
       min-height: 100vh;
       background: var(--bg);
       color: var(--ink);
       font-family: 'Inter', sans-serif;
-      padding: 40px 16px 60px;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .shell {
-      width: 100%;
-      max-width: 1180px;
-      margin: 0 auto;
-    }
-
-    /* ---- Masthead ---- */
-    .masthead {
+    /* ─── NAV BAR ─── */
+    .topbar {
+      height: 52px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      padding: 0 28px;
       gap: 14px;
-      margin-bottom: 40px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .mast-id { display: flex; align-items: center; gap: 16px; }
-
-    .logo {
-      width: 48px;
-      height: 48px;
-      object-fit: contain;
-      border-radius: 10px;
-      background: var(--surface);
-      padding: 8px;
-      border: 1px solid var(--line);
-    }
-
-    .mast-text .eyebrow {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      letter-spacing: .15em;
-      text-transform: uppercase;
-      color: var(--color-brand);
-      font-weight: 700;
-    }
-
-    .mast-text h1 {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--ink);
-      letter-spacing: -.01em;
-      line-height: 1;
-      margin-top: 4px;
-    }
-
-    .mast-clock {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11.5px;
-      color: var(--muted);
-      text-align: right;
-      line-height: 1.5;
-    }
-
-    .mast-clock b { color: var(--ink); font-weight: 500; }
-
-    /* ---- Two column layout ---- */
-    .layout {
-      display: grid;
-      grid-template-columns: 420px 1fr;
-      gap: 32px;
-      align-items: flex-start;
-    }
-
-    .col-form {
       position: sticky;
-      top: 40px;
-    }
-
-    .col-list { min-width: 0; }
-
-    /* ---- Form Container ---- */
-    .ticket-top {
-      position: relative;
-      margin-bottom: 36px;
-    }
-
-    .ticket-top h2 {
-      font-size: 26px;
-      font-weight: 700;
-      line-height: 1.25;
-      color: var(--ink);
-      max-width: 400px;
-      letter-spacing: -.01em;
-    }
-
-    .ticket-top p {
-      margin-top: 8px;
-      font-size: 14px;
-      line-height: 1.6;
-      color: var(--muted);
-      max-width: 420px;
-    }
-
-    .stamp {
-      position: absolute;
       top: 0;
-      right: 0;
-      padding: 6px 14px;
-      border: 1px solid var(--color-brand);
-      border-radius: 20px;
-      color: var(--color-brand);
-      background: var(--color-brand-light);
-      transition: all .3s ease;
+      z-index: 100;
     }
 
-    .stamp.spin {
-      transform: scale(1.05);
-      background: var(--color-brand);
-      color: #fff;
-    }
-
-    .stamp span {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 500;
-      font-size: 11px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-
-    .field { margin-bottom: 22px; }
-
-    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-    label {
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--gold);
       display: flex;
-      align-items: baseline;
-      gap: 7px;
-      margin-bottom: 8px;
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark svg { width: 14px; height: 14px; fill: #fff; }
+
+    .topbar-logo {
+      height: 24px;
+      object-fit: contain;
+    }
+
+    .topbar-div {
+      width: 1px;
+      height: 20px;
+      background: var(--line);
+    }
+
+    .topbar-title {
+      font-size: 13px;
       font-weight: 600;
       color: var(--ink);
+      letter-spacing: .01em;
     }
 
-    .input-wrap { position: relative; }
-
-    .input-wrap .icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 15px;
-      color: var(--color-brand);
-      pointer-events: none;
+    .topbar-clock {
+      margin-left: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+      text-align: right;
     }
 
-    input, select, textarea {
-      width: 100%;
-      border: 1px solid var(--line);
+    .topbar-clock b { color: var(--ink-2); font-weight: 500; }
+
+    /* ─── LAYOUT ─── */
+    .body-wrap {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      min-height: calc(100vh - 52px);
+    }
+
+    /* ─── LEFT PANEL ─── */
+    .left-panel {
+      border-right: 1px solid var(--line);
       background: var(--surface);
-      border-radius: 6px;
-      padding: 14px 14px 14px 40px;
-      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .left-inner {
+      padding: 32px 28px 40px;
+      position: sticky;
+      top: 52px;
+      max-height: calc(100vh - 52px);
+      overflow-y: auto;
+    }
+
+    .panel-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    .panel-heading {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.25;
+      letter-spacing: -.02em;
+      margin-bottom: 6px;
+    }
+
+    .panel-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    /* Type toggle */
+    .type-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .type-row input { display: none; }
+
+    .type-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 11px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .18s ease;
+      user-select: none;
+    }
+
+    .type-label .t-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: .4;
+      transition: .18s ease;
+    }
+
+    .type-row input:checked + .type-label {
+      border-color: var(--gold-border);
+      color: var(--gold);
+      background: var(--gold-dim);
+    }
+
+    .type-row input:checked + .type-label .t-dot { opacity: 1; }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .divider-line { flex: 1; height: 1px; background: var(--line); }
+
+    .divider-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Fields */
+    .field { margin-bottom: 18px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .field > label, .field-row .field > label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--ink-2);
+      letter-spacing: .02em;
+      margin-bottom: 7px;
+    }
+
+    .opt-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-left: 5px;
+    }
+
+    .inp-wrap { position: relative; }
+
+    input[type=text], input[type=date], select, textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 13.5px;
       font-family: 'Inter', sans-serif;
       font-weight: 500;
       color: var(--ink);
       outline: none;
-      transition: .2s ease;
+      transition: border-color .15s, box-shadow .15s;
     }
 
-    textarea {
-      min-height: 100px;
-      resize: vertical;
-      padding-left: 14px;
-      line-height: 1.5;
+    input[type=text]:focus, input[type=date]:focus, select:focus, textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-dim);
+      background: var(--surface);
     }
 
     select {
       appearance: none;
       -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2378716c' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 34px;
       cursor: pointer;
     }
 
-    .input-wrap.has-caret::after {
-      content: "";
-      position: absolute;
-      right: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 12px;
-      color: var(--muted);
-      pointer-events: none;
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+      line-height: 1.55;
     }
 
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--color-brand);
-      box-shadow: 0 0 0 3px var(--color-brand-light);
-    }
+    .hidden { display: none !important; }
 
-    .hidden { display: none; }
-
-    .type-toggle { display: flex; gap: 12px; }
-    .type-toggle input { display: none; }
-
-    .type-toggle label {
-      flex: 1;
-      margin: 0;
-      justify-content: center;
-      padding: 12px;
-      border: 1px solid var(--line);
-      background: var(--surface);
-      border-radius: 6px;
-      cursor: pointer;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 500;
-      transition: .2s ease;
-      user-select: none;
-    }
-
-    .type-toggle input:checked + label {
-      border-color: var(--color-brand);
-      color: var(--color-brand);
-      background: var(--color-brand-light);
-    }
-
-    .btn {
+    /* Submit button */
+    .btn-primary {
       width: 100%;
-      border: none;
-      border-radius: 6px;
-      padding: 16px;
-      margin-top: 16px;
-      background: var(--color-brand);
+      margin-top: 8px;
+      padding: 14px 20px;
+      background: var(--gold);
       color: #fff;
+      border: none;
+      border-radius: 8px;
       font-family: 'Inter', sans-serif;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      transition: .2s ease;
+      gap: 9px;
+      transition: background .18s, transform .1s;
+      letter-spacing: .01em;
     }
 
-    .btn:hover { background: var(--color-brand-hover); }
-    .btn:active { transform: scale(0.99); }
-    .btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+    .btn-primary:hover { background: var(--gold-hover); }
+    .btn-primary:active { transform: scale(.99); }
+    .btn-primary:disabled { opacity: .65; cursor: not-allowed; transform: none; }
 
-    .btn-ghost {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 14px;
-      margin-top: 10px;
-      background: var(--surface);
-      color: var(--muted);
-      font-family: 'Inter', sans-serif;
-      font-size: 13.5px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: .2s ease;
-    }
-
-    .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
-
-    .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,.3);
+    .spinner-sm {
+      width: 15px; height: 15px;
+      border: 2px solid rgba(255,255,255,.35);
       border-top-color: #fff;
       border-radius: 50%;
-      animation: spin .75s linear infinite;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .footer {
-      text-align: center;
+    .footer-note {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
       font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .08em;
       color: var(--muted);
-      font-size: 10.5px;
-      letter-spacing: .05em;
-      margin-top: 40px;
+      text-transform: uppercase;
     }
 
-    /* ---- success / error feedback ---- */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(41, 37, 36, 0.4);
-      backdrop-filter: blur(4px);
+    /* ─── RIGHT PANEL ─── */
+    .right-panel {
+      padding: 32px 28px 60px;
+    }
+
+    .board-header {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: .25s ease;
-      z-index: 9999;
-      padding: 20px;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 12px;
     }
 
-    .modal.show { opacity: 1; visibility: visible; }
-
-    .modal-box {
-      width: min(92vw, 320px);
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 32px 24px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,.08);
-      transform: scale(.95) translateY(10px);
-      animation: pop .3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
-
-    @keyframes pop { to { transform: scale(1) translateY(0); } }
-
-    .check {
-      width: 56px; height: 56px;
-      margin: 0 auto 16px;
-      border-radius: 50%;
-      background: rgba(16, 185, 129, 0.1);
-      color: var(--color-success);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      font-weight: 700;
-    }
-
-    .modal-box h2 {
+    .board-title-wrap h2 {
       font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 8px;
+      font-weight: 700;
       color: var(--ink);
+      letter-spacing: -.01em;
     }
 
-    .modal-box p {
-      font-size: 13.5px;
+    .board-title-wrap .board-sub {
+      font-size: 12.5px;
       color: var(--muted);
-      line-height: 1.5;
+      margin-top: 3px;
     }
 
-    .error-toast {
-      position: fixed;
-      left: 50%;
-      bottom: 24px;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--color-error);
-      color: #fff;
-      padding: 12px 20px;
-      border-radius: 6px;
-      box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2);
-      opacity: 0;
-      visibility: hidden;
-      transition: .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      z-index: 10000;
-      max-width: min(92vw, 400px);
-      text-align: center;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .error-toast.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* WhatsApp Button */
-    .wa-float {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      z-index: 9998;
-      background: #25D366;
-      color: #fff;
-      text-decoration: none;
-      padding: 12px 18px;
-      border-radius: 999px;
-      box-shadow: 0 8px 20px rgba(37, 211, 102, 0.25);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 600;
-      font-size: 12px;
+    .count-badge {
       font-family: 'JetBrains Mono', monospace;
-      transition: .2s ease;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold);
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      border-radius: 20px;
+      padding: 4px 12px;
+      letter-spacing: .04em;
     }
 
-    .wa-float:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px rgba(37, 211, 102, 0.3);
+    /* Filter chips */
+    .chips {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
-    .wa-dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+    .chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      transition: .15s ease;
+      user-select: none;
+    }
 
-    /* ============ LIST (right column) ============ */
+    .chip:hover { border-color: var(--line-2); color: var(--ink-2); }
+    .chip.active { background: var(--gold-dim); color: var(--gold); border-color: var(--gold-border); }
+
+    /* Board */
     .board {
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.03);
       overflow: hidden;
     }
 
-    .board-head {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--line);
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .board-head h2 { font-size: 16px; font-weight: 600; color: var(--ink); }
-
-    .board-head .count {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .list { padding: 10px 14px 18px; }
-
-    /* ---- Filter toolbar ---- */
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      padding: 14px 24px 0;
-      overflow-x: auto;
-    }
-
-    .toolbar::-webkit-scrollbar { display: none; }
-    .toolbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-    .chip {
-      flex: none;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11.5px;
-      font-weight: 600;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      padding: 8px 16px;
-      border-radius: 999px;
-      background: var(--bg);
-      color: var(--muted);
-      border: 1px solid var(--line);
-      cursor: pointer;
-      transition: .2s ease;
-      user-select: none;
-    }
-
-    .chip.active {
-      background: var(--color-brand-light);
-      color: var(--color-brand);
-      border-color: var(--color-brand);
-    }
-
-    .empty, .loading, .error-state {
-      padding: 60px 24px;
+    /* States */
+    .state-box {
+      padding: 56px 24px;
       text-align: center;
+    }
+
+    .state-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+      opacity: .35;
+    }
+
+    .state-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
       color: var(--muted);
     }
 
-    .empty .big, .loading .big, .error-state .big {
-      font-size: 32px;
-      margin-bottom: 12px;
-      opacity: 0.5;
-    }
-
-    .empty p, .loading p, .error-state p {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      letter-spacing: .05em;
-    }
-
-    .error-state { color: var(--urgent); }
-    .error-state .big { opacity: 1; }
-
-    .spinner-lg {
-      width: 28px;
-      height: 28px;
-      border: 3px solid var(--line);
-      border-top-color: var(--color-brand);
+    .state-spinner {
+      width: 26px;
+      height: 26px;
+      border: 2px solid var(--line);
+      border-top-color: var(--gold);
       border-radius: 50%;
-      margin: 0 auto 16px;
+      margin: 0 auto 14px;
       animation: spin .8s linear infinite;
     }
 
-    .row {
+    .state-error { color: var(--urgent); }
+    .state-error .state-icon { opacity: 1; }
+
+    /* Task rows */
+    .task-row {
       display: flex;
       align-items: flex-start;
-      gap: 14px;
-      padding: 16px 12px;
-      border-radius: 8px;
-      transition: .2s ease;
+      gap: 0;
+      padding: 0;
+      border-bottom: 1px solid var(--line);
       cursor: pointer;
+      transition: background .15s;
     }
 
-    .row + .row { border-top: 1px solid var(--line); border-radius: 0; }
+    .task-row:last-child { border-bottom: none; }
+    .task-row:hover { background: var(--bg); }
 
-    .row:hover { background: var(--bg); }
+    .row-accent {
+      width: 3px;
+      align-self: stretch;
+      flex-shrink: 0;
+      border-radius: 0;
+      background: transparent;
+      transition: background .15s;
+    }
 
-    .row-badge {
-      flex: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
+    .task-row:hover .row-accent,
+    .task-row[data-type="Reminder"] .row-accent { background: var(--gold); }
+    .task-row[data-type="Task List"] .row-accent { background: var(--line-2); }
+
+    .row-inner {
+      flex: 1;
+      min-width: 0;
+      padding: 16px 18px 16px 16px;
+    }
+
+    .row-top {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      margin-top: 2px;
-      border: 1px solid transparent;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
-    .row-badge.task { background: var(--bg); border-color: var(--line); }
-
-    .row-badge.reminder {
-      background: var(--color-brand-light);
-      color: var(--color-brand);
-      border-color: var(--color-brand-light);
+    .row-type-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--line-2);
+      flex-shrink: 0;
+      margin-top: 5px;
     }
 
-    .row-main { flex: 1; min-width: 0; }
+    [data-type="Reminder"] .row-type-dot { background: var(--gold); }
 
     .row-title {
+      font-size: 14px;
       font-weight: 600;
-      font-size: 14.5px;
       color: var(--ink);
       line-height: 1.4;
       word-break: break-word;
     }
 
-    .row-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .row-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
 
     .pill {
+      display: inline-flex;
+      align-items: center;
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
       font-weight: 600;
       letter-spacing: .04em;
       text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 999px;
+      padding: 3px 9px;
+      border-radius: 4px;
       white-space: nowrap;
     }
 
-    .pill.date { background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
-    .pill.status-not-started { background: #f5f5f4; color: #57534e; }
-    .pill.status-in-progress { background: var(--color-brand-light); color: var(--color-brand); }
-    .pill.priority-low { background: var(--ok-light); color: var(--ok); }
-    .pill.priority-medium { background: var(--warn-light); color: var(--warn); }
-    .pill.priority-urgent { background: var(--urgent-light); color: var(--urgent); }
+    .pill-date { background: var(--info-bg); color: var(--muted); border: 1px solid var(--line); }
+    .pill-not-started { background: var(--info-bg); color: #57534e; }
+    .pill-in-progress { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); }
+    .pill-low { background: var(--ok-bg); color: var(--ok); }
+    .pill-medium { background: var(--warn-bg); color: var(--warn); }
+    .pill-urgent { background: var(--urgent-bg); color: var(--urgent); }
 
     .row-note {
-      margin-top: 10px;
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--muted);
-      line-height: 1.5;
-      word-break: break-word;
+      line-height: 1.55;
       background: var(--bg);
-      padding: 10px 12px;
-      border-radius: 6px;
+      padding: 9px 12px;
       border-left: 2px solid var(--line);
+      border-radius: 0 5px 5px 0;
+      margin-bottom: 10px;
+      word-break: break-word;
     }
 
-    .row-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+    .row-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+    }
 
-    .btn-done, .btn-edit {
-      background: transparent;
-      border: 1px solid var(--line);
-      color: var(--muted);
+    .btn-sm {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
-      font-weight: 600;
-      letter-spacing: .05em;
+      font-weight: 700;
+      letter-spacing: .06em;
       text-transform: uppercase;
-      padding: 6px 14px;
-      border-radius: 6px;
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
       cursor: pointer;
-      transition: all .2s ease;
+      transition: .15s ease;
     }
 
-    .btn-done:hover { border-color: var(--ink); color: var(--ink); background: var(--surface); }
-    .btn-edit:hover { border-color: var(--color-brand); color: var(--color-brand); background: var(--color-brand-light); }
+    .btn-sm:hover { border-color: var(--ink); color: var(--ink); }
+    .btn-sm.edit:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+    .btn-sm.done:hover { border-color: var(--ok); color: var(--ok); background: var(--ok-bg); }
 
-    /* ---- Edit modal ---- */
-    .edit-modal {
+    /* ─── TOAST / MODAL ─── */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%) translateY(12px);
+      padding: 11px 20px 11px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      visibility: hidden;
+      transition: .25s cubic-bezier(.34,1.56,.64,1);
+      z-index: 10000;
+      max-width: min(92vw, 380px);
+      text-align: left;
+      box-shadow: 0 4px 20px rgba(0,0,0,.12);
+    }
+
+    .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+    .toast-ok { background: #052e16; color: #bbf7d0; }
+    .toast-err { background: #450a0a; color: #fecaca; }
+
+    .toast-icon { font-size: 16px; flex-shrink: 0; }
+
+    /* Edit / overlay modal */
+    .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(41, 37, 36, 0.45);
-      backdrop-filter: blur(4px);
+      background: rgba(28,25,23,.45);
+      backdrop-filter: blur(3px);
       display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
       visibility: hidden;
       transition: .2s ease;
-      z-index: 9999;
+      z-index: 9000;
       padding: 20px;
     }
 
-    .edit-modal.show { opacity: 1; visibility: visible; }
+    .overlay.show { opacity: 1; visibility: visible; }
 
-    .edit-box {
+    .modal-card {
       width: min(92vw, 440px);
-      max-height: 88vh;
+      max-height: 90vh;
       overflow-y: auto;
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: 14px;
-      padding: 28px 26px;
-      box-shadow: 0 24px 48px rgba(0,0,0,.12);
-      transform: scale(.96) translateY(8px);
-      animation: pop .25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      padding: 26px 24px 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.15);
+      transform: translateY(10px) scale(.97);
+      animation: popIn .22s cubic-bezier(.34,1.56,.64,1) forwards;
     }
 
-    .edit-box-head {
+    @keyframes popIn { to { transform: translateY(0) scale(1); } }
+
+    .modal-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
-    .edit-box-head h3 {
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--ink);
-    }
+    .modal-head h3 { font-size: 16px; font-weight: 700; color: var(--ink); }
 
-    .edit-close {
-      background: var(--bg);
+    .close-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
       border: 1px solid var(--line);
+      background: var(--bg);
       color: var(--muted);
-      width: 30px;
-      height: 30px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1;
-      transition: .2s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: .15s ease;
     }
 
-    .edit-close:hover { color: var(--ink); border-color: var(--ink); }
+    .close-btn:hover { color: var(--ink); border-color: var(--ink-2); }
 
-    .edit-actions { display: flex; gap: 10px; margin-top: 8px; }
-    .edit-actions .btn { margin-top: 0; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
 
     .btn-secondary {
-      background: var(--surface);
-      color: var(--ink);
+      flex: 1;
+      padding: 12px 16px;
       border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink-2);
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .15s ease;
     }
 
-    .btn-secondary:hover { background: var(--bg); border-color: var(--ink); }
+    .btn-secondary:hover { background: var(--bg); border-color: var(--line-2); }
 
-    @media (max-width: 900px) {
-      .layout { grid-template-columns: 1fr; }
-      .col-form { position: static; }
+    .modal-actions .btn-primary { flex: 2; margin-top: 0; }
+
+    /* WA float */
+    .wa-float {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 8000;
+      background: #128C7E;
+      color: #fff;
+      text-decoration: none;
+      padding: 11px 18px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      box-shadow: 0 6px 20px rgba(18,140,126,.25);
+      transition: .18s ease;
     }
 
-    @media (max-width: 600px) {
-      .field-grid { grid-template-columns: 1fr; }
-      .ticket-top h2 { font-size: 22px; max-width: 260px; }
-      .masthead { flex-wrap: wrap; border-bottom: none; margin-bottom: 24px; padding-bottom: 0; }
-      .mast-clock { display: none; }
-      .row { padding: 14px 8px; }
+    .wa-float:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(18,140,126,.3); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 860px) {
+      .body-wrap { grid-template-columns: 1fr; }
+      .left-panel { border-right: none; border-bottom: 1px solid var(--line); }
+      .left-inner { position: static; max-height: none; }
+      .right-panel { padding: 24px 18px 80px; }
+    }
+
+    @media (max-width: 520px) {
+      .topbar { padding: 0 16px; }
+      .left-inner { padding: 24px 18px 32px; }
+      .field-row { grid-template-columns: 1fr; }
+      .panel-heading { font-size: 19px; }
+      .board-header { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 
 <body>
-  <div class="shell">
 
-    <div class="masthead">
-      <div class="mast-id">
-        <img class="logo" src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="Logo perusahaan">
-        <div class="mast-text">
-          <div class="eyebrow">Marketing Team</div>
-          <h1>Office Desk</h1>
+  <!-- TOP BAR -->
+  <nav class="topbar">
+    <img class="topbar-logo"
+         src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png"
+         alt="The Seminyak">
+    <div class="topbar-div"></div>
+    <span class="topbar-title">Marketing Desk</span>
+    <div class="topbar-clock" id="mastClock">—</div>
+  </nav>
+
+  <div class="body-wrap">
+
+    <!-- ═══ LEFT: FORM ═══ -->
+    <div class="left-panel">
+      <div class="left-inner">
+
+        <div class="panel-eyebrow">Input Baru</div>
+        <h1 class="panel-heading">Drop it here,<br>bot yang urus sisanya.</h1>
+        <p class="panel-sub">Catat task atau reminder — notifikasi otomatis dikirim ke WhatsApp sesuai tanggal yang kamu set.</p>
+
+        <!-- Type toggle -->
+        <div class="type-row">
+          <input type="radio" id="typeTask" name="type" value="Task List" checked>
+          <label for="typeTask" class="type-label"><span class="t-dot"></span>Task List</label>
+
+          <input type="radio" id="typeRemind" name="type" value="Reminder">
+          <label for="typeRemind" class="type-label"><span class="t-dot"></span>Reminder</label>
         </div>
-      </div>
-      <div class="mast-clock" id="mastClock">—</div>
-    </div>
 
-    <div class="layout">
-
-      <!-- ===== LEFT: FORM ===== -->
-      <div class="col-form">
-        <div class="ticket-top">
-          <div class="stamp" id="stamp">
-            <span id="stampText">TASK</span>
-          </div>
-          <h2>Drop it here,<br>the bot picks it up.</h2>
-          <p>Catat task atau reminder sekali, lalu notifikasi otomatis terkirim ke WhatsApp di tanggal yang kamu tentukan.</p>
+        <div class="divider">
+          <div class="divider-line"></div>
+          <span class="divider-label" id="divLabel">Detail Task</span>
+          <div class="divider-line"></div>
         </div>
 
-        <div class="ticket-body">
-          <form id="reminderForm">
+        <form id="mainForm">
+          <!-- TASK FIELDS -->
+          <div id="taskFields">
+            <div class="field">
+              <label for="taskName">Nama Task</label>
+              <input id="taskName" name="taskName" type="text" placeholder="Contoh: Follow up client Seminyak Beach" autocomplete="off">
+            </div>
 
             <div class="field">
-              <label>Jenis Entri</label>
-              <div class="type-toggle">
-                <input type="radio" id="typeTask" name="type" value="Task List" checked>
-                <label for="typeTask"> Task List</label>
-                <input type="radio" id="typeReminder" name="type" value="Reminder">
-                <label for="typeReminder"> Reminder</label>
-              </div>
+              <label for="deadline">
+                Deadline
+                <span class="opt-tag">opsional</span>
+              </label>
+              <input id="deadline" name="deadline" type="date">
             </div>
 
-            <div id="taskSection">
+            <div class="field-row">
               <div class="field">
-                <label for="taskName">Task Name</label>
-                <div class="input-wrap">
-                  <span class="icon"></span>
-                  <input id="taskName" name="taskName" type="text" placeholder="Contoh: Follow up client besok" autocomplete="off">
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="deadline">Deadline</label>
-                <div class="input-wrap">
-                  <span class="icon"></span>
-                  <input id="deadline" name="deadline" type="date">
-                </div>
-              </div>
-
-               <div class="field-grid">
-                <div class="field">
-                  <label for="status">Status</label>
-                  <div class="input-wrap has-caret">
-                    <span class="icon"></span>
-                    <select id="status" name="status">
-                      <option value="">Pilih status</option>
-                      <option value="Not started">Not started</option>
-                      <option value="In progress">In progress</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="field">
-                  <label for="priority">Priority</label>
-                  <div class="input-wrap has-caret">
-                    <span class="icon"></span>
-                    <select id="priority" name="priority">
-                      <option value="">Pilih priority</option>
-                      <option value="Low">Low</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Urgent">Urgent</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="note">Note</label>
-                <textarea id="note" name="note" placeholder="Tambahkan note jika ada..."></textarea>
-               </div>
-            </div>
-
-            <div id="reminderSection" class="hidden">
-              <div class="field">
-                <label for="reminderName">Reminder Name</label>
-                <div class="input-wrap">
-                  <span class="icon"></span>
-                  <input id="reminderName" name="reminderName" type="text" placeholder="Contoh: Kirim reminder meeting" autocomplete="off">
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="date">Date</label>
-                <div class="input-wrap">
-                  <span class="icon"></span>
-                  <input id="date" name="date" type="date">
-                </div>
-              </div>
-            </div>
-
-            <button type="submit" class="btn" id="submitBtn">
-              <span id="btnLabel">Simpan</span>
-            </button>
-          </form>
-         </div>
-
-        <div class="footer">POWERED BY YOGI CHATBOT · WA AUTO-NOTIFY</div>
-      </div>
-
-      <!-- ===== RIGHT: LIST ===== -->
-      <div class="col-list">
-        <div class="board">
-          <div class="board-head">
-            <h2>Antrian Aktif</h2>
-            <span class="count" id="countLabel">memuat...</span>
-          </div>
-          <div class="toolbar" id="toolbar">
-            <div class="chip" data-filter="all">Semua</div>
-            <div class="chip active" data-filter="Task List">Task</div>
-            <div class="chip" data-filter="Reminder">Reminder</div>
-          </div>
-          <div class="list" id="list">
-            <div class="loading">
-              <div class="spinner-lg"></div>
-              <p>LOADING...</p>
-            </div>
-          </div>
-        </div>
-        <div class="footer">SYNCED WITH NOTION · KLIK ITEM UNTUK EDIT</div>
-      </div>
-
-    </div>
-  </div>
-
-  <a class="wa-float" href="https://wa.me/6281776452000" target="_blank" rel="noopener">
-    <span class="wa-dot"></span>
-    WA Bot
-  </a>
-
-  <!-- Success / error feedback for the create form -->
-  <div id="successModal" class="modal">
-    <div class="modal-box">
-      <div class="check"></div>
-      <h2>Tersimpan</h2>
-      <p id="successText">Reminder berhasil disimpan ke database</p>
-    </div>
-  </div>
-
-  <div id="errorToast" class="error-toast"></div>
-
-  <!-- Edit modal -->
-  <div id="editModal" class="edit-modal">
-    <div class="edit-box">
-      <div class="edit-box-head">
-        <h3 id="editTitle">Edit Item</h3>
-        <button type="button" class="edit-close" id="editClose">&times;</button>
-      </div>
-
-      <form id="editForm">
-        <input type="hidden" id="editId" name="id">
-        <input type="hidden" id="editType" name="type">
-
-        <div id="editTaskFields">
-          <div class="field">
-            <label for="editTaskName">Task Name</label>
-            <div class="input-wrap">
-              <span class="icon"></span>
-              <input id="editTaskName" name="taskName" type="text" autocomplete="off">
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="editDeadline">Deadline</label>
-            <div class="input-wrap">
-              <span class="icon"></span>
-              <input id="editDeadline" name="deadline" type="date">
-            </div>
-          </div>
-
-          <div class="field-grid">
-            <div class="field">
-              <label for="editStatus">Status</label>
-              <div class="input-wrap has-caret">
-                <span class="icon"></span>
-                <select id="editStatus" name="status">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                  <option value="">— pilih —</option>
                   <option value="Not started">Not started</option>
                   <option value="In progress">In progress</option>
-                  <option value="Done">Done</option>
                 </select>
               </div>
-            </div>
-
-            <div class="field">
-              <label for="editPriority">Priority</label>
-              <div class="input-wrap has-caret">
-                <span class="icon"></span>
-                <select id="editPriority" name="priority">
+              <div class="field">
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority">
+                  <option value="">— pilih —</option>
                   <option value="Low">Low</option>
                   <option value="Medium">Medium</option>
                   <option value="Urgent">Urgent</option>
                 </select>
               </div>
             </div>
+
+            <div class="field">
+              <label for="note">
+                Note
+                <span class="opt-tag">opsional</span>
+              </label>
+              <textarea id="note" name="note" placeholder="Tambahkan detail jika perlu..."></textarea>
+            </div>
           </div>
 
+          <!-- REMINDER FIELDS -->
+          <div id="reminderFields" class="hidden">
+            <div class="field">
+              <label for="reminderName">Nama Reminder</label>
+              <input id="reminderName" name="reminderName" type="text" placeholder="Contoh: Kirim recap mingguan" autocomplete="off">
+            </div>
+
+            <div class="field">
+              <label for="remDate">Tanggal</label>
+              <input id="remDate" name="date" type="date">
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="submitBtn">
+            <span id="btnLabel">Simpan</span>
+          </button>
+        </form>
+
+        <div class="footer-note">Powered by Yogi Chatbot · WA Auto-Notify</div>
+      </div>
+    </div>
+
+    <!-- ═══ RIGHT: BOARD ═══ -->
+    <div class="right-panel">
+      <div class="board-header">
+        <div class="board-title-wrap">
+          <h2>Antrian Aktif</h2>
+          <div class="board-sub">Task &amp; reminder yang belum selesai</div>
+        </div>
+        <span class="count-badge" id="countLabel">memuat...</span>
+      </div>
+
+      <div class="chips" id="chipBar">
+        <div class="chip" data-filter="all">Semua</div>
+        <div class="chip active" data-filter="Task List">Task</div>
+        <div class="chip" data-filter="Reminder">Reminder</div>
+      </div>
+
+      <div class="board">
+        <div id="list">
+          <div class="state-box">
+            <div class="state-spinner"></div>
+            <div class="state-label">Memuat data...</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing:.06em; text-transform:uppercase; color: var(--muted);">
+        Synced with Notion · Klik baris untuk edit
+      </div>
+    </div>
+
+  </div>
+
+  <!-- WA BUTTON -->
+  <a class="wa-float" href="https://wa.me/6281776452000" target="_blank" rel="noopener">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    WA Bot
+  </a>
+
+  <!-- TOASTS -->
+  <div id="toastOk" class="toast toast-ok">
+    <span class="toast-icon">✓</span>
+    <span id="toastOkMsg">Berhasil disimpan</span>
+  </div>
+
+  <div id="toastErr" class="toast toast-err">
+    <span class="toast-icon">✕</span>
+    <span id="toastErrMsg">Terjadi kesalahan</span>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div id="editOverlay" class="overlay">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="editTitle">Edit Item</h3>
+        <button type="button" class="close-btn" id="editClose">&times;</button>
+      </div>
+
+      <form id="editForm">
+        <input type="hidden" id="editId">
+        <input type="hidden" id="editType">
+
+        <div id="editTaskFields">
           <div class="field">
-            <label for="editNote">Note</label>
-            <textarea id="editNote" name="note"></textarea>
+            <label for="editTaskName">Nama Task</label>
+            <input id="editTaskName" type="text" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="editDeadline">
+              Deadline
+              <span class="opt-tag">opsional</span>
+            </label>
+            <input id="editDeadline" type="date">
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="editStatus">Status</label>
+              <select id="editStatus">
+                <option value="Not started">Not started</option>
+                <option value="In progress">In progress</option>
+                <option value="Done">Done</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="editPriority">Priority</label>
+              <select id="editPriority">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="Urgent">Urgent</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="editNote">Note <span class="opt-tag">opsional</span></label>
+            <textarea id="editNote"></textarea>
           </div>
         </div>
 
         <div id="editReminderFields" class="hidden">
           <div class="field">
-            <label for="editReminderName">Reminder Name</label>
-            <div class="input-wrap">
-              <span class="icon"></span>
-              <input id="editReminderName" name="reminderName" type="text" autocomplete="off">
-            </div>
+            <label for="editRemName">Nama Reminder</label>
+            <input id="editRemName" type="text" autocomplete="off">
           </div>
-
           <div class="field">
-            <label for="editDate">Date</label>
-            <div class="input-wrap">
-              <span class="icon"></span>
-              <input id="editDate" name="date" type="date">
-            </div>
+            <label for="editRemDate">Tanggal</label>
+            <input id="editRemDate" type="date">
           </div>
         </div>
 
-        <div class="edit-actions">
-          <button type="button" class="btn btn-secondary" id="editCancel">Batal</button>
-          <button type="submit" class="btn" id="editSubmitBtn">
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="editCancel">Batal</button>
+          <button type="submit" class="btn-primary" id="editSubmitBtn">
             <span id="editBtnLabel">Simpan Perubahan</span>
           </button>
         </div>
@@ -953,281 +921,218 @@
   </div>
 
   <script>
-    // MASUKKAN URL WEB APP GAS-MU DI SINI
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4nQtMFch9K-Pt4bsNKDeoaTxOtPKx12oNicJ55WHdsyRQH2wdNa0r0ftThDE4F9ligQ/exec';
 
-    /* ============ Create form (left column) ============ */
-    const typeInputs = document.querySelectorAll('input[name="type"]');
-    const taskSection = document.getElementById('taskSection');
-    const reminderSection = document.getElementById('reminderSection');
-    const form = document.getElementById('reminderForm');
+    /* ─── Clock ─── */
+    function tickClock() {
+      const now = new Date();
+      const d = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+      const t = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('mastClock').innerHTML = d + '&nbsp;&nbsp;<b>' + t + '</b>';
+    }
+    tickClock();
+    setInterval(tickClock, 30000);
+
+    /* ─── Toast helpers ─── */
+    function showToast(id, msgId, msg, duration) {
+      const el = document.getElementById(id);
+      document.getElementById(msgId).textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), duration || 3000);
+    }
+
+    function showOk(msg) { showToast('toastOk', 'toastOkMsg', msg, 2800); }
+    function showErr(msg) { showToast('toastErr', 'toastErrMsg', msg, 3500); }
+
+    /* ─── Type toggle ─── */
+    const taskFields = document.getElementById('taskFields');
+    const reminderFields = document.getElementById('reminderFields');
+    const divLabel = document.getElementById('divLabel');
+
+    function toggleType() {
+      const v = document.querySelector('input[name="type"]:checked').value;
+      const isTask = v === 'Task List';
+      taskFields.classList.toggle('hidden', !isTask);
+      reminderFields.classList.toggle('hidden', isTask);
+      divLabel.textContent = isTask ? 'Detail Task' : 'Detail Reminder';
+    }
+
+    document.querySelectorAll('input[name="type"]').forEach(r => r.addEventListener('change', toggleType));
+    toggleType();
+
+    /* ─── Default date ─── */
+    function today() { return new Date().toISOString().split('T')[0]; }
+    document.getElementById('remDate').value = today();
+
+    /* ─── Submit form ─── */
+    const mainForm = document.getElementById('mainForm');
     const submitBtn = document.getElementById('submitBtn');
     const btnLabel = document.getElementById('btnLabel');
-    const successModal = document.getElementById('successModal');
-    const successText = document.getElementById('successText');
-    const errorToast = document.getElementById('errorToast');
-    const reminderDateInput = document.getElementById('date');
-    const stamp = document.getElementById('stamp');
-    const stampText = document.getElementById('stampText');
-    const mastClock = document.getElementById('mastClock');
 
-    function todayValue() {
-      return new Date().toISOString().split('T')[0];
+    function setSubmitLoading(on) {
+      submitBtn.disabled = on;
+      btnLabel.innerHTML = on ? '<span class="spinner-sm"></span> Menyimpan...' : 'Simpan';
     }
 
-    function setDefaults() {
-      reminderDateInput.value = todayValue();
-      document.getElementById('deadline').value = '';
-    }
-
-    function updateClock() {
-      const now = new Date();
-      const date = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-      const time = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-      mastClock.innerHTML = date + '<br><b>' + time + '</b>';
-    }
-
-    function toggleFields() {
-      const type = document.querySelector('input[name="type"]:checked').value;
-
-      stamp.classList.add('spin');
-      setTimeout(() => stamp.classList.remove('spin'), 350);
-
-      if (type === 'Task List') {
-        taskSection.classList.remove('hidden');
-        reminderSection.classList.add('hidden');
-        stampText.textContent = 'TASK';
-      } else {
-        taskSection.classList.add('hidden');
-        reminderSection.classList.remove('hidden');
-        stampText.textContent = 'REMIND';
-      }
-    }
-
-    function showSuccess(message) {
-      successText.textContent = message || 'Reminder berhasil disimpan ke database';
-      successModal.classList.add('show');
-      setTimeout(() => successModal.classList.remove('show'), 2500);
-    }
-
-    function showError(message) {
-      errorToast.textContent = message || 'Terjadi kesalahan';
-      errorToast.classList.add('show');
-      setTimeout(() => errorToast.classList.remove('show'), 3200);
-    }
-
-    function setLoading(isLoading) {
-      submitBtn.disabled = isLoading;
-      if (isLoading) {
-        btnLabel.innerHTML = '<span class="spinner"></span> Menyimpan...';
-      } else {
-        btnLabel.textContent = 'Simpan';
-      }
-    }
-
-    typeInputs.forEach(el => el.addEventListener('change', toggleFields));
-
-    form.addEventListener('submit', function (e) {
+    mainForm.addEventListener('submit', function(e) {
       e.preventDefault();
-
-      const data = Object.fromEntries(new FormData(form));
-      setLoading(true);
+      const data = Object.fromEntries(new FormData(mainForm));
+      setSubmitLoading(true);
 
       fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(data)
       })
-        .then(response => response.json())
-        .then(res => {
-          setLoading(false);
-          if (res.success) {
-            showSuccess(res.message || 'Reminder berhasil disimpan ke database');
-            form.reset();
-            document.getElementById('typeTask').checked = true;
-            setDefaults();
-            toggleFields();
-            loadReminders();
-          } else {
-            showError(res.message || 'Gagal menyimpan data');
-          }
-        })
-        .catch(err => {
-          setLoading(false);
-          showError(err.message || String(err));
-        });
+      .then(r => r.json())
+      .then(res => {
+        setSubmitLoading(false);
+        if (res.success) {
+          showOk(res.message || 'Berhasil disimpan ke database');
+          mainForm.reset();
+          document.getElementById('typeTask').checked = true;
+          document.getElementById('remDate').value = today();
+          toggleType();
+          loadItems();
+        } else {
+          showErr(res.message || 'Gagal menyimpan data');
+        }
+      })
+      .catch(err => {
+        setSubmitLoading(false);
+        showErr(err.message || String(err));
+      });
     });
 
-    /* ============ List (right column) ============ */
+    /* ─── List ─── */
     let allItems = [];
     let activeFilter = 'Task List';
     const listEl = document.getElementById('list');
     const countLabel = document.getElementById('countLabel');
-    const toolbar = document.getElementById('toolbar');
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return str.replace(/[&<>"']/g, function (c) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-      });
+    function esc(s) {
+      if (!s) return '';
+      return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
 
-    function formatDate(iso) {
+    function fmtDate(iso) {
       if (!iso) return '';
       const d = new Date(iso);
-      if (isNaN(d.getTime())) return iso;
+      if (isNaN(d)) return iso;
       return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
-    function slug(str) {
-      return (str || '').toLowerCase().replace(/\s+/g, '-');
+    function priorityClass(p) {
+      if (!p) return '';
+      const m = { 'Low': 'pill-low', 'Medium': 'pill-medium', 'Urgent': 'pill-urgent' };
+      return m[p] || '';
+    }
+
+    function statusClass(s) {
+      if (!s) return '';
+      if (s === 'Not started') return 'pill-not-started';
+      if (s === 'In progress') return 'pill-in-progress';
+      return '';
     }
 
     function renderRow(item) {
       const isTask = item.type === 'Task List';
-      const badgeClass = isTask ? 'task' : 'reminder';
-      const badgeIcon = isTask ? '' : '';
+      let pills = '';
+      if (item.deadline) pills += '<span class="pill pill-date">' + esc(fmtDate(item.deadline)) + '</span>';
+      if (item.status) pills += '<span class="pill ' + statusClass(item.status) + '">' + esc(item.status) + '</span>';
+      if (item.priority) pills += '<span class="pill ' + priorityClass(item.priority) + '">' + esc(item.priority) + '</span>';
 
-      let metaHtml = '';
-      if (item.deadline) {
-        metaHtml += '<span class="pill date">' + escapeHtml(formatDate(item.deadline)) + '</span>';
-      }
-      if (item.status) {
-        metaHtml += '<span class="pill status-' + slug(item.status) + '">' + escapeHtml(item.status) + '</span>';
-      }
-      if (item.priority) {
-        metaHtml += '<span class="pill priority-' + slug(item.priority) + '">' + escapeHtml(item.priority) + '</span>';
-      }
+      const noteHtml = item.note ? '<div class="row-note">' + esc(item.note) + '</div>' : '';
 
-      const noteHtml = item.note
-        ? '<div class="row-note">' + escapeHtml(item.note) + '</div>'
-        : '';
-
-      let actionHtml = '<div class="row-actions">';
-      actionHtml += '<button type="button" class="btn-edit" data-edit-id="' + item.id + '">Edit</button>';
+      let actions = '<div class="row-actions">';
+      actions += '<button type="button" class="btn-sm edit" data-edit-id="' + item.id + '">Edit</button>';
       if (isTask && item.status !== 'Done') {
-        actionHtml += '<button type="button" class="btn-done" data-done-id="' + item.id + '">Tandai Selesai</button>';
+        actions += '<button type="button" class="btn-sm done" data-done-id="' + item.id + '">Selesai</button>';
       }
-      actionHtml += '</div>';
+      actions += '</div>';
 
-      return (
-        '<div class="row" id="row-' + item.id + '" data-row-id="' + item.id + '">' +
-          '<div class="row-badge ' + badgeClass + '">' + badgeIcon + '</div>' +
-          '<div class="row-main">' +
-            '<div class="row-title">' + escapeHtml(item.taskName || '(tanpa nama)') + '</div>' +
-            '<div class="row-meta">' + metaHtml + '</div>' +
-            noteHtml +
-            actionHtml +
+      return '<div class="task-row" data-type="' + esc(item.type) + '" id="row-' + item.id + '" data-row-id="' + item.id + '">' +
+        '<div class="row-accent"></div>' +
+        '<div class="row-inner">' +
+          '<div class="row-top">' +
+            '<div class="row-type-dot"></div>' +
+            '<div class="row-title">' + esc(item.taskName || '(tanpa nama)') + '</div>' +
           '</div>' +
-        '</div>'
-      );
+          (pills ? '<div class="row-pills">' + pills + '</div>' : '') +
+          noteHtml +
+          actions +
+        '</div>' +
+      '</div>';
     }
 
-    function render() {
+    function renderList() {
       const filtered = activeFilter === 'all'
         ? allItems
-        : allItems.filter(function (i) { return i.type === activeFilter; });
+        : allItems.filter(i => i.type === activeFilter);
 
       countLabel.textContent = filtered.length + ' item';
 
       if (!filtered.length) {
-        listEl.innerHTML =
-          '<div class="empty"><div class="big"></div><p>BELUM ADA ENTRI DI KATEGORI INI</p></div>';
+        listEl.innerHTML = '<div class="state-box"><div class="state-icon">◌</div><div class="state-label">Belum ada entri di kategori ini</div></div>';
         return;
       }
-
       listEl.innerHTML = filtered.map(renderRow).join('');
     }
 
-    toolbar.addEventListener('click', function (e) {
+    document.getElementById('chipBar').addEventListener('click', function(e) {
       const chip = e.target.closest('.chip');
       if (!chip) return;
-
-      toolbar.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('active'); });
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
       activeFilter = chip.dataset.filter;
-      render();
+      renderList();
     });
 
-    // Klik tombol "Tandai Selesai"
-    listEl.addEventListener('click', function (e) {
+    listEl.addEventListener('click', function(e) {
       const doneBtn = e.target.closest('[data-done-id]');
-      if (doneBtn) {
-        e.stopPropagation();
-        markAsDone(doneBtn.getAttribute('data-done-id'));
-        return;
-      }
+      if (doneBtn) { e.stopPropagation(); markDone(doneBtn.dataset.doneId); return; }
 
       const editBtn = e.target.closest('[data-edit-id]');
-      if (editBtn) {
-        e.stopPropagation();
-        openEditModal(editBtn.getAttribute('data-edit-id'));
-        return;
-      }
+      if (editBtn) { e.stopPropagation(); openEdit(editBtn.dataset.editId); return; }
 
-      // Klik di mana saja pada row -> buka edit juga
-      const row = e.target.closest('.row');
-      if (row) {
-        openEditModal(row.getAttribute('data-row-id'));
-      }
+      const row = e.target.closest('.task-row');
+      if (row) openEdit(row.dataset.rowId);
     });
 
-    function markAsDone(notionId) {
-      const row = document.getElementById('row-' + notionId);
-      if (row) row.style.opacity = '0.5';
-
+    function markDone(id) {
+      const row = document.getElementById('row-' + id);
+      if (row) row.style.opacity = '.45';
       fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'updateStatus', id: notionId, status: 'Done' })
+        body: JSON.stringify({ action: 'updateStatus', id: id, status: 'Done' })
       })
-        .then(response => response.json())
-        .then(res => {
-          if (res.success) {
-            loadReminders();
-          } else {
-            showError('Gagal update: ' + res.message);
-            if (row) row.style.opacity = '1';
-          }
-        })
-        .catch(err => {
-          showError('Terjadi kesalahan: ' + err.message);
-          if (row) row.style.opacity = '1';
-        });
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) { showOk('Task ditandai selesai'); loadItems(); }
+        else { showErr('Gagal: ' + res.message); if (row) row.style.opacity = '1'; }
+      })
+      .catch(err => { showErr(err.message); if (row) row.style.opacity = '1'; });
     }
 
-    function loadReminders() {
+    function loadItems() {
       fetch(SCRIPT_URL + '?action=getReminders')
-        .then(response => response.json())
-        .then(res => {
-          if (res.success) {
-            allItems = res.data || [];
-            render();
-          } else {
-            throw new Error(res.message);
-          }
-        })
-        .catch(err => {
-          listEl.innerHTML =
-            '<div class="error-state"><div class="big"></div><p>' +
-            escapeHtml(err.message || String(err)) +
-            '</p></div>';
-          countLabel.textContent = 'error';
-        });
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) { allItems = res.data || []; renderList(); }
+        else throw new Error(res.message);
+      })
+      .catch(err => {
+        listEl.innerHTML = '<div class="state-box state-error"><div class="state-icon">!</div><div class="state-label">' + esc(err.message || String(err)) + '</div></div>';
+        countLabel.textContent = 'error';
+      });
     }
 
-    /* ============ Edit modal ============ */
-    const editModal = document.getElementById('editModal');
+    /* ─── Edit modal ─── */
+    const editOverlay = document.getElementById('editOverlay');
     const editForm = document.getElementById('editForm');
-    const editTitle = document.getElementById('editTitle');
-    const editTaskFields = document.getElementById('editTaskFields');
-    const editReminderFields = document.getElementById('editReminderFields');
-    const editSubmitBtn = document.getElementById('editSubmitBtn');
-    const editBtnLabel = document.getElementById('editBtnLabel');
-    const editClose = document.getElementById('editClose');
-    const editCancel = document.getElementById('editCancel');
 
-    function openEditModal(id) {
+    function openEdit(id) {
       const item = allItems.find(i => String(i.id) === String(id));
       if (!item) return;
 
@@ -1235,9 +1140,9 @@
       document.getElementById('editType').value = item.type;
 
       const isTask = item.type === 'Task List';
-      editTitle.textContent = isTask ? 'Edit Task' : 'Edit Reminder';
-      editTaskFields.classList.toggle('hidden', !isTask);
-      editReminderFields.classList.toggle('hidden', isTask);
+      document.getElementById('editTitle').textContent = isTask ? 'Edit Task' : 'Edit Reminder';
+      document.getElementById('editTaskFields').classList.toggle('hidden', !isTask);
+      document.getElementById('editReminderFields').classList.toggle('hidden', isTask);
 
       if (isTask) {
         document.getElementById('editTaskName').value = item.taskName || '';
@@ -1246,39 +1151,31 @@
         document.getElementById('editPriority').value = item.priority || 'Low';
         document.getElementById('editNote').value = item.note || '';
       } else {
-        document.getElementById('editReminderName').value = item.taskName || '';
-        document.getElementById('editDate').value = item.deadline || '';
+        document.getElementById('editRemName').value = item.taskName || '';
+        document.getElementById('editRemDate').value = item.deadline || '';
       }
 
-      editModal.classList.add('show');
+      editOverlay.classList.add('show');
     }
 
-    function closeEditModal() {
-      editModal.classList.remove('show');
-    }
+    function closeEdit() { editOverlay.classList.remove('show'); }
 
-    editClose.addEventListener('click', closeEditModal);
-    editCancel.addEventListener('click', closeEditModal);
-    editModal.addEventListener('click', function (e) {
-      if (e.target === editModal) closeEditModal();
-    });
+    document.getElementById('editClose').addEventListener('click', closeEdit);
+    document.getElementById('editCancel').addEventListener('click', closeEdit);
+    editOverlay.addEventListener('click', e => { if (e.target === editOverlay) closeEdit(); });
 
-    function setEditLoading(isLoading) {
-      editSubmitBtn.disabled = isLoading;
-      editBtnLabel.innerHTML = isLoading
-        ? '<span class="spinner"></span> Menyimpan...'
-        : 'Simpan Perubahan';
-    }
-
-    editForm.addEventListener('submit', function (e) {
+    editForm.addEventListener('submit', function(e) {
       e.preventDefault();
-
       const id = document.getElementById('editId').value;
       const type = document.getElementById('editType').value;
       const isTask = type === 'Task List';
+      const btn = document.getElementById('editSubmitBtn');
+      const lbl = document.getElementById('editBtnLabel');
 
-      const payload = { action: 'updateItem', id: id, type: type };
+      btn.disabled = true;
+      lbl.innerHTML = '<span class="spinner-sm"></span> Menyimpan...';
 
+      const payload = { action: 'updateItem', id, type };
       if (isTask) {
         payload.taskName = document.getElementById('editTaskName').value;
         payload.deadline = document.getElementById('editDeadline').value;
@@ -1286,40 +1183,31 @@
         payload.priority = document.getElementById('editPriority').value;
         payload.note = document.getElementById('editNote').value;
       } else {
-        payload.reminderName = document.getElementById('editReminderName').value;
-        payload.date = document.getElementById('editDate').value;
+        payload.reminderName = document.getElementById('editRemName').value;
+        payload.date = document.getElementById('editRemDate').value;
       }
-
-      setEditLoading(true);
 
       fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
       })
-        .then(response => response.json())
-        .then(res => {
-          setEditLoading(false);
-          if (res.success) {
-            closeEditModal();
-            showSuccess(res.message || 'Perubahan berhasil disimpan');
-            loadReminders();
-          } else {
-            showError(res.message || 'Gagal menyimpan perubahan');
-          }
-        })
-        .catch(err => {
-          setEditLoading(false);
-          showError(err.message || String(err));
-        });
+      .then(r => r.json())
+      .then(res => {
+        btn.disabled = false;
+        lbl.textContent = 'Simpan Perubahan';
+        if (res.success) { closeEdit(); showOk(res.message || 'Perubahan tersimpan'); loadItems(); }
+        else showErr(res.message || 'Gagal menyimpan');
+      })
+      .catch(err => {
+        btn.disabled = false;
+        lbl.textContent = 'Simpan Perubahan';
+        showErr(err.message || String(err));
+      });
     });
 
-    /* ============ Init ============ */
-    setDefaults();
-    toggleFields();
-    updateClock();
-    setInterval(updateClock, 30000);
-    loadReminders();
+    /* ─── Init ─── */
+    loadItems();
   </script>
 </body>
 </html>
