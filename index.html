@@ -356,11 +356,80 @@
       letter-spacing: .04em;
     }
 
+    /* Filter bar — chips + search in one row */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    /* Search bar */
+    .search-wrap {
+      position: relative;
+      flex: 0 0 180px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 13px;
+      height: 13px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 6px 30px 6px 30px;
+      font-size: 11.5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      color: var(--ink);
+      outline: none;
+      transition: border-color .15s, box-shadow .15s, width .2s;
+    }
+
+    #searchInput::placeholder { color: var(--muted); }
+
+    #searchInput:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-dim);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--line);
+      border: none;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+    }
+
+    .search-clear:hover { background: var(--line-2); color: var(--ink); }
+    .search-clear.visible { display: flex; }
+
     /* Filter chips */
     .chips {
       display: flex;
       gap: 8px;
-      margin-bottom: 20px;
+      flex: 1;
       flex-wrap: wrap;
     }
 
@@ -812,10 +881,20 @@
         <span class="count-badge" id="countLabel">memuat...</span>
       </div>
 
-      <div class="chips" id="chipBar">
-        <div class="chip" data-filter="all">Semua</div>
-        <div class="chip active" data-filter="Task List">Task</div>
-        <div class="chip" data-filter="Reminder">Reminder</div>
+      <div class="filter-bar">
+        <div class="chips" id="chipBar">
+          <div class="chip" data-filter="all">Semua</div>
+          <div class="chip active" data-filter="Task List">Task</div>
+          <div class="chip" data-filter="Reminder">Reminder</div>
+        </div>
+
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input id="searchInput" type="text" placeholder="Cari...">
+          <button type="button" class="search-clear" id="searchClear" aria-label="Hapus pencarian">&times;</button>
+        </div>
       </div>
 
       <div class="board">
@@ -1081,18 +1160,46 @@
     }
 
     function renderList() {
-      const filtered = activeFilter === 'all'
+      const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+
+      let filtered = activeFilter === 'all'
         ? allItems
         : allItems.filter(i => i.type === activeFilter);
+
+      if (q) {
+        filtered = filtered.filter(i =>
+          (i.taskName  || '').toLowerCase().includes(q) ||
+          (i.note      || '').toLowerCase().includes(q) ||
+          (i.status    || '').toLowerCase().includes(q) ||
+          (i.priority  || '').toLowerCase().includes(q)
+        );
+      }
 
       countLabel.textContent = filtered.length + ' item';
 
       if (!filtered.length) {
-        listEl.innerHTML = '<div class="state-box"><div class="state-icon">◌</div><div class="state-label">Belum ada entri di kategori ini</div></div>';
+        const msg = q ? 'Tidak ada hasil untuk "' + esc(q) + '"' : 'Belum ada entri di kategori ini';
+        listEl.innerHTML = '<div class="state-box"><div class="state-icon">◌</div><div class="state-label">' + msg + '</div></div>';
         return;
       }
       listEl.innerHTML = filtered.map(renderRow).join('');
     }
+
+    /* ─── Search listeners ─── */
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+
+    searchInput.addEventListener('input', function() {
+      searchClear.classList.toggle('visible', this.value.length > 0);
+      renderList();
+    });
+
+    searchClear.addEventListener('click', function() {
+      searchInput.value = '';
+      searchClear.classList.remove('visible');
+      searchInput.focus();
+      renderList();
+    });
 
     document.getElementById('chipBar').addEventListener('click', function(e) {
       const chip = e.target.closest('.chip');
