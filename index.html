@@ -770,34 +770,31 @@
     .cal-nav {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 10px 16px;
+      gap: 6px;
+      margin-bottom: 14px;
     }
 
     .cal-nav-btn {
-      width: 30px;
-      height: 30px;
-      border-radius: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
       border: 1px solid var(--line);
-      background: var(--bg);
+      background: transparent;
       color: var(--muted);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: .15s ease;
+      flex-shrink: 0;
     }
 
-    .cal-nav-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
-    .cal-nav-btn svg { width: 14px; height: 14px; }
+    .cal-nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .cal-nav-btn svg { width: 11px; height: 11px; }
 
     .cal-month-label {
       font-family: 'Inter', sans-serif;
-      font-size: 15px;
+      font-size: 13.5px;
       font-weight: 700;
       color: var(--ink);
       letter-spacing: -.01em;
@@ -805,10 +802,10 @@
 
     .cal-month-label span {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 500;
       color: var(--muted);
-      margin-left: 8px;
+      margin-left: 6px;
     }
 
     .cal-grid-wrap {
@@ -1128,39 +1125,27 @@
           <h2>Antrian Aktif</h2>
           <div class="board-sub">Task &amp; reminder yang belum selesai</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span class="count-badge" id="countLabel">memuat...</span>
-          <div class="view-toggle">
-            <button type="button" class="view-btn active" id="btnViewList">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-              List
-            </button>
-            <button type="button" class="view-btn" id="btnViewCal">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              Calendar
-            </button>
-          </div>
+        <span class="count-badge" id="countLabel">memuat...</span>
+      </div>
+
+      <!-- FILTER BAR — selalu terlihat -->
+      <div class="filter-bar" id="filterBar">
+        <div class="chips" id="chipBar">
+          <div class="chip active" data-filter="Task List">Task</div>
+          <div class="chip" data-filter="Reminder">Reminder</div>
+        </div>
+
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input id="searchInput" type="text" placeholder="Cari...">
+          <button type="button" class="search-clear" id="searchClear" aria-label="Hapus pencarian">&times;</button>
         </div>
       </div>
 
       <!-- LIST VIEW -->
       <div class="board-list-wrap" id="boardListWrap">
-        <div class="filter-bar">
-          <div class="chips" id="chipBar">
-            <div class="chip" data-filter="all">Semua</div>
-            <div class="chip active" data-filter="Task List">Task</div>
-            <div class="chip" data-filter="Reminder">Reminder</div>
-          </div>
-
-          <div class="search-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input id="searchInput" type="text" placeholder="Cari...">
-            <button type="button" class="search-clear" id="searchClear" aria-label="Hapus pencarian">&times;</button>
-          </div>
-        </div>
-
         <div class="board">
           <div id="list">
             <div class="state-box">
@@ -1177,12 +1162,12 @@
           <button type="button" class="cal-nav-btn" id="calPrev">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
-          <div class="cal-month-label">
-            <span id="calMonthLabel">—</span>
-          </div>
           <button type="button" class="cal-nav-btn" id="calNext">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
+          <div class="cal-month-label">
+            <span id="calMonthLabel">—</span>
+          </div>
         </div>
 
         <div class="cal-grid-wrap">
@@ -1476,6 +1461,15 @@
         );
       }
 
+      // Urgent ke atas saat filter Task List aktif
+      if (activeFilter === 'Task List') {
+        filtered = filtered.slice().sort((a, b) => {
+          const aUrgent = a.priority === 'Urgent' ? 0 : 1;
+          const bUrgent = b.priority === 'Urgent' ? 0 : 1;
+          return aUrgent - bUrgent;
+        });
+      }
+
       countLabel.textContent = filtered.length + ' item';
 
       if (!filtered.length) {
@@ -1508,7 +1502,13 @@
       document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
       activeFilter = chip.dataset.filter;
-      renderList();
+
+      if (activeFilter === 'Reminder') {
+        switchToCal();
+      } else {
+        switchToList();
+        renderList();
+      }
     });
 
     listEl.addEventListener('click', function(e) {
@@ -1546,8 +1546,7 @@
           allItems = res.data || [];
           renderList();
           if (currentView === 'cal') renderCalendar();
-        }
-        else throw new Error(res.message);
+        }        else throw new Error(res.message);
       })
       .catch(err => {
         listEl.innerHTML = '<div class="state-box state-error"><div class="state-icon">!</div><div class="state-label">' + esc(err.message || String(err)) + '</div></div>';
@@ -1634,31 +1633,26 @@
     });
 
     /* ─── View Toggle ─── */
-    const btnViewList = document.getElementById('btnViewList');
-    const btnViewCal  = document.getElementById('btnViewCal');
     const boardListWrap = document.getElementById('boardListWrap');
     const calendarWrap  = document.getElementById('calendarWrap');
 
     let currentView = 'list';
 
-    btnViewList.addEventListener('click', function() {
-      if (currentView === 'list') return;
+    function switchToList() {
       currentView = 'list';
-      btnViewList.classList.add('active');
-      btnViewCal.classList.remove('active');
       boardListWrap.classList.remove('hide');
       calendarWrap.classList.remove('show');
-    });
+      document.getElementById('calDetail').classList.remove('show');
+      document.querySelector('.search-wrap').style.display = '';
+    }
 
-    btnViewCal.addEventListener('click', function() {
-      if (currentView === 'cal') return;
+    function switchToCal() {
       currentView = 'cal';
-      btnViewCal.classList.add('active');
-      btnViewList.classList.remove('active');
       boardListWrap.classList.add('hide');
       calendarWrap.classList.add('show');
+      document.querySelector('.search-wrap').style.display = 'none';
       renderCalendar();
-    });
+    }
 
     /* ─── Calendar ─── */
     let calYear  = new Date().getFullYear();
@@ -1673,7 +1667,7 @@
     }
 
     function itemsOnDate(iso) {
-      return allItems.filter(i => (i.deadline || '') === iso);
+      return allItems.filter(i => (i.deadline || '') === iso && i.type === 'Reminder');
     }
 
     function renderCalendar() {
