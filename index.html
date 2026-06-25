@@ -725,6 +725,256 @@
 
     .modal-actions .btn-primary { flex: 2; margin-top: 0; }
 
+    /* ─── VIEW TOGGLE (List / Calendar) ─── */
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    .view-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 5px;
+      border: none;
+      background: transparent;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      transition: .15s ease;
+    }
+
+    .view-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .view-btn:hover { color: var(--ink-2); }
+    .view-btn.active {
+      background: var(--surface);
+      color: var(--gold);
+      box-shadow: 0 1px 4px rgba(0,0,0,.07);
+    }
+
+    /* ─── CALENDAR ─── */
+    .calendar-wrap { display: none; }
+    .calendar-wrap.show { display: block; }
+    .board-list-wrap { display: block; }
+    .board-list-wrap.hide { display: none; }
+
+    .cal-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 16px;
+    }
+
+    .cal-nav-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: .15s ease;
+    }
+
+    .cal-nav-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+    .cal-nav-btn svg { width: 14px; height: 14px; }
+
+    .cal-month-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -.01em;
+    }
+
+    .cal-month-label span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-left: 8px;
+    }
+
+    .cal-grid-wrap {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .cal-dow {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cal-dow-cell {
+      padding: 8px 4px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .cal-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .cal-cell {
+      min-height: 88px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 7px 6px 6px;
+      cursor: pointer;
+      transition: background .12s;
+      position: relative;
+      vertical-align: top;
+    }
+
+    .cal-cell:nth-child(7n) { border-right: none; }
+    .cal-cell:hover { background: var(--bg); }
+    .cal-cell.other-month { background: #fafaf9; }
+    .cal-cell.other-month .cal-day-num { color: var(--line-2); }
+
+    .cal-cell.today .cal-day-num {
+      background: var(--gold);
+      color: #fff;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cal-cell.selected { background: var(--gold-dim); }
+    .cal-cell.selected .cal-day-num { color: var(--gold); }
+
+    .cal-day-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-2);
+      margin-bottom: 4px;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cal-events {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cal-event {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      line-height: 1.3;
+      padding: 2px 5px;
+      border-radius: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cal-event.type-task {
+      background: var(--info-bg);
+      color: var(--ink-2);
+    }
+
+    .cal-event.type-reminder {
+      background: var(--gold-dim);
+      color: var(--gold);
+    }
+
+    .cal-event-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .type-task .cal-event-dot { background: var(--muted); }
+    .type-reminder .cal-event-dot { background: var(--gold); }
+
+    .cal-event-more {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 1px 5px;
+      letter-spacing: .04em;
+    }
+
+    /* Day detail panel below calendar */
+    .cal-detail {
+      margin-top: 12px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .cal-detail.show { display: block; }
+
+    .cal-detail-head {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cal-detail-head h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .cal-detail-close {
+      width: 24px; height: 24px;
+      border-radius: 5px;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: .15s ease;
+    }
+
+    .cal-detail-close:hover { color: var(--ink); border-color: var(--ink); }
+
+    .cal-detail-list { padding: 8px 0; }
+
     /* WA float */
     .wa-float {
       position: fixed;
@@ -878,31 +1128,82 @@
           <h2>Antrian Aktif</h2>
           <div class="board-sub">Task &amp; reminder yang belum selesai</div>
         </div>
-        <span class="count-badge" id="countLabel">memuat...</span>
-      </div>
-
-      <div class="filter-bar">
-        <div class="chips" id="chipBar">
-          <div class="chip" data-filter="all">Semua</div>
-          <div class="chip active" data-filter="Task List">Task</div>
-          <div class="chip" data-filter="Reminder">Reminder</div>
-        </div>
-
-        <div class="search-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input id="searchInput" type="text" placeholder="Cari...">
-          <button type="button" class="search-clear" id="searchClear" aria-label="Hapus pencarian">&times;</button>
-        </div>
-      </div>
-
-      <div class="board">
-        <div id="list">
-          <div class="state-box">
-            <div class="state-spinner"></div>
-            <div class="state-label">Memuat data...</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="count-badge" id="countLabel">memuat...</span>
+          <div class="view-toggle">
+            <button type="button" class="view-btn active" id="btnViewList">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              List
+            </button>
+            <button type="button" class="view-btn" id="btnViewCal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Calendar
+            </button>
           </div>
+        </div>
+      </div>
+
+      <!-- LIST VIEW -->
+      <div class="board-list-wrap" id="boardListWrap">
+        <div class="filter-bar">
+          <div class="chips" id="chipBar">
+            <div class="chip" data-filter="all">Semua</div>
+            <div class="chip active" data-filter="Task List">Task</div>
+            <div class="chip" data-filter="Reminder">Reminder</div>
+          </div>
+
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input id="searchInput" type="text" placeholder="Cari...">
+            <button type="button" class="search-clear" id="searchClear" aria-label="Hapus pencarian">&times;</button>
+          </div>
+        </div>
+
+        <div class="board">
+          <div id="list">
+            <div class="state-box">
+              <div class="state-spinner"></div>
+              <div class="state-label">Memuat data...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CALENDAR VIEW -->
+      <div class="calendar-wrap" id="calendarWrap">
+        <div class="cal-nav">
+          <button type="button" class="cal-nav-btn" id="calPrev">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="cal-month-label">
+            <span id="calMonthLabel">—</span>
+          </div>
+          <button type="button" class="cal-nav-btn" id="calNext">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <div class="cal-grid-wrap">
+          <div class="cal-dow">
+            <div class="cal-dow-cell">Sen</div>
+            <div class="cal-dow-cell">Sel</div>
+            <div class="cal-dow-cell">Rab</div>
+            <div class="cal-dow-cell">Kam</div>
+            <div class="cal-dow-cell">Jum</div>
+            <div class="cal-dow-cell">Sab</div>
+            <div class="cal-dow-cell">Min</div>
+          </div>
+          <div class="cal-days" id="calDays"></div>
+        </div>
+
+        <div class="cal-detail" id="calDetail">
+          <div class="cal-detail-head">
+            <h4 id="calDetailTitle">—</h4>
+            <button type="button" class="cal-detail-close" id="calDetailClose">&times;</button>
+          </div>
+          <div class="cal-detail-list" id="calDetailList"></div>
         </div>
       </div>
 
@@ -1241,7 +1542,11 @@
       fetch(SCRIPT_URL + '?action=getReminders')
       .then(r => r.json())
       .then(res => {
-        if (res.success) { allItems = res.data || []; renderList(); }
+        if (res.success) {
+          allItems = res.data || [];
+          renderList();
+          if (currentView === 'cal') renderCalendar();
+        }
         else throw new Error(res.message);
       })
       .catch(err => {
@@ -1326,6 +1631,209 @@
         lbl.textContent = 'Simpan Perubahan';
         showErr(err.message || String(err));
       });
+    });
+
+    /* ─── View Toggle ─── */
+    const btnViewList = document.getElementById('btnViewList');
+    const btnViewCal  = document.getElementById('btnViewCal');
+    const boardListWrap = document.getElementById('boardListWrap');
+    const calendarWrap  = document.getElementById('calendarWrap');
+
+    let currentView = 'list';
+
+    btnViewList.addEventListener('click', function() {
+      if (currentView === 'list') return;
+      currentView = 'list';
+      btnViewList.classList.add('active');
+      btnViewCal.classList.remove('active');
+      boardListWrap.classList.remove('hide');
+      calendarWrap.classList.remove('show');
+    });
+
+    btnViewCal.addEventListener('click', function() {
+      if (currentView === 'cal') return;
+      currentView = 'cal';
+      btnViewCal.classList.add('active');
+      btnViewList.classList.remove('active');
+      boardListWrap.classList.add('hide');
+      calendarWrap.classList.add('show');
+      renderCalendar();
+    });
+
+    /* ─── Calendar ─── */
+    let calYear  = new Date().getFullYear();
+    let calMonth = new Date().getMonth(); // 0-based
+    let calSelectedDate = null;
+
+    const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni',
+                       'Juli','Agustus','September','Oktober','November','Desember'];
+
+    function isoDate(y, m, d) {
+      return y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    }
+
+    function itemsOnDate(iso) {
+      return allItems.filter(i => (i.deadline || '') === iso);
+    }
+
+    function renderCalendar() {
+      // Month label
+      document.getElementById('calMonthLabel').innerHTML =
+        MONTHS_ID[calMonth] + ' <span>' + calYear + '</span>';
+
+      const todayIso = today();
+      const firstDay = new Date(calYear, calMonth, 1);
+      const lastDay  = new Date(calYear, calMonth + 1, 0);
+
+      // Monday-based: 0=Mon … 6=Sun
+      let startDow = firstDay.getDay(); // 0=Sun
+      startDow = startDow === 0 ? 6 : startDow - 1;
+
+      const calDaysEl = document.getElementById('calDays');
+      let html = '';
+
+      // Cells from previous month
+      const prevLastDay = new Date(calYear, calMonth, 0).getDate();
+      for (let i = startDow - 1; i >= 0; i--) {
+        const d = prevLastDay - i;
+        const iso = isoDate(calYear, calMonth - 1, d);
+        html += renderCalCell(d, iso, true, todayIso);
+      }
+
+      // Cells of current month
+      for (let d = 1; d <= lastDay.getDate(); d++) {
+        const iso = isoDate(calYear, calMonth, d);
+        html += renderCalCell(d, iso, false, todayIso);
+      }
+
+      // Fill remaining cells to complete last row
+      const totalCells = startDow + lastDay.getDate();
+      const remaining  = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+      for (let d = 1; d <= remaining; d++) {
+        const iso = isoDate(calYear, calMonth + 1, d);
+        html += renderCalCell(d, iso, true, todayIso);
+      }
+
+      calDaysEl.innerHTML = html;
+
+      // Re-attach click listeners
+      calDaysEl.querySelectorAll('.cal-cell').forEach(cell => {
+        cell.addEventListener('click', function() {
+          const iso = this.dataset.date;
+          calSelectedDate = iso;
+
+          // highlight selected
+          calDaysEl.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected'));
+          this.classList.add('selected');
+
+          showCalDetail(iso);
+        });
+      });
+
+      // Re-highlight selected if still visible
+      if (calSelectedDate) {
+        const sel = calDaysEl.querySelector('[data-date="' + calSelectedDate + '"]');
+        if (sel) sel.classList.add('selected');
+      }
+    }
+
+    function renderCalCell(dayNum, iso, otherMonth, todayIso) {
+      const items = itemsOnDate(iso);
+      const isToday = iso === todayIso;
+
+      let cls = 'cal-cell';
+      if (otherMonth) cls += ' other-month';
+      if (isToday) cls += ' today';
+      if (iso === calSelectedDate) cls += ' selected';
+
+      let eventsHtml = '';
+      const maxShow = 2;
+      items.slice(0, maxShow).forEach(item => {
+        const typeClass = item.type === 'Reminder' ? 'type-reminder' : 'type-task';
+        const name = (item.taskName || '').substring(0, 18) + ((item.taskName || '').length > 18 ? '…' : '');
+        eventsHtml += '<div class="cal-event ' + typeClass + '">' +
+          '<span class="cal-event-dot"></span>' +
+          esc(name) +
+        '</div>';
+      });
+
+      if (items.length > maxShow) {
+        eventsHtml += '<div class="cal-event-more">+' + (items.length - maxShow) + ' lagi</div>';
+      }
+
+      return '<div class="' + cls + '" data-date="' + iso + '">' +
+        '<div class="cal-day-num">' + dayNum + '</div>' +
+        '<div class="cal-events">' + eventsHtml + '</div>' +
+      '</div>';
+    }
+
+    function showCalDetail(iso) {
+      const items = itemsOnDate(iso);
+      const detailEl  = document.getElementById('calDetail');
+      const titleEl   = document.getElementById('calDetailTitle');
+      const listDEl   = document.getElementById('calDetailList');
+
+      // Format date nicely
+      const d = new Date(iso + 'T00:00:00');
+      const label = d.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+      titleEl.textContent = label;
+
+      if (!items.length) {
+        listDEl.innerHTML = '<div class="state-box" style="padding:20px 16px"><div class="state-label">Tidak ada item di tanggal ini</div></div>';
+      } else {
+        listDEl.innerHTML = items.map(item => {
+          const isTask = item.type === 'Task List';
+          let pills = '';
+          if (item.status)   pills += '<span class="pill ' + statusClass(item.status)     + '">' + esc(item.status)   + '</span>';
+          if (item.priority) pills += '<span class="pill ' + priorityClass(item.priority) + '">' + esc(item.priority) + '</span>';
+
+          return '<div class="task-row" data-type="' + esc(item.type) + '" data-row-id="' + item.id + '" style="cursor:pointer">' +
+            '<div class="row-accent"></div>' +
+            '<div class="row-inner">' +
+              '<div class="row-top"><div class="row-type-dot"></div>' +
+              '<div class="row-title">' + esc(item.taskName || '(tanpa nama)') + '</div></div>' +
+              (pills ? '<div class="row-pills">' + pills + '</div>' : '') +
+              (item.note ? '<div class="row-note">' + esc(item.note) + '</div>' : '') +
+              '<div class="row-actions">' +
+                '<button type="button" class="btn-sm edit" data-edit-id="' + item.id + '">Edit</button>' +
+                (isTask && item.status !== 'Done' ? '<button type="button" class="btn-sm done" data-done-id="' + item.id + '">Selesai</button>' : '') +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+
+        // Wire up buttons in detail
+        listDEl.querySelectorAll('[data-done-id]').forEach(btn => {
+          btn.addEventListener('click', e => { e.stopPropagation(); markDone(btn.dataset.doneId); });
+        });
+        listDEl.querySelectorAll('[data-edit-id]').forEach(btn => {
+          btn.addEventListener('click', e => { e.stopPropagation(); openEdit(btn.dataset.editId); });
+        });
+      }
+
+      detailEl.classList.add('show');
+    }
+
+    document.getElementById('calDetailClose').addEventListener('click', function() {
+      document.getElementById('calDetail').classList.remove('show');
+      calSelectedDate = null;
+      document.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected'));
+    });
+
+    document.getElementById('calPrev').addEventListener('click', function() {
+      calMonth--;
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      calSelectedDate = null;
+      document.getElementById('calDetail').classList.remove('show');
+      renderCalendar();
+    });
+
+    document.getElementById('calNext').addEventListener('click', function() {
+      calMonth++;
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+      calSelectedDate = null;
+      document.getElementById('calDetail').classList.remove('show');
+      renderCalendar();
     });
 
     /* ─── Init ─── */
