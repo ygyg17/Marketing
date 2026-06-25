@@ -1010,6 +1010,97 @@
       .field-row { grid-template-columns: 1fr; }
       .panel-heading { font-size: 19px; }
       .board-header { flex-direction: column; align-items: flex-start; }
+
+      /* Agenda view menggantikan grid di mobile */
+      .cal-grid-wrap { display: none; }
+      .agenda-wrap { display: block; }
+    }
+
+    /* Agenda view (mobile only) */
+    .agenda-wrap {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .agenda-empty {
+      padding: 40px 20px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .agenda-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+      transition: background .12s;
+    }
+
+    .agenda-row:last-child { border-bottom: none; }
+    .agenda-row:hover { background: var(--bg); }
+
+    .agenda-date {
+      flex-shrink: 0;
+      width: 42px;
+      text-align: center;
+    }
+
+    .agenda-day-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .agenda-day-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .agenda-date.is-today .agenda-day-num {
+      color: var(--gold);
+    }
+
+    .agenda-items {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding-top: 2px;
+    }
+
+    .agenda-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.35;
+    }
+
+    .agenda-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
     }
   </style>
 </head>
@@ -1182,6 +1273,9 @@
           </div>
           <div class="cal-days" id="calDays"></div>
         </div>
+
+        <!-- Agenda view (mobile) -->
+        <div class="agenda-wrap" id="agendaWrap"></div>
 
         <div class="cal-detail" id="calDetail">
           <div class="cal-detail-head">
@@ -1729,6 +1823,59 @@
         const sel = calDaysEl.querySelector('[data-date="' + calSelectedDate + '"]');
         if (sel) sel.classList.add('selected');
       }
+
+      // Also render agenda for mobile
+      renderAgenda();
+    }
+
+    function renderAgenda() {
+      const agendaEl = document.getElementById('agendaWrap');
+      const todayIso = today();
+      const DAY_ID = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+
+      // Collect all days in current month that have reminders
+      const lastDay = new Date(calYear, calMonth + 1, 0).getDate();
+      const daysWithItems = [];
+
+      for (let d = 1; d <= lastDay; d++) {
+        const iso = isoDate(calYear, calMonth, d);
+        const items = itemsOnDate(iso);
+        if (items.length) daysWithItems.push({ iso, d, items });
+      }
+
+      if (!daysWithItems.length) {
+        agendaEl.innerHTML = '<div class="agenda-empty">Tidak ada reminder bulan ini</div>';
+        return;
+      }
+
+      agendaEl.innerHTML = daysWithItems.map(function(day) {
+        const dt = new Date(day.iso + 'T00:00:00');
+        const isToday = day.iso === todayIso;
+        const dayName = DAY_ID[dt.getDay()];
+
+        const itemsHtml = day.items.map(function(item) {
+          return '<div class="agenda-item">' +
+            '<span class="agenda-dot"></span>' +
+            '<span>' + esc(item.taskName || '(tanpa nama)') + '</span>' +
+          '</div>';
+        }).join('');
+
+        return '<div class="agenda-row" data-date="' + day.iso + '">' +
+          '<div class="agenda-date' + (isToday ? ' is-today' : '') + '">' +
+            '<div class="agenda-day-num">' + day.d + '</div>' +
+            '<div class="agenda-day-name">' + dayName + '</div>' +
+          '</div>' +
+          '<div class="agenda-items">' + itemsHtml + '</div>' +
+        '</div>';
+      }).join('');
+
+      // Click row → open detail
+      agendaEl.querySelectorAll('.agenda-row').forEach(function(row) {
+        row.addEventListener('click', function() {
+          calSelectedDate = this.dataset.date;
+          showCalDetail(this.dataset.date);
+        });
+      });
     }
 
     function renderCalCell(dayNum, iso, otherMonth, todayIso) {
