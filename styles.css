@@ -23,12 +23,14 @@
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-body {
+html, body {
   min-height: 100vh;
   background: var(--bg);
   color: var(--ink);
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 /* ─── NAV BAR ─── */
@@ -54,7 +56,7 @@ body {
 .topbar-clock b { color: var(--ink-2); font-weight: 500; }
 
 /* ─── LAYOUT ─── */
-.body-wrap { display: grid; grid-template-columns: 380px 1fr; min-height: calc(100vh - 52px); }
+.body-wrap { display: grid; grid-template-columns: 380px 1fr; min-height: calc(100vh - 52px); max-width: 100%; }
 
 /* ─── LEFT PANEL ─── */
 .left-panel { border-right: 1px solid var(--line); background: var(--surface); display: flex; flex-direction: column; }
@@ -101,7 +103,7 @@ textarea { min-height: 88px; resize: vertical; line-height: 1.55; }
 .footer-note { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
 
 /* ─── RIGHT PANEL ─── */
-.right-panel { padding: 32px 28px 60px; }
+.right-panel { padding: 32px 28px 60px; max-width: 100%; overflow-x: hidden; }
 .board-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
 .board-title-wrap h2 { font-size: 18px; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
 .board-title-wrap .board-sub { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
@@ -123,7 +125,7 @@ textarea { min-height: 88px; resize: vertical; line-height: 1.55; }
 .chip:hover { border-color: var(--line-2); color: var(--ink-2); }
 .chip.active { background: var(--gold-dim); color: var(--gold); border-color: var(--gold-border); }
 
-.board { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.board { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; max-width: 100%; }
 .state-box { padding: 56px 24px; text-align: center; }
 .state-icon { font-size: 28px; margin-bottom: 12px; opacity: .35; }
 .state-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
@@ -227,7 +229,7 @@ textarea { min-height: 88px; resize: vertical; line-height: 1.55; }
 .stat-num { font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--ink); }
 .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
 
-.table-wrapper { width: 100%; overflow-x: auto; }
+.table-wrapper { width: 100%; overflow-x: auto; max-width: 100%; }
 .req-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
 .req-table th { padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
 .req-table td { padding: 14px 16px; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: middle; }
@@ -276,4 +278,46 @@ textarea { min-height: 88px; resize: vertical; line-height: 1.55; }
   .cal-grid-wrap { display: none; }
   .agenda-wrap { display: block; }
   .stat-pill { min-width: 100%; }
+}
+
+/* ─── MOBILE: DESIGN REQUEST AS CARDS (FIX: tabel melebar ke samping) ─── */
+@media (max-width: 700px) {
+  .table-wrapper { overflow-x: visible; }
+
+  .req-table thead { display: none; }
+  .req-table, .req-table tbody, .req-table tr, .req-table td { display: block; width: 100%; }
+
+  .req-table tr {
+    border-bottom: 1px solid var(--line);
+    padding: 14px 16px;
+  }
+  .req-table tr:last-child { border-bottom: none; }
+
+  .req-table td {
+    padding: 3px 0;
+    border-bottom: none;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  /* Label di depan tiap kolom, dari data-label yang akan ditambahkan di JS */
+  .req-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 8px;
+    margin-bottom: 2px;
+  }
+  .req-table td[data-label]:first-child::before { margin-top: 0; }
+
+  .req-table td:last-child {
+    text-align: left;
+    margin-top: 6px;
+  }
+  .req-table td:last-child::before { content: none; }
 }
