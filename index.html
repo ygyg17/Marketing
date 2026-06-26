@@ -279,6 +279,8 @@
     </div>
   </div>
 
+  <script src="config.js"></script>
+
   <script>
     // ══════════════════════════════════════════════════════════════════════
     // KONFIGURASI URL APP SCRIPT
@@ -286,8 +288,8 @@
     // URL untuk Database Task & Reminder
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4nQtMFch9K-Pt4bsNKDeoaTxOtPKx12oNicJ55WHdsyRQH2wdNa0r0ftThDE4F9ligQ/exec';
     
-    // URL untuk Database Design Request (ganti sesuai config.js milikmu)
-    const REQ_SCRIPT_URL = 'URL_APP_SCRIPT_DESIGN_REQUEST_KAMU_DISINI'; 
+    // URL untuk Database Design Request (mengambil dari config.js)
+    const REQ_SCRIPT_URL = CONFIG.GAS_WEB_APP_URL; 
     // ══════════════════════════════════════════════════════════════════════
 
     /* ─── Clock ─── */
@@ -605,12 +607,6 @@
     function loadDesignRequests() {
       const tbody = document.getElementById('reqTableBody');
       tbody.innerHTML = '<tr><td colspan="6" class="state-box"><div class="state-spinner"></div><div class="state-label">Memuat requests...</div></td></tr>';
-
-      // Pastikan REQ_SCRIPT_URL valid, jika belum diisi, mock data atau error
-      if(REQ_SCRIPT_URL === 'URL_APP_SCRIPT_DESIGN_REQUEST_KAMU_DISINI') {
-        tbody.innerHTML = '<tr><td colspan="6" class="state-box"><div class="state-icon">!</div><div class="state-label">Mohon ganti REQ_SCRIPT_URL di dalam script dengan URL Google App Script kamu.</div></td></tr>';
-        return;
-      }
 
       fetch(`${REQ_SCRIPT_URL}?action=getRequests`)
         .then(res => res.json())
