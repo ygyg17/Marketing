@@ -13,9 +13,7 @@
 <body>
 
   <nav class="topbar">
-    <img class="topbar-logo"
-         src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png"
-         alt="The Seminyak">
+    <img class="topbar-logo" src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
     <div class="topbar-div"></div>
     <span class="topbar-title">Marketing Desk</span>
     <div class="topbar-clock" id="mastClock">—</div>
@@ -25,40 +23,34 @@
 
     <div class="left-panel">
       <div class="left-inner">
-
         <div class="panel-eyebrow">Input Baru</div>
         <h1 class="panel-heading">Drop it here,<br>bot yang urus sisanya.</h1>
         <p class="panel-sub">Catat task atau reminder — notifikasi otomatis dikirim ke WhatsApp sesuai tanggal yang kamu set.</p>
 
         <form id="mainForm">
+          <div class="type-row">
+            <input type="radio" id="typeTask" name="type" value="Task List" checked>
+            <label for="typeTask" class="type-label"><span class="t-dot"></span>Task List</label>
 
-        <div class="type-row">
-          <input type="radio" id="typeTask" name="type" value="Task List" checked>
-          <label for="typeTask" class="type-label"><span class="t-dot"></span>Task List</label>
+            <input type="radio" id="typeRemind" name="type" value="Reminder">
+            <label for="typeRemind" class="type-label"><span class="t-dot"></span>Reminder</label>
+          </div>
 
-          <input type="radio" id="typeRemind" name="type" value="Reminder">
-          <label for="typeRemind" class="type-label"><span class="t-dot"></span>Reminder</label>
-        </div>
+          <div class="divider">
+            <div class="divider-line"></div>
+            <span class="divider-label" id="divLabel">Detail Task</span>
+            <div class="divider-line"></div>
+          </div>
 
-        <div class="divider">
-          <div class="divider-line"></div>
-          <span class="divider-label" id="divLabel">Detail Task</span>
-          <div class="divider-line"></div>
-        </div>
           <div id="taskFields">
             <div class="field">
               <label for="taskName">Nama Task</label>
               <input id="taskName" name="taskName" type="text" placeholder="Contoh: Follow up client Seminyak Beach" autocomplete="off">
             </div>
-
             <div class="field">
-              <label for="deadline">
-                Deadline
-                <span class="opt-tag">opsional</span>
-              </label>
+              <label for="deadline">Deadline <span class="opt-tag">opsional</span></label>
               <input id="deadline" name="deadline" type="date">
             </div>
-
             <div class="field-row">
               <div class="field">
                 <label for="status">Status</label>
@@ -78,12 +70,8 @@
                 </select>
               </div>
             </div>
-
             <div class="field">
-              <label for="note">
-                Note
-                <span class="opt-tag">opsional</span>
-              </label>
+              <label for="note">Note <span class="opt-tag">opsional</span></label>
               <textarea id="note" name="note" placeholder="Tambahkan detail jika perlu..."></textarea>
             </div>
           </div>
@@ -93,7 +81,6 @@
               <label for="reminderName">Nama Reminder</label>
               <input id="reminderName" name="reminderName" type="text" placeholder="Contoh: Kirim recap mingguan" autocomplete="off">
             </div>
-
             <div class="field">
               <label for="remDate">Tanggal</label>
               <input id="remDate" name="date" type="date">
@@ -112,8 +99,8 @@
     <div class="right-panel">
       <div class="board-header">
         <div class="board-title-wrap">
-          <h2>Antrian Aktif</h2>
-          <div class="board-sub">Task &amp; reminder yang belum selesai</div>
+          <h2 id="boardMainTitle">Antrian Aktif</h2>
+          <div class="board-sub" id="boardSubTitle">Task &amp; reminder yang belum selesai</div>
         </div>
         <span class="count-badge" id="countLabel">memuat...</span>
       </div>
@@ -122,13 +109,14 @@
         <div class="chips" id="chipBar">
           <div class="chip active" data-filter="Task List">Task</div>
           <div class="chip" data-filter="Reminder">Reminder</div>
+          <div class="chip" data-filter="Design Request">Design Request</div>
         </div>
 
-        <div class="search-wrap">
+        <div class="search-wrap" id="searchWrapBox">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input id="searchInput" type="text" placeholder="Cari...">
+          <input id="searchInput" type="text" placeholder="Cari Task...">
           <button type="button" class="search-clear" id="searchClear" aria-label="Hapus pencarian">&times;</button>
         </div>
       </div>
@@ -152,20 +140,13 @@
           <button type="button" class="cal-nav-btn" id="calNext">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
-          <div class="cal-month-label">
-            <span id="calMonthLabel">—</span>
-          </div>
+          <div class="cal-month-label"><span id="calMonthLabel">—</span></div>
         </div>
 
         <div class="cal-grid-wrap">
           <div class="cal-dow">
-            <div class="cal-dow-cell">Sen</div>
-            <div class="cal-dow-cell">Sel</div>
-            <div class="cal-dow-cell">Rab</div>
-            <div class="cal-dow-cell">Kam</div>
-            <div class="cal-dow-cell">Jum</div>
-            <div class="cal-dow-cell">Sab</div>
-            <div class="cal-dow-cell">Min</div>
+            <div class="cal-dow-cell">Sen</div><div class="cal-dow-cell">Sel</div><div class="cal-dow-cell">Rab</div>
+            <div class="cal-dow-cell">Kam</div><div class="cal-dow-cell">Jum</div><div class="cal-dow-cell">Sab</div><div class="cal-dow-cell">Min</div>
           </div>
           <div class="cal-days" id="calDays"></div>
         </div>
@@ -181,11 +162,33 @@
         </div>
       </div>
 
+      <div class="design-req-wrap hide" id="designReqWrap">
+        <div class="stats-strip" id="reqStatsStrip"></div>
+        <div class="board">
+          <div class="table-wrapper">
+            <table class="req-table">
+              <thead>
+                <tr>
+                  <th>Requester</th>
+                  <th>Dept</th>
+                  <th>Submitted</th>
+                  <th>Deadline</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="reqTableBody">
+                <tr><td colspan="6" class="state-box"><div class="state-spinner"></div><div class="state-label">Memuat requests...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <div style="margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing:.06em; text-transform:uppercase; color: var(--muted);">
-        Synced with Notion · Klik baris untuk edit
+        Synced with Google Sheets · Klik baris untuk edit
       </div>
     </div>
-
   </div>
 
   <a class="wa-float" href="https://wa.me/6281776452000" target="_blank" rel="noopener">
@@ -193,15 +196,8 @@
     WA Bot
   </a>
 
-  <div id="toastOk" class="toast toast-ok">
-    <span class="toast-icon">✓</span>
-    <span id="toastOkMsg">Berhasil disimpan</span>
-  </div>
-
-  <div id="toastErr" class="toast toast-err">
-    <span class="toast-icon">✕</span>
-    <span id="toastErrMsg">Terjadi kesalahan</span>
-  </div>
+  <div id="toastOk" class="toast toast-ok"><span class="toast-icon">✓</span><span id="toastOkMsg">Berhasil disimpan</span></div>
+  <div id="toastErr" class="toast toast-err"><span class="toast-icon">✕</span><span id="toastErrMsg">Terjadi kesalahan</span></div>
 
   <div id="editOverlay" class="overlay">
     <div class="modal-card">
@@ -209,70 +205,90 @@
         <h3 id="editTitle">Edit Item</h3>
         <button type="button" class="close-btn" id="editClose">&times;</button>
       </div>
-
       <form id="editForm">
         <input type="hidden" id="editId">
         <input type="hidden" id="editType">
-
         <div id="editTaskFields">
-          <div class="field">
-            <label for="editTaskName">Nama Task</label>
-            <input id="editTaskName" type="text" autocomplete="off">
-          </div>
-          <div class="field">
-            <label for="editDeadline">
-              Deadline
-              <span class="opt-tag">opsional</span>
-            </label>
-            <input id="editDeadline" type="date">
-          </div>
+          <div class="field"><label>Nama Task</label><input id="editTaskName" type="text" autocomplete="off"></div>
+          <div class="field"><label>Deadline <span class="opt-tag">opsional</span></label><input id="editDeadline" type="date"></div>
           <div class="field-row">
             <div class="field">
-              <label for="editStatus">Status</label>
-              <select id="editStatus">
-                <option value="Not started">Not started</option>
-                <option value="In progress">In progress</option>
-                <option value="Done">Done</option>
-              </select>
+              <label>Status</label>
+              <select id="editStatus"><option value="Not started">Not started</option><option value="In progress">In progress</option><option value="Done">Done</option></select>
             </div>
             <div class="field">
-              <label for="editPriority">Priority</label>
-              <select id="editPriority">
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="Urgent">Urgent</option>
-              </select>
+              <label>Priority</label>
+              <select id="editPriority"><option value="Low">Low</option><option value="Medium">Medium</option><option value="Urgent">Urgent</option></select>
             </div>
           </div>
-          <div class="field">
-            <label for="editNote">Note <span class="opt-tag">opsional</span></label>
-            <textarea id="editNote"></textarea>
-          </div>
+          <div class="field"><label>Note <span class="opt-tag">opsional</span></label><textarea id="editNote"></textarea></div>
         </div>
-
         <div id="editReminderFields" class="hidden">
-          <div class="field">
-            <label for="editRemName">Nama Reminder</label>
-            <input id="editRemName" type="text" autocomplete="off">
-          </div>
-          <div class="field">
-            <label for="editRemDate">Tanggal</label>
-            <input id="editRemDate" type="date">
-          </div>
+          <div class="field"><label>Nama Reminder</label><input id="editRemName" type="text" autocomplete="off"></div>
+          <div class="field"><label>Tanggal</label><input id="editRemDate" type="date"></div>
         </div>
-
         <div class="modal-actions">
           <button type="button" class="btn-secondary" id="editCancel">Batal</button>
-          <button type="submit" class="btn-primary" id="editSubmitBtn">
-            <span id="editBtnLabel">Simpan Perubahan</span>
-          </button>
+          <button type="submit" class="btn-primary" id="editSubmitBtn"><span id="editBtnLabel">Simpan Perubahan</span></button>
         </div>
       </form>
     </div>
   </div>
 
+  <div id="reqModalOverlay" class="overlay">
+    <div class="modal-card" style="width: min(92vw, 560px);">
+      <div class="modal-head" style="margin-bottom: 16px;">
+        <div>
+          <h3 id="reqModalName" style="font-size: 16px; margin-bottom: 4px;">—</h3>
+          <div id="reqModalMeta" style="font-size: 12px; color: var(--muted); font-family: 'Inter', sans-serif;">—</div>
+        </div>
+        <button type="button" class="close-btn" id="reqModalClose">&times;</button>
+      </div>
+
+      <div class="req-detail-grid">
+        <div class="req-field"><span>Email</span><strong id="reqModalEmail">—</strong></div>
+        <div class="req-field"><span>Department</span><strong id="reqModalDept">—</strong></div>
+        <div class="req-field"><span>Submitted</span><strong id="reqModalSub">—</strong></div>
+        <div class="req-field"><span>Deadline</span><strong id="reqModalDead">—</strong></div>
+      </div>
+      <div class="req-field" style="margin-top:16px;">
+        <span>Design Brief & Notes</span>
+        <div id="reqModalNotes" style="margin-top:6px; font-size:13.5px; color:var(--ink); line-height:1.6; background:var(--bg); padding:12px; border-radius:8px; border:1px solid var(--line); white-space:pre-wrap;">—</div>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 24px; border-top: 1px solid var(--line); padding-top: 20px; align-items:center;">
+        <span id="reqModalStatusBadge"></span>
+        <div style="flex:1"></div>
+        <a id="reqModalFile" href="#" target="_blank" class="btn-secondary" style="text-decoration:none; display:none; flex:unset; padding:8px 14px; font-size:12px;">Lihat File</a>
+        <button class="btn-primary" id="reqModalDoneBtn" style="flex:unset; width:auto; padding:8px 14px; font-size:12px; background:var(--ok);">Mark as Done</button>
+        <button class="btn-secondary" id="reqModalDeleteBtn" style="flex:unset; width:auto; padding:8px 14px; font-size:12px; color:var(--urgent); border-color:var(--urgent-bg);">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmOverlay" class="overlay" style="z-index: 9500;">
+    <div class="modal-card" style="width: min(90vw, 340px); text-align: center; padding: 30px 24px;">
+      <h3 style="margin-bottom: 8px;">Hapus Request?</h3>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 24px; line-height: 1.5;">Tindakan ini akan menghapus data secara permanen dan tidak dapat dibatalkan.</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="confirmCancelBtn">Batal</button>
+        <button class="btn-primary" id="confirmDeleteBtn" style="background: var(--urgent);">
+          <span id="confirmDeleteLabel">Ya, Hapus</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // ══════════════════════════════════════════════════════════════════════
+    // KONFIGURASI URL APP SCRIPT
+    // ══════════════════════════════════════════════════════════════════════
+    // URL untuk Database Task & Reminder
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4nQtMFch9K-Pt4bsNKDeoaTxOtPKx12oNicJ55WHdsyRQH2wdNa0r0ftThDE4F9ligQ/exec';
+    
+    // URL untuk Database Design Request (ganti sesuai config.js milikmu)
+    const REQ_SCRIPT_URL = 'URL_APP_SCRIPT_DESIGN_REQUEST_KAMU_DISINI'; 
+    // ══════════════════════════════════════════════════════════════════════
 
     /* ─── Clock ─── */
     function tickClock() {
@@ -281,8 +297,7 @@
       const t = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
       document.getElementById('mastClock').innerHTML = d + '&nbsp;&nbsp;<b>' + t + '</b>';
     }
-    tickClock();
-    setInterval(tickClock, 30000);
+    tickClock(); setInterval(tickClock, 30000);
 
     /* ─── Toast helpers ─── */
     function showToast(id, msgId, msg, duration) {
@@ -291,11 +306,21 @@
       el.classList.add('show');
       setTimeout(() => el.classList.remove('show'), duration || 3000);
     }
-
     function showOk(msg) { showToast('toastOk', 'toastOkMsg', msg, 2800); }
     function showErr(msg) { showToast('toastErr', 'toastErrMsg', msg, 3500); }
 
-    /* ─── Type toggle ─── */
+    function esc(s) {
+      if (!s) return '';
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (isNaN(d)) return iso;
+      return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    /* ─── Type toggle (Left Panel) ─── */
     const taskFields = document.getElementById('taskFields');
     const reminderFields = document.getElementById('reminderFields');
     const divLabel = document.getElementById('divLabel');
@@ -307,15 +332,13 @@
       reminderFields.classList.toggle('hidden', isTask);
       divLabel.textContent = isTask ? 'Detail Task' : 'Detail Reminder';
     }
-
     document.querySelectorAll('input[name="type"]').forEach(r => r.addEventListener('change', toggleType));
     toggleType();
-
-    /* ─── Default date ─── */
+    
     function today() { return new Date().toISOString().split('T')[0]; }
     document.getElementById('remDate').value = today();
 
-    /* ─── Submit form ─── */
+    /* ─── Submit Form (Task & Reminder) ─── */
     const mainForm = document.getElementById('mainForm');
     const submitBtn = document.getElementById('submitBtn');
     const btnLabel = document.getElementById('btnLabel');
@@ -328,11 +351,8 @@
     mainForm.addEventListener('submit', function(e) {
       e.preventDefault();
       const type = document.querySelector('input[name="type"]:checked').value;
-      const isTask = type === 'Task List';
-
-      // Build payload manually — only include fields for the active type
       const data = { type };
-      if (isTask) {
+      if (type === 'Task List') {
         data.taskName = document.getElementById('taskName').value;
         data.deadline  = document.getElementById('deadline').value;
         data.status    = document.getElementById('status').value;
@@ -344,143 +364,31 @@
       }
 
       setSubmitLoading(true);
-
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(data)
-      })
+      fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) })
       .then(r => r.json())
       .then(res => {
         setSubmitLoading(false);
         if (res.success) {
-          showOk(res.message || 'Berhasil disimpan ke database');
-          mainForm.reset();
-          document.getElementById('typeTask').checked = true;
-          document.getElementById('remDate').value = today();
-          toggleType();
-          loadItems();
-        } else {
-          showErr(res.message || 'Gagal menyimpan data');
-        }
+          showOk(res.message || 'Berhasil disimpan');
+          mainForm.reset(); document.getElementById('typeTask').checked = true; document.getElementById('remDate').value = today();
+          toggleType(); loadItems();
+        } else showErr(res.message || 'Gagal menyimpan data');
       })
-      .catch(err => {
-        setSubmitLoading(false);
-        showErr(err.message || String(err));
-      });
+      .catch(err => { setSubmitLoading(false); showErr(err.message || String(err)); });
     });
 
-    /* ─── List ─── */
-    let allItems = [];
+    /* ─── Global State & Filter ─── */
+    let allItems = []; // Tasks & Reminders
+    let reqData = [];  // Design Requests
     let activeFilter = 'Task List';
-    const listEl = document.getElementById('list');
-    const countLabel = document.getElementById('countLabel');
-
-    function esc(s) {
-      if (!s) return '';
-      return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    }
-
-    function fmtDate(iso) {
-      if (!iso) return '';
-      const d = new Date(iso);
-      if (isNaN(d)) return iso;
-      return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-    }
-
-    function priorityClass(p) {
-      if (!p) return '';
-      const m = { 'Low': 'pill-low', 'Medium': 'pill-medium', 'Urgent': 'pill-urgent' };
-      return m[p] || '';
-    }
-
-    function statusClass(s) {
-      if (!s) return '';
-      if (s === 'Not started') return 'pill-not-started';
-      if (s === 'In progress') return 'pill-in-progress';
-      return '';
-    }
-
-    function renderRow(item) {
-      const isTask = item.type === 'Task List';
-      let pills = '';
-      if (item.deadline) pills += '<span class="pill pill-date">' + esc(fmtDate(item.deadline)) + '</span>';
-      if (item.status) pills += '<span class="pill ' + statusClass(item.status) + '">' + esc(item.status) + '</span>';
-      if (item.priority) pills += '<span class="pill ' + priorityClass(item.priority) + '">' + esc(item.priority) + '</span>';
-
-      const noteHtml = item.note ? '<div class="row-note">' + esc(item.note) + '</div>' : '';
-
-      let actions = '<div class="row-actions">';
-      actions += '<button type="button" class="btn-sm edit" data-edit-id="' + item.id + '">Edit</button>';
-      if (isTask && item.status !== 'Done') {
-        actions += '<button type="button" class="btn-sm done" data-done-id="' + item.id + '">Selesai</button>';
-      }
-      actions += '</div>';
-
-      return '<div class="task-row" data-type="' + esc(item.type) + '" id="row-' + item.id + '" data-row-id="' + item.id + '">' +
-        '<div class="row-accent"></div>' +
-        '<div class="row-inner">' +
-          '<div class="row-top">' +
-            '<div class="row-type-dot"></div>' +
-            '<div class="row-title">' + esc(item.taskName || '(tanpa nama)') + '</div>' +
-          '</div>' +
-          (pills ? '<div class="row-pills">' + pills + '</div>' : '') +
-          noteHtml +
-          actions +
-        '</div>' +
-      '</div>';
-    }
-
-    function renderList() {
-      const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
-
-      let filtered = activeFilter === 'all'
-        ? allItems
-        : allItems.filter(i => i.type === activeFilter);
-
-      if (q) {
-        filtered = filtered.filter(i =>
-          (i.taskName  || '').toLowerCase().includes(q) ||
-          (i.note      || '').toLowerCase().includes(q) ||
-          (i.status    || '').toLowerCase().includes(q) ||
-          (i.priority  || '').toLowerCase().includes(q)
-        );
-      }
-
-      // Urgent ke atas saat filter Task List aktif
-      if (activeFilter === 'Task List') {
-        filtered = filtered.slice().sort((a, b) => {
-          const aUrgent = a.priority === 'Urgent' ? 0 : 1;
-          const bUrgent = b.priority === 'Urgent' ? 0 : 1;
-          return aUrgent - bUrgent;
-        });
-      }
-
-      countLabel.textContent = filtered.length + ' item';
-
-      if (!filtered.length) {
-        const msg = q ? 'Tidak ada hasil untuk "' + esc(q) + '"' : 'Belum ada entri di kategori ini';
-        listEl.innerHTML = '<div class="state-box"><div class="state-icon">◌</div><div class="state-label">' + msg + '</div></div>';
-        return;
-      }
-      listEl.innerHTML = filtered.map(renderRow).join('');
-    }
-
-    /* ─── Search listeners ─── */
-    const searchInput = document.getElementById('searchInput');
-    const searchClear = document.getElementById('searchClear');
-
-    searchInput.addEventListener('input', function() {
-      searchClear.classList.toggle('visible', this.value.length > 0);
-      renderList();
-    });
-
-    searchClear.addEventListener('click', function() {
-      searchInput.value = '';
-      searchClear.classList.remove('visible');
-      searchInput.focus();
-      renderList();
-    });
+    
+    // View wrappers
+    const boardListWrap = document.getElementById('boardListWrap');
+    const calendarWrap  = document.getElementById('calendarWrap');
+    const designReqWrap = document.getElementById('designReqWrap');
+    const searchWrapBox = document.getElementById('searchWrapBox');
+    const countLabel    = document.getElementById('countLabel');
+    const boardSub      = document.getElementById('boardSubTitle');
 
     document.getElementById('chipBar').addEventListener('click', function(e) {
       const chip = e.target.closest('.chip');
@@ -489,7 +397,9 @@
       chip.classList.add('active');
       activeFilter = chip.dataset.filter;
 
-      if (activeFilter === 'Reminder') {
+      if (activeFilter === 'Design Request') {
+        switchToDesignReq();
+      } else if (activeFilter === 'Reminder') {
         switchToCal();
       } else {
         switchToList();
@@ -497,13 +407,89 @@
       }
     });
 
+    function switchToList() {
+      boardListWrap.classList.remove('hide');
+      calendarWrap.classList.remove('show');
+      designReqWrap.classList.remove('show');
+      searchWrapBox.style.display = '';
+      boardSub.textContent = "Task yang belum selesai";
+    }
+
+    function switchToCal() {
+      boardListWrap.classList.add('hide');
+      calendarWrap.classList.add('show');
+      designReqWrap.classList.remove('show');
+      searchWrapBox.style.display = 'none';
+      boardSub.textContent = "Jadwal reminder tersimpan";
+      renderCalendar();
+    }
+
+    function switchToDesignReq() {
+      boardListWrap.classList.add('hide');
+      calendarWrap.classList.remove('show');
+      designReqWrap.classList.add('show');
+      searchWrapBox.style.display = 'none';
+      boardSub.textContent = "Antrian Design Request tim kreatif";
+      if (reqData.length === 0) loadDesignRequests();
+      else renderReqTable();
+    }
+
+    /* ─── TASKS & REMINDER LOGIC ─── */
+    const listEl = document.getElementById('list');
+
+    function priorityClass(p) { return { 'Low': 'pill-low', 'Medium': 'pill-medium', 'Urgent': 'pill-urgent' }[p] || ''; }
+    function statusClass(s) { return s === 'Not started' ? 'pill-not-started' : s === 'In progress' ? 'pill-in-progress' : ''; }
+
+    function renderRow(item) {
+      const isTask = item.type === 'Task List';
+      let pills = '';
+      if (item.deadline) pills += '<span class="pill pill-date">' + esc(fmtDate(item.deadline)) + '</span>';
+      if (item.status) pills += '<span class="pill ' + statusClass(item.status) + '">' + esc(item.status) + '</span>';
+      if (item.priority) pills += '<span class="pill ' + priorityClass(item.priority) + '">' + esc(item.priority) + '</span>';
+      
+      let actions = '<div class="row-actions"><button type="button" class="btn-sm edit" data-edit-id="' + item.id + '">Edit</button>';
+      if (isTask && item.status !== 'Done') actions += '<button type="button" class="btn-sm done" data-done-id="' + item.id + '">Selesai</button>';
+      actions += '</div>';
+
+      return `<div class="task-row" data-type="${esc(item.type)}" id="row-${item.id}" data-row-id="${item.id}">
+        <div class="row-accent"></div>
+        <div class="row-inner">
+          <div class="row-top"><div class="row-type-dot"></div><div class="row-title">${esc(item.taskName || '(tanpa nama)')}</div></div>
+          ${pills ? `<div class="row-pills">${pills}</div>` : ''}
+          ${item.note ? `<div class="row-note">${esc(item.note)}</div>` : ''}
+          ${actions}
+        </div>
+      </div>`;
+    }
+
+    function renderList() {
+      if (activeFilter === 'Design Request') return;
+      const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      let filtered = activeFilter === 'all' ? allItems : allItems.filter(i => i.type === activeFilter);
+      if (q) filtered = filtered.filter(i => (i.taskName||'').toLowerCase().includes(q) || (i.note||'').toLowerCase().includes(q) || (i.status||'').toLowerCase().includes(q));
+      if (activeFilter === 'Task List') filtered = filtered.sort((a, b) => (a.priority === 'Urgent' ? 0 : 1) - (b.priority === 'Urgent' ? 0 : 1));
+      
+      countLabel.textContent = filtered.length + ' item';
+      if (!filtered.length) {
+        listEl.innerHTML = `<div class="state-box"><div class="state-icon">◌</div><div class="state-label">${q ? 'Tidak ada hasil' : 'Belum ada entri'}</div></div>`;
+        return;
+      }
+      listEl.innerHTML = filtered.map(renderRow).join('');
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+      document.getElementById('searchClear').classList.toggle('visible', this.value.length > 0);
+      renderList();
+    });
+    document.getElementById('searchClear').addEventListener('click', function() {
+      document.getElementById('searchInput').value = ''; this.classList.remove('visible'); renderList();
+    });
+
     listEl.addEventListener('click', function(e) {
       const doneBtn = e.target.closest('[data-done-id]');
       if (doneBtn) { e.stopPropagation(); markDone(doneBtn.dataset.doneId); return; }
-
       const editBtn = e.target.closest('[data-edit-id]');
       if (editBtn) { e.stopPropagation(); openEdit(editBtn.dataset.editId); return; }
-
       const row = e.target.closest('.task-row');
       if (row) openEdit(row.dataset.rowId);
     });
@@ -511,366 +497,252 @@
     function markDone(id) {
       const row = document.getElementById('row-' + id);
       if (row) row.style.opacity = '.45';
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'updateStatus', id: id, status: 'Done' })
-      })
-      .then(r => r.json())
-      .then(res => {
-        if (res.success) { showOk('Task ditandai selesai'); loadItems(); }
-        else { showErr('Gagal: ' + res.message); if (row) row.style.opacity = '1'; }
-      })
-      .catch(err => { showErr(err.message); if (row) row.style.opacity = '1'; });
+      fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'updateStatus', id: id, status: 'Done' }) })
+      .then(r => r.json()).then(res => {
+        if (res.success) { showOk('Task selesai'); loadItems(); } else { showErr('Gagal'); if (row) row.style.opacity = '1'; }
+      }).catch(err => { showErr(err.message); if (row) row.style.opacity = '1'; });
     }
 
     function loadItems() {
       fetch(SCRIPT_URL + '?action=getReminders')
       .then(r => r.json())
       .then(res => {
-        if (res.success) {
-          allItems = res.data || [];
-          renderList();
-          if (currentView === 'cal') renderCalendar();
-        }        else throw new Error(res.message);
+        if (res.success) { allItems = res.data || []; renderList(); if (activeFilter === 'Reminder') renderCalendar(); }
+        else throw new Error(res.message);
       })
-      .catch(err => {
-        listEl.innerHTML = '<div class="state-box state-error"><div class="state-icon">!</div><div class="state-label">' + esc(err.message || String(err)) + '</div></div>';
-        countLabel.textContent = 'error';
-      });
+      .catch(err => { listEl.innerHTML = `<div class="state-box state-error"><div class="state-icon">!</div><div class="state-label">Gagal muat data</div></div>`; });
     }
 
-    /* ─── Edit modal ─── */
-    const editOverlay = document.getElementById('editOverlay');
-    const editForm = document.getElementById('editForm');
-
-    function openEdit(id) {
-      const item = allItems.find(i => String(i.id) === String(id));
-      if (!item) return;
-
-      document.getElementById('editId').value = item.id;
-      document.getElementById('editType').value = item.type;
-
-      const isTask = item.type === 'Task List';
-      document.getElementById('editTitle').textContent = isTask ? 'Edit Task' : 'Edit Reminder';
-      document.getElementById('editTaskFields').classList.toggle('hidden', !isTask);
-      document.getElementById('editReminderFields').classList.toggle('hidden', isTask);
-
-      if (isTask) {
-        document.getElementById('editTaskName').value = item.taskName || '';
-        document.getElementById('editDeadline').value = item.deadline || '';
-        document.getElementById('editStatus').value = item.status || 'Not started';
-        document.getElementById('editPriority').value = item.priority || 'Low';
-        document.getElementById('editNote').value = item.note || '';
-      } else {
-        document.getElementById('editRemName').value = item.taskName || '';
-        document.getElementById('editRemDate').value = item.deadline || '';
-      }
-
-      editOverlay.classList.add('show');
-    }
-
-    function closeEdit() { editOverlay.classList.remove('show'); }
-
-    document.getElementById('editClose').addEventListener('click', closeEdit);
-    document.getElementById('editCancel').addEventListener('click', closeEdit);
-    editOverlay.addEventListener('click', e => { if (e.target === editOverlay) closeEdit(); });
-
-    editForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const id = document.getElementById('editId').value;
-      const type = document.getElementById('editType').value;
-      const isTask = type === 'Task List';
-      const btn = document.getElementById('editSubmitBtn');
-      const lbl = document.getElementById('editBtnLabel');
-
-      btn.disabled = true;
-      lbl.innerHTML = '<span class="spinner-sm"></span> Menyimpan...';
-
-      const payload = { action: 'updateItem', id, type };
-      if (isTask) {
-        payload.taskName = document.getElementById('editTaskName').value;
-        payload.deadline = document.getElementById('editDeadline').value || '';
-        payload.status   = document.getElementById('editStatus').value;
-        payload.priority = document.getElementById('editPriority').value;
-        payload.note     = document.getElementById('editNote').value;
-      } else {
-        payload.reminderName = document.getElementById('editRemName').value;
-        payload.date = document.getElementById('editRemDate').value;
-      }
-
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      })
-      .then(r => r.json())
-      .then(res => {
-        btn.disabled = false;
-        lbl.textContent = 'Simpan Perubahan';
-        if (res.success) { closeEdit(); showOk(res.message || 'Perubahan tersimpan'); loadItems(); }
-        else showErr(res.message || 'Gagal menyimpan');
-      })
-      .catch(err => {
-        btn.disabled = false;
-        lbl.textContent = 'Simpan Perubahan';
-        showErr(err.message || String(err));
-      });
-    });
-
-    /* ─── View Toggle ─── */
-    const boardListWrap = document.getElementById('boardListWrap');
-    const calendarWrap  = document.getElementById('calendarWrap');
-
-    let currentView = 'list';
-
-    function switchToList() {
-      currentView = 'list';
-      boardListWrap.classList.remove('hide');
-      calendarWrap.classList.remove('show');
-      document.getElementById('calDetail').classList.remove('show');
-      document.querySelector('.search-wrap').style.display = '';
-    }
-
-    function switchToCal() {
-      currentView = 'cal';
-      boardListWrap.classList.add('hide');
-      calendarWrap.classList.add('show');
-      document.querySelector('.search-wrap').style.display = 'none';
-      renderCalendar();
-    }
-
-    /* ─── Calendar ─── */
-    let calYear  = new Date().getFullYear();
-    let calMonth = new Date().getMonth(); // 0-based
-    let calSelectedDate = null;
-
-    const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni',
-                       'Juli','Agustus','September','Oktober','November','Desember'];
-
-    function isoDate(y, m, d) {
-      return y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-    }
-
-    function itemsOnDate(iso) {
-      return allItems.filter(i => (i.deadline || '') === iso && i.type === 'Reminder');
-    }
+    /* ─── CALENDAR LOGIC ─── */
+    let calYear = new Date().getFullYear(), calMonth = new Date().getMonth(), calSelectedDate = null;
+    const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    function isoDate(y, m, d) { return y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
+    function itemsOnDate(iso) { return allItems.filter(i => (i.deadline || '') === iso && i.type === 'Reminder'); }
 
     function renderCalendar() {
-      // Month label
-      document.getElementById('calMonthLabel').innerHTML =
-        MONTHS_ID[calMonth] + ' <span>' + calYear + '</span>';
-
-      const todayIso = today();
-      const firstDay = new Date(calYear, calMonth, 1);
-      const lastDay  = new Date(calYear, calMonth + 1, 0);
-
-      // Monday-based: 0=Mon … 6=Sun
-      let startDow = firstDay.getDay(); // 0=Sun
-      startDow = startDow === 0 ? 6 : startDow - 1;
-
-      const calDaysEl = document.getElementById('calDays');
+      document.getElementById('calMonthLabel').innerHTML = MONTHS_ID[calMonth] + ' <span>' + calYear + '</span>';
+      const todayIso = today(), firstDay = new Date(calYear, calMonth, 1), lastDay = new Date(calYear, calMonth + 1, 0);
+      let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
       let html = '';
-
-      // Cells from previous month
       const prevLastDay = new Date(calYear, calMonth, 0).getDate();
-      for (let i = startDow - 1; i >= 0; i--) {
-        const d = prevLastDay - i;
-        const iso = isoDate(calYear, calMonth - 1, d);
-        html += renderCalCell(d, iso, true, todayIso);
-      }
-
-      // Cells of current month
-      for (let d = 1; d <= lastDay.getDate(); d++) {
-        const iso = isoDate(calYear, calMonth, d);
-        html += renderCalCell(d, iso, false, todayIso);
-      }
-
-      // Fill remaining cells to complete last row
-      const totalCells = startDow + lastDay.getDate();
-      const remaining  = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
-      for (let d = 1; d <= remaining; d++) {
-        const iso = isoDate(calYear, calMonth + 1, d);
-        html += renderCalCell(d, iso, true, todayIso);
-      }
-
+      for (let i = startDow - 1; i >= 0; i--) html += renderCalCell(prevLastDay - i, isoDate(calYear, calMonth - 1, prevLastDay - i), true, todayIso);
+      for (let d = 1; d <= lastDay.getDate(); d++) html += renderCalCell(d, isoDate(calYear, calMonth, d), false, todayIso);
+      const totalCells = startDow + lastDay.getDate(), rem = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+      for (let d = 1; d <= rem; d++) html += renderCalCell(d, isoDate(calYear, calMonth + 1, d), true, todayIso);
+      
+      const calDaysEl = document.getElementById('calDays');
       calDaysEl.innerHTML = html;
-
-      // Re-attach click listeners
       calDaysEl.querySelectorAll('.cal-cell').forEach(cell => {
         cell.addEventListener('click', function() {
-          const iso = this.dataset.date;
-          calSelectedDate = iso;
-
-          // highlight selected
-          calDaysEl.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected'));
-          this.classList.add('selected');
-
-          showCalDetail(iso);
-        });
-      });
-
-      // Re-highlight selected if still visible
-      if (calSelectedDate) {
-        const sel = calDaysEl.querySelector('[data-date="' + calSelectedDate + '"]');
-        if (sel) sel.classList.add('selected');
-      }
-
-      // Also render agenda for mobile
-      renderAgenda();
-    }
-
-    function renderAgenda() {
-      const agendaEl = document.getElementById('agendaWrap');
-      const todayIso = today();
-      const DAY_ID = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
-
-      // Collect all days in current month that have reminders
-      const lastDay = new Date(calYear, calMonth + 1, 0).getDate();
-      const daysWithItems = [];
-
-      for (let d = 1; d <= lastDay; d++) {
-        const iso = isoDate(calYear, calMonth, d);
-        const items = itemsOnDate(iso);
-        if (items.length) daysWithItems.push({ iso, d, items });
-      }
-
-      if (!daysWithItems.length) {
-        agendaEl.innerHTML = '<div class="agenda-empty">Tidak ada reminder bulan ini</div>';
-        return;
-      }
-
-      agendaEl.innerHTML = daysWithItems.map(function(day) {
-        const dt = new Date(day.iso + 'T00:00:00');
-        const isToday = day.iso === todayIso;
-        const dayName = DAY_ID[dt.getDay()];
-
-        const itemsHtml = day.items.map(function(item) {
-          return '<div class="agenda-item">' +
-            '<span class="agenda-dot"></span>' +
-            '<span>' + esc(item.taskName || '(tanpa nama)') + '</span>' +
-          '</div>';
-        }).join('');
-
-        return '<div class="agenda-row" data-date="' + day.iso + '">' +
-          '<div class="agenda-date' + (isToday ? ' is-today' : '') + '">' +
-            '<div class="agenda-day-num">' + day.d + '</div>' +
-            '<div class="agenda-day-name">' + dayName + '</div>' +
-          '</div>' +
-          '<div class="agenda-items">' + itemsHtml + '</div>' +
-        '</div>';
-      }).join('');
-
-      // Click row → open detail
-      agendaEl.querySelectorAll('.agenda-row').forEach(function(row) {
-        row.addEventListener('click', function() {
           calSelectedDate = this.dataset.date;
-          showCalDetail(this.dataset.date);
+          calDaysEl.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected'));
+          this.classList.add('selected'); showCalDetail(this.dataset.date);
         });
       });
+      if (calSelectedDate) { const sel = calDaysEl.querySelector(`[data-date="${calSelectedDate}"]`); if (sel) sel.classList.add('selected'); }
     }
 
     function renderCalCell(dayNum, iso, otherMonth, todayIso) {
       const items = itemsOnDate(iso);
-      const isToday = iso === todayIso;
-
-      let cls = 'cal-cell';
-      if (otherMonth) cls += ' other-month';
-      if (isToday) cls += ' today';
-      if (iso === calSelectedDate) cls += ' selected';
-
-      let eventsHtml = '';
-      const maxShow = 2;
-      items.slice(0, maxShow).forEach(item => {
-        const typeClass = item.type === 'Reminder' ? 'type-reminder' : 'type-task';
-        const name = (item.taskName || '').substring(0, 18) + ((item.taskName || '').length > 18 ? '…' : '');
-        eventsHtml += '<div class="cal-event ' + typeClass + '">' +
-          '<span class="cal-event-dot"></span>' +
-          esc(name) +
-        '</div>';
-      });
-
-      if (items.length > maxShow) {
-        eventsHtml += '<div class="cal-event-more">+' + (items.length - maxShow) + ' lagi</div>';
-      }
-
-      return '<div class="' + cls + '" data-date="' + iso + '">' +
-        '<div class="cal-day-num">' + dayNum + '</div>' +
-        '<div class="cal-events">' + eventsHtml + '</div>' +
-      '</div>';
+      let cls = 'cal-cell' + (otherMonth ? ' other-month' : '') + (iso === todayIso ? ' today' : '') + (iso === calSelectedDate ? ' selected' : '');
+      let ev = items.slice(0, 2).map(i => `<div class="cal-event type-reminder"><span class="cal-event-dot"></span>${esc((i.taskName||'').substring(0,18))}</div>`).join('');
+      if (items.length > 2) ev += `<div class="cal-event-more">+${items.length - 2} lagi</div>`;
+      return `<div class="${cls}" data-date="${iso}"><div class="cal-day-num">${dayNum}</div><div class="cal-events">${ev}</div></div>`;
     }
 
     function showCalDetail(iso) {
-      const items = itemsOnDate(iso);
-      const detailEl  = document.getElementById('calDetail');
-      const titleEl   = document.getElementById('calDetailTitle');
-      const listDEl   = document.getElementById('calDetailList');
-
-      // Format date nicely
-      const d = new Date(iso + 'T00:00:00');
-      const label = d.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-      titleEl.textContent = label;
-
-      if (!items.length) {
-        listDEl.innerHTML = '<div class="state-box" style="padding:20px 16px"><div class="state-label">Tidak ada item di tanggal ini</div></div>';
-      } else {
-        listDEl.innerHTML = items.map(item => {
-          const isTask = item.type === 'Task List';
-          let pills = '';
-          if (item.status)   pills += '<span class="pill ' + statusClass(item.status)     + '">' + esc(item.status)   + '</span>';
-          if (item.priority) pills += '<span class="pill ' + priorityClass(item.priority) + '">' + esc(item.priority) + '</span>';
-
-          return '<div class="task-row" data-type="' + esc(item.type) + '" data-row-id="' + item.id + '" style="cursor:pointer">' +
-            '<div class="row-accent"></div>' +
-            '<div class="row-inner">' +
-              '<div class="row-top"><div class="row-type-dot"></div>' +
-              '<div class="row-title">' + esc(item.taskName || '(tanpa nama)') + '</div></div>' +
-              (pills ? '<div class="row-pills">' + pills + '</div>' : '') +
-              (item.note ? '<div class="row-note">' + esc(item.note) + '</div>' : '') +
-              '<div class="row-actions">' +
-                '<button type="button" class="btn-sm edit" data-edit-id="' + item.id + '">Edit</button>' +
-                (isTask && item.status !== 'Done' ? '<button type="button" class="btn-sm done" data-done-id="' + item.id + '">Selesai</button>' : '') +
-              '</div>' +
-            '</div>' +
-          '</div>';
-        }).join('');
-
-        // Wire up buttons in detail
-        listDEl.querySelectorAll('[data-done-id]').forEach(btn => {
-          btn.addEventListener('click', e => { e.stopPropagation(); markDone(btn.dataset.doneId); });
-        });
-        listDEl.querySelectorAll('[data-edit-id]').forEach(btn => {
-          btn.addEventListener('click', e => { e.stopPropagation(); openEdit(btn.dataset.editId); });
-        });
-      }
-
-      detailEl.classList.add('show');
+      const items = itemsOnDate(iso), dEl = document.getElementById('calDetail');
+      document.getElementById('calDetailTitle').textContent = new Date(iso + 'T00:00:00').toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+      const lEl = document.getElementById('calDetailList');
+      if (!items.length) lEl.innerHTML = '<div class="state-box" style="padding:20px"><div class="state-label">Tidak ada reminder</div></div>';
+      else lEl.innerHTML = items.map(renderRow).join('');
+      dEl.classList.add('show');
     }
 
-    document.getElementById('calDetailClose').addEventListener('click', function() {
-      document.getElementById('calDetail').classList.remove('show');
-      calSelectedDate = null;
-      document.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected'));
+    document.getElementById('calDetailClose').addEventListener('click', () => { document.getElementById('calDetail').classList.remove('show'); calSelectedDate = null; document.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected')); });
+    document.getElementById('calPrev').addEventListener('click', () => { calMonth--; if(calMonth < 0){calMonth=11; calYear--;} renderCalendar(); document.getElementById('calDetail').classList.remove('show'); });
+    document.getElementById('calNext').addEventListener('click', () => { calMonth++; if(calMonth > 11){calMonth=0; calYear++;} renderCalendar(); document.getElementById('calDetail').classList.remove('show'); });
+
+    /* ─── EDIT MODAL LOGIC (Tasks & Reminders) ─── */
+    const editOverlay = document.getElementById('editOverlay'), editForm = document.getElementById('editForm');
+    function openEdit(id) {
+      const item = allItems.find(i => String(i.id) === String(id)); if (!item) return;
+      document.getElementById('editId').value = item.id; document.getElementById('editType').value = item.type;
+      const isTask = item.type === 'Task List';
+      document.getElementById('editTitle').textContent = isTask ? 'Edit Task' : 'Edit Reminder';
+      document.getElementById('editTaskFields').classList.toggle('hidden', !isTask);
+      document.getElementById('editReminderFields').classList.toggle('hidden', isTask);
+      if (isTask) {
+        document.getElementById('editTaskName').value = item.taskName || ''; document.getElementById('editDeadline').value = item.deadline || '';
+        document.getElementById('editStatus').value = item.status || 'Not started'; document.getElementById('editPriority').value = item.priority || 'Low';
+        document.getElementById('editNote').value = item.note || '';
+      } else {
+        document.getElementById('editRemName').value = item.taskName || ''; document.getElementById('editRemDate').value = item.deadline || '';
+      }
+      editOverlay.classList.add('show');
+    }
+    function closeEdit() { editOverlay.classList.remove('show'); }
+    document.getElementById('editClose').addEventListener('click', closeEdit); document.getElementById('editCancel').addEventListener('click', closeEdit);
+
+    editForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const id = document.getElementById('editId').value, type = document.getElementById('editType').value, isTask = type === 'Task List';
+      const btn = document.getElementById('editSubmitBtn'), lbl = document.getElementById('editBtnLabel');
+      btn.disabled = true; lbl.innerHTML = '<span class="spinner-sm"></span> Menyimpan...';
+      const payload = { action: 'updateItem', id, type };
+      if (isTask) { payload.taskName = document.getElementById('editTaskName').value; payload.deadline = document.getElementById('editDeadline').value; payload.status = document.getElementById('editStatus').value; payload.priority = document.getElementById('editPriority').value; payload.note = document.getElementById('editNote').value; }
+      else { payload.reminderName = document.getElementById('editRemName').value; payload.date = document.getElementById('editRemDate').value; }
+      fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r=>r.json()).then(res=>{
+        btn.disabled=false; lbl.textContent='Simpan Perubahan'; if(res.success){closeEdit(); showOk('Perubahan tersimpan'); loadItems();} else showErr('Gagal menyimpan');
+      });
     });
 
-    document.getElementById('calPrev').addEventListener('click', function() {
-      calMonth--;
-      if (calMonth < 0) { calMonth = 11; calYear--; }
-      calSelectedDate = null;
-      document.getElementById('calDetail').classList.remove('show');
-      renderCalendar();
+    /* ══════════════════════════════════════════════════════════════════════
+       DESIGN REQUEST LOGIC (Tabel + Data API)
+       ══════════════════════════════════════════════════════════════════════ */
+    let reqActiveIndex = null;
+
+    function loadDesignRequests() {
+      const tbody = document.getElementById('reqTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" class="state-box"><div class="state-spinner"></div><div class="state-label">Memuat requests...</div></td></tr>';
+
+      // Pastikan REQ_SCRIPT_URL valid, jika belum diisi, mock data atau error
+      if(REQ_SCRIPT_URL === 'URL_APP_SCRIPT_DESIGN_REQUEST_KAMU_DISINI') {
+        tbody.innerHTML = '<tr><td colspan="6" class="state-box"><div class="state-icon">!</div><div class="state-label">Mohon ganti REQ_SCRIPT_URL di dalam script dengan URL Google App Script kamu.</div></td></tr>';
+        return;
+      }
+
+      fetch(`${REQ_SCRIPT_URL}?action=getRequests`)
+        .then(res => res.json())
+        .then(data => {
+          reqData = data || [];
+          renderReqTable();
+        })
+        .catch(err => {
+          tbody.innerHTML = '<tr><td colspan="6" class="state-box"><div class="state-icon">!</div><div class="state-label">Gagal terhubung ke database Request.</div></td></tr>';
+        });
+    }
+
+    function renderReqTable() {
+      const tbody = document.getElementById('reqTableBody');
+      tbody.innerHTML = '';
+      countLabel.textContent = reqData.length + ' item';
+
+      // Update stat strip
+      const total = reqData.length;
+      const pending = reqData.filter(r => r.Status === 'Pending').length;
+      const done = reqData.filter(r => r.Status === 'Done').length;
+      document.getElementById('reqStatsStrip').innerHTML = `
+        <div class="stat-pill"><span class="stat-num">${total}</span><span class="stat-label">Total</span></div>
+        <div class="stat-pill"><span class="stat-num" style="color:var(--warn);">${pending}</span><span class="stat-label">Pending</span></div>
+        <div class="stat-pill"><span class="stat-num" style="color:var(--ok);">${done}</span><span class="stat-label">Done</span></div>
+      `;
+
+      if (reqData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="state-box"><div class="state-icon">◌</div><div class="state-label">Belum ada Design Request</div></td></tr>';
+        return;
+      }
+
+      reqData.forEach((row, idx) => {
+        const isPending = row.Status === 'Pending';
+        const overdue = isPending && new Date(row.Deadline) < new Date();
+        const tr = document.createElement('tr');
+        
+        tr.innerHTML = `
+          <td>
+            <div style="font-weight:600; color:var(--ink); margin-bottom:2px;">${esc(row.Name || '—')}</div>
+            <div style="font-size:11px; color:var(--muted);">${esc(row.Email || '')}</div>
+          </td>
+          <td>${esc(row.Department || '—')}</td>
+          <td>${fmtDate(row['Date Submit'])}</td>
+          <td style="${overdue ? 'color:var(--urgent); font-weight:600;' : ''}">${fmtDate(row.Deadline)}</td>
+          <td><span class="pill ${isPending ? 'pill-medium' : 'pill-low'}">${esc(row.Status)}</span></td>
+          <td style="text-align:right;">
+            <button class="btn-sm" style="border:1px solid var(--line-2);" onclick="event.stopPropagation(); openReqModal(${idx})">Lihat</button>
+          </td>
+        `;
+        tr.addEventListener('click', () => openReqModal(idx));
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* ─── MODAL DESIGN REQUEST ─── */
+    const reqModalOverlay = document.getElementById('reqModalOverlay');
+
+    function openReqModal(idx) {
+      const row = reqData[idx];
+      if (!row) return;
+      reqActiveIndex = idx;
+      const isPending = row.Status === 'Pending';
+
+      document.getElementById('reqModalName').textContent = row.Name || '—';
+      document.getElementById('reqModalMeta').textContent = `${row.Department || '—'} · Diajukan ${fmtDate(row['Date Submit'])}`;
+      document.getElementById('reqModalEmail').textContent = row.Email || '—';
+      document.getElementById('reqModalDept').textContent = row.Department || '—';
+      document.getElementById('reqModalSub').textContent = fmtDate(row['Date Submit']);
+      document.getElementById('reqModalDead').textContent = fmtDate(row.Deadline);
+      document.getElementById('reqModalNotes').textContent = row.Notes || '—';
+      
+      document.getElementById('reqModalStatusBadge').innerHTML = `<span class="pill ${isPending ? 'pill-medium' : 'pill-low'}">${esc(row.Status)}</span>`;
+      
+      const fileLink = document.getElementById('reqModalFile');
+      if (row['File URL']) { fileLink.href = row['File URL']; fileLink.style.display = 'inline-flex'; } 
+      else { fileLink.style.display = 'none'; }
+
+      document.getElementById('reqModalDoneBtn').style.display = isPending ? 'inline-block' : 'none';
+      reqModalOverlay.classList.add('show');
+    }
+
+    document.getElementById('reqModalClose').addEventListener('click', () => reqModalOverlay.classList.remove('show'));
+    reqModalOverlay.addEventListener('click', e => { if (e.target === reqModalOverlay) reqModalOverlay.classList.remove('show'); });
+
+    // Mark as Done (Request)
+    document.getElementById('reqModalDoneBtn').addEventListener('click', () => {
+      if (reqActiveIndex === null) return;
+      const btn = document.getElementById('reqModalDoneBtn');
+      btn.disabled = true; btn.textContent = 'Updating...';
+
+      fetch(`${REQ_SCRIPT_URL}?action=markDone&rowIndex=${reqActiveIndex}`)
+        .then(() => {
+          reqData[reqActiveIndex].Status = 'Done';
+          renderReqTable();
+          showOk('Request ditandai selesai');
+          openReqModal(reqActiveIndex); // Refresh modal
+        })
+        .catch(err => showErr('Gagal mengupdate request'))
+        .finally(() => { btn.disabled = false; btn.textContent = 'Mark as Done'; });
     });
 
-    document.getElementById('calNext').addEventListener('click', function() {
-      calMonth++;
-      if (calMonth > 11) { calMonth = 0; calYear++; }
-      calSelectedDate = null;
-      document.getElementById('calDetail').classList.remove('show');
-      renderCalendar();
+    /* ─── CONFIRM DELETE (Request) ─── */
+    const confirmOverlay = document.getElementById('confirmOverlay');
+    document.getElementById('reqModalDeleteBtn').addEventListener('click', () => {
+      confirmOverlay.classList.add('show');
     });
 
-    /* ─── Init ─── */
+    document.getElementById('confirmCancelBtn').addEventListener('click', () => confirmOverlay.classList.remove('show'));
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+      if (reqActiveIndex === null) return;
+      const btn = document.getElementById('confirmDeleteBtn');
+      const lbl = document.getElementById('confirmDeleteLabel');
+      btn.disabled = true; lbl.textContent = 'Menghapus...';
+
+      fetch(`${REQ_SCRIPT_URL}?action=deleteRequest&rowIndex=${reqActiveIndex}`)
+        .then(() => {
+          reqData.splice(reqActiveIndex, 1);
+          reqActiveIndex = null;
+          renderReqTable();
+          confirmOverlay.classList.remove('show');
+          reqModalOverlay.classList.remove('show');
+          showOk('Request berhasil dihapus');
+        })
+        .catch(err => showErr('Gagal menghapus request'))
+        .finally(() => { btn.disabled = false; lbl.textContent = 'Ya, Hapus'; });
+    });
+
+    // Init
     loadItems();
+
   </script>
 </body>
 </html>
