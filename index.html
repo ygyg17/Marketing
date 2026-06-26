@@ -6,25 +6,325 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="styles.css">
 
   <style>
-    /* ── Multiple file links (Design Request modal) ───────────────── */
-    .req-file-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+    :root {
+      --bg: #fafaf9;
+      --surface: #ffffff;
+      --ink: #1c1917;
+      --ink-2: #44403c;
+      --muted: #78716c;
+      --line: #e7e5e4;
+      --line-2: #d6d3d1;
+      --gold: #BA8F2E;
+      --gold-hover: #9c7726;
+      --gold-dim: rgba(186,143,46,0.10);
+      --gold-border: rgba(186,143,46,0.30);
+      --ok: #15803d;
+      --ok-bg: #f0fdf4;
+      --warn: #b45309;
+      --warn-bg: #fffbeb;
+      --urgent: #b91c1c;
+      --urgent-bg: #fef2f2;
+      --info-bg: #f5f5f4;
+      --topbar-h: 52px;
     }
-    .req-file-list .btn-secondary {
-      text-decoration: none;
-      display: inline-flex;
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden; /* body tidak scroll — masing-masing panel yang scroll */
+    }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      height: var(--topbar-h);
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+      display: flex;
       align-items: center;
-      gap: 6px;
-      flex: unset;
-      width: fit-content;
-      padding: 8px 14px;
-      font-size: 12px;
+      padding: 0 28px;
+      gap: 14px;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+    }
+    .topbar-logo { height: 24px; object-fit: contain; }
+    .topbar-div { width: 1px; height: 20px; background: var(--line); }
+    .topbar-title { font-size: 13px; font-weight: 600; color: var(--ink); letter-spacing: .01em; }
+    .topbar-clock { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); line-height: 1.4; text-align: right; }
+    .topbar-clock b { color: var(--ink-2); font-weight: 500; }
+
+    /* ─── LAYOUT ─── */
+    .body-wrap {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      height: calc(100vh - var(--topbar-h));
+      margin-top: var(--topbar-h);
+      overflow: hidden; /* clip kedua panel */
+    }
+
+    /* ─── LEFT PANEL — sticky, scrollable sendiri ─── */
+    .left-panel {
+      border-right: 1px solid var(--line);
+      background: var(--surface);
+      height: 100%;          /* isi tinggi body-wrap */
+      overflow-y: auto;      /* scroll sendiri kalau konten lebih panjang */
+      overflow-x: hidden;
+    }
+    .left-inner {
+      padding: 32px 28px 40px;
+    }
+
+    /* ─── RIGHT PANEL — scrollable ─── */
+    .right-panel {
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 32px 28px 80px;
+    }
+
+    /* ─── LEFT PANEL CONTENT ─── */
+    .panel-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+    .panel-heading { font-size: 22px; font-weight: 700; color: var(--ink); line-height: 1.25; letter-spacing: -.02em; margin-bottom: 6px; }
+    .panel-sub { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
+
+    .type-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+    .type-row input { display: none; }
+    .type-label { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: .18s ease; user-select: none; }
+    .type-label .t-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .4; transition: .18s ease; }
+    .type-row input:checked + .type-label { border-color: var(--gold-border); color: var(--gold); background: var(--gold-dim); }
+    .type-row input:checked + .type-label .t-dot { opacity: 1; }
+
+    .divider { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .divider-line { flex: 1; height: 1px; background: var(--line); }
+    .divider-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+    .field { margin-bottom: 18px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field > label, .field-row .field > label { display: block; font-size: 11.5px; font-weight: 600; color: var(--ink-2); letter-spacing: .02em; margin-bottom: 7px; }
+    .opt-tag { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 500; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; margin-left: 5px; }
+
+    input[type=text], input[type=date], select, textarea { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 11px 14px; font-size: 13.5px; font-family: 'Inter', sans-serif; font-weight: 500; color: var(--ink); outline: none; transition: border-color .15s, box-shadow .15s; }
+    input[type=text]:focus, input[type=date]:focus, select:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim); background: var(--surface); }
+    select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2378716c' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; cursor: pointer; }
+    textarea { min-height: 88px; resize: vertical; line-height: 1.55; }
+    .hidden { display: none !important; }
+
+    .btn-primary { width: 100%; margin-top: 8px; padding: 14px 20px; background: var(--gold); color: #fff; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 9px; transition: background .18s, transform .1s; letter-spacing: .01em; }
+    .btn-primary:hover { background: var(--gold-hover); }
+    .btn-primary:active { transform: scale(.99); }
+    .btn-primary:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+
+    .spinner-sm { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer-note { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+
+    /* ─── RIGHT PANEL CONTENT ─── */
+    .board-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
+    .board-title-wrap h2 { font-size: 18px; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
+    .board-title-wrap .board-sub { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+    .count-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--gold); background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: 20px; padding: 4px 12px; letter-spacing: .04em; }
+
+    .filter-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+    .search-wrap { position: relative; flex: 0 0 180px; }
+    .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 13px; height: 13px; color: var(--muted); pointer-events: none; }
+    #searchInput { width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 6px 30px 6px 30px; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; font-weight: 500; color: var(--ink); outline: none; transition: border-color .15s, box-shadow .15s; }
+    #searchInput::placeholder { color: var(--muted); }
+    #searchInput:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim); }
+    .search-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; border-radius: 50%; background: var(--line); border: none; color: var(--muted); font-size: 11px; line-height: 1; cursor: pointer; display: none; align-items: center; justify-content: center; transition: background .15s; }
+    .search-clear:hover { background: var(--line-2); color: var(--ink); }
+    .search-clear.visible { display: flex; }
+
+    .chips { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+    .chip { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; transition: .15s ease; user-select: none; }
+    .chip:hover { border-color: var(--line-2); color: var(--ink-2); }
+    .chip.active { background: var(--gold-dim); color: var(--gold); border-color: var(--gold-border); }
+
+    .board { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .state-box { padding: 56px 24px; text-align: center; }
+    .state-icon { font-size: 28px; margin-bottom: 12px; opacity: .35; }
+    .state-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .state-spinner { width: 26px; height: 26px; border: 2px solid var(--line); border-top-color: var(--gold); border-radius: 50%; margin: 0 auto 14px; animation: spin .8s linear infinite; }
+    .state-error .state-icon { opacity: 1; color: var(--urgent); }
+
+    /* Task rows */
+    .task-row { display: flex; align-items: flex-start; border-bottom: 1px solid var(--line); cursor: pointer; transition: background .15s; }
+    .task-row:last-child { border-bottom: none; }
+    .task-row:hover { background: var(--bg); }
+    .row-accent { width: 3px; align-self: stretch; flex-shrink: 0; background: transparent; transition: background .15s; }
+    .task-row[data-type="Task List"] .row-accent { background: var(--line-2); }
+    .task-row:hover .row-accent, .task-row[data-type="Reminder"] .row-accent { background: var(--gold); }
+    .row-inner { flex: 1; min-width: 0; padding: 16px 18px 16px 16px; }
+    .row-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .row-type-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line-2); flex-shrink: 0; margin-top: 5px; }
+    [data-type="Reminder"] .row-type-dot { background: var(--gold); }
+    .row-title { font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.4; word-break: break-word; }
+    .row-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .pill { display: inline-flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 3px 9px; border-radius: 4px; white-space: nowrap; }
+    .pill-date { background: var(--info-bg); color: var(--muted); border: 1px solid var(--line); }
+    .pill-not-started { background: var(--info-bg); color: #57534e; }
+    .pill-in-progress { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); }
+    .pill-low { background: var(--ok-bg); color: var(--ok); }
+    .pill-medium { background: var(--warn-bg); color: var(--warn); }
+    .pill-urgent { background: var(--urgent-bg); color: var(--urgent); }
+    .row-note { font-size: 12.5px; color: var(--muted); line-height: 1.55; background: var(--bg); padding: 9px 12px; border-left: 2px solid var(--line); border-radius: 0 5px 5px 0; margin-bottom: 10px; word-break: break-word; }
+    .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+    .btn-sm { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 5px 12px; border-radius: 5px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; transition: .15s ease; }
+    .btn-sm:hover { border-color: var(--ink); color: var(--ink); }
+    .btn-sm.edit:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+    .btn-sm.done:hover { border-color: var(--ok); color: var(--ok); background: var(--ok-bg); }
+
+    /* Toast & Modal */
+    .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(12px); padding: 11px 20px 11px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; opacity: 0; visibility: hidden; transition: .25s cubic-bezier(.34,1.56,.64,1); z-index: 10000; max-width: min(92vw, 380px); box-shadow: 0 4px 20px rgba(0,0,0,.12); }
+    .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    .toast-ok { background: #052e16; color: #bbf7d0; }
+    .toast-err { background: #450a0a; color: #fecaca; }
+    .toast-icon { font-size: 16px; flex-shrink: 0; }
+
+    .overlay { position: fixed; inset: 0; background: rgba(28,25,23,.45); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: .2s ease; z-index: 9000; padding: 20px; }
+    .overlay.show { opacity: 1; visibility: visible; }
+    .modal-card { width: min(92vw, 440px); max-height: 90vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 26px 24px 24px; box-shadow: 0 20px 40px rgba(0,0,0,.15); transform: translateY(10px) scale(.97); animation: popIn .22s cubic-bezier(.34,1.56,.64,1) forwards; }
+    @keyframes popIn { to { transform: translateY(0) scale(1); } }
+    .modal-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; gap: 16px; }
+    .modal-head h3 { font-size: 16px; font-weight: 700; color: var(--ink); }
+    .close-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); font-size: 16px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: .15s ease; flex-shrink: 0; }
+    .close-btn:hover { color: var(--ink); border-color: var(--ink-2); }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-secondary { flex: 1; padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink-2); font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: .15s ease; text-align: center; }
+    .btn-secondary:hover { background: var(--bg); border-color: var(--line-2); }
+    .modal-actions .btn-primary { flex: 2; margin-top: 0; }
+
+    /* Calendar */
+    .calendar-wrap, .design-req-wrap { display: none; }
+    .calendar-wrap.show, .design-req-wrap.show { display: block; }
+    .board-list-wrap { display: block; }
+    .board-list-wrap.hide { display: none; }
+    .cal-nav { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+    .cal-nav-btn { width: 24px; height: 24px; border-radius: 5px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: .15s ease; flex-shrink: 0; }
+    .cal-nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .cal-nav-btn svg { width: 11px; height: 11px; }
+    .cal-month-label { font-size: 13.5px; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
+    .cal-month-label span { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 500; color: var(--muted); margin-left: 6px; }
+    .cal-grid-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .cal-dow { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--line); }
+    .cal-dow-cell { padding: 8px 4px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); }
+    .cal-cell { min-height: 88px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 7px 6px 6px; cursor: pointer; transition: background .12s; }
+    .cal-cell:nth-child(7n) { border-right: none; }
+    .cal-cell:hover { background: var(--bg); }
+    .cal-cell.other-month { background: #fafaf9; }
+    .cal-cell.other-month .cal-day-num { color: var(--line-2); }
+    .cal-cell.today .cal-day-num { background: var(--gold); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+    .cal-cell.selected { background: var(--gold-dim); }
+    .cal-cell.selected .cal-day-num { color: var(--gold); }
+    .cal-day-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--ink-2); margin-bottom: 4px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+    .cal-events { display: flex; flex-direction: column; gap: 2px; }
+    .cal-event { display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; line-height: 1.3; padding: 2px 5px; border-radius: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cal-event.type-task { background: var(--info-bg); color: var(--ink-2); }
+    .cal-event.type-reminder { background: var(--gold-dim); color: var(--gold); }
+    .cal-event-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .type-task .cal-event-dot { background: var(--muted); }
+    .type-reminder .cal-event-dot { background: var(--gold); }
+    .cal-event-more { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; color: var(--muted); padding: 1px 5px; letter-spacing: .04em; }
+    .cal-detail { margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: none; }
+    .cal-detail.show { display: block; }
+    .cal-detail-head { padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+    .cal-detail-head h4 { font-size: 13px; font-weight: 700; color: var(--ink); }
+    .cal-detail-close { width: 24px; height: 24px; border-radius: 5px; border: 1px solid var(--line); background: var(--bg); color: var(--muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: .15s ease; }
+    .cal-detail-close:hover { color: var(--ink); border-color: var(--ink); }
+    .cal-detail-list { padding: 8px 0; }
+
+    /* Design Request */
+    .stats-strip { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .stat-pill { background: var(--surface); border: 1px solid var(--line); padding: 8px 14px; border-radius: 8px; display: flex; align-items: center; gap: 8px; flex: 1; min-width: 100px; }
+    .stat-num { font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--ink); }
+    .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+    .table-wrapper { width: 100%; overflow-x: auto; }
+    .req-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    .req-table th { padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+    .req-table td { padding: 14px 16px; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: middle; }
+    .req-table tr:last-child td { border-bottom: none; }
+    .req-table tbody tr { transition: background .12s; cursor: pointer; }
+    .req-table tbody tr:hover { background: var(--bg); }
+    .req-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .req-field { display: flex; flex-direction: column; gap: 4px; }
+    .req-field span { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .req-field strong { font-size: 13.5px; font-weight: 500; color: var(--ink); }
+
+    /* Multiple file links */
+    .req-file-list { display: flex; flex-direction: column; gap: 6px; }
+    .req-file-list .btn-secondary { text-decoration: none; display: inline-flex; align-items: center; gap: 6px; flex: unset; width: fit-content; padding: 8px 14px; font-size: 12px; }
+
+    /* WA Float */
+    .wa-float { position: fixed; right: 20px; bottom: 20px; z-index: 8000; background: #128C7E; color: #fff; text-decoration: none; padding: 11px 18px; border-radius: 999px; display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; box-shadow: 0 6px 20px rgba(18,140,126,.25); transition: .18s ease; }
+    .wa-float:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(18,140,126,.3); }
+
+    /* Agenda */
+    .agenda-wrap { display: none; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .agenda-empty { padding: 40px 20px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .agenda-row { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border-bottom: 1px solid var(--line); cursor: pointer; transition: background .12s; }
+    .agenda-row:last-child { border-bottom: none; }
+    .agenda-row:hover { background: var(--bg); }
+    .agenda-date { flex-shrink: 0; width: 42px; text-align: center; }
+    .agenda-day-num { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; color: var(--ink); line-height: 1; }
+    .agenda-day-name { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+    .agenda-date.is-today .agenda-day-num { color: var(--gold); }
+    .agenda-items { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; padding-top: 2px; }
+    .agenda-item { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.35; }
+    .agenda-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 860px) {
+      html, body { overflow: auto; }
+      .body-wrap {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow: visible;
+        margin-top: var(--topbar-h);
+      }
+      .left-panel {
+        height: auto;
+        overflow: visible;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+      }
+      .right-panel {
+        height: auto;
+        overflow: visible;
+        padding: 24px 18px 80px;
+      }
+      .req-detail-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 520px) {
+      .topbar { padding: 0 16px; }
+      .left-inner { padding: 24px 18px 32px; }
+      .field-row { grid-template-columns: 1fr; }
+      .panel-heading { font-size: 19px; }
+      .board-header { flex-direction: column; align-items: flex-start; }
+      .cal-grid-wrap { display: none; }
+      .agenda-wrap { display: block; }
+      .stat-pill { min-width: 100%; }
+    }
+
+    @media (max-width: 700px) {
+      .table-wrapper { overflow-x: visible; }
+      .req-table thead { display: none; }
+      .req-table, .req-table tbody, .req-table tr, .req-table td { display: block; width: 100%; }
+      .req-table tr { border-bottom: 1px solid var(--line); padding: 14px 16px; }
+      .req-table tr:last-child { border-bottom: none; }
+      .req-table td { padding: 3px 0; border-bottom: none; white-space: normal; word-break: break-word; }
+      .req-table td[data-label]::before { content: attr(data-label); display: block; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 8px; margin-bottom: 2px; }
+      .req-table td[data-label]:first-child::before { margin-top: 0; }
+      .req-table td:last-child { text-align: left; margin-top: 6px; }
+      .req-table td:last-child::before { content: none; }
     }
   </style>
 </head>
@@ -40,6 +340,7 @@
 
   <div class="body-wrap">
 
+    <!-- ══ LEFT PANEL ══ -->
     <div class="left-panel">
       <div class="left-inner">
         <div class="panel-eyebrow">Input Baru</div>
@@ -50,7 +351,6 @@
           <div class="type-row">
             <input type="radio" id="typeTask" name="type" value="Task List" checked>
             <label for="typeTask" class="type-label"><span class="t-dot"></span>Task List</label>
-
             <input type="radio" id="typeRemind" name="type" value="Reminder">
             <label for="typeRemind" class="type-label"><span class="t-dot"></span>Reminder</label>
           </div>
@@ -115,6 +415,7 @@
       </div>
     </div>
 
+    <!-- ══ RIGHT PANEL ══ -->
     <div class="right-panel">
       <div class="board-header">
         <div class="board-title-wrap">
@@ -130,7 +431,6 @@
           <div class="chip" data-filter="Reminder">Reminder</div>
           <div class="chip" data-filter="Design Request">Design Request</div>
         </div>
-
         <div class="search-wrap" id="searchWrapBox">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -161,7 +461,6 @@
           </button>
           <div class="cal-month-label"><span id="calMonthLabel">—</span></div>
         </div>
-
         <div class="cal-grid-wrap">
           <div class="cal-dow">
             <div class="cal-dow-cell">Sen</div><div class="cal-dow-cell">Sel</div><div class="cal-dow-cell">Rab</div>
@@ -169,9 +468,7 @@
           </div>
           <div class="cal-days" id="calDays"></div>
         </div>
-
         <div class="agenda-wrap" id="agendaWrap"></div>
-
         <div class="cal-detail" id="calDetail">
           <div class="cal-detail-head">
             <h4 id="calDetailTitle">—</h4>
@@ -188,12 +485,8 @@
             <table class="req-table">
               <thead>
                 <tr>
-                  <th>Requester</th>
-                  <th>Dept</th>
-                  <th>Submitted</th>
-                  <th>Deadline</th>
-                  <th>Status</th>
-                  <th style="text-align: right;">Action</th>
+                  <th>Requester</th><th>Dept</th><th>Submitted</th><th>Deadline</th><th>Status</th>
+                  <th style="text-align:right;">Action</th>
                 </tr>
               </thead>
               <tbody id="reqTableBody">
@@ -204,20 +497,23 @@
         </div>
       </div>
 
-      <div style="margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing:.06em; text-transform:uppercase; color: var(--muted);">
+      <div style="margin-top:12px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);">
         Klik baris untuk edit
       </div>
     </div>
   </div>
 
+  <!-- WA Float -->
   <a class="wa-float" href="https://wa.me/6281776452000" target="_blank" rel="noopener">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
     WA Bot
   </a>
 
+  <!-- Toasts -->
   <div id="toastOk" class="toast toast-ok"><span class="toast-icon">✓</span><span id="toastOkMsg">Berhasil disimpan</span></div>
   <div id="toastErr" class="toast toast-err"><span class="toast-icon">✕</span><span id="toastErrMsg">Terjadi kesalahan</span></div>
 
+  <!-- Edit Modal -->
   <div id="editOverlay" class="overlay">
     <div class="modal-card">
       <div class="modal-head">
@@ -254,16 +550,16 @@
     </div>
   </div>
 
+  <!-- Design Request Modal -->
   <div id="reqModalOverlay" class="overlay">
-    <div class="modal-card" style="width: min(92vw, 560px);">
-      <div class="modal-head" style="margin-bottom: 16px;">
+    <div class="modal-card" style="width:min(92vw,560px);">
+      <div class="modal-head" style="margin-bottom:16px;">
         <div>
-          <h3 id="reqModalName" style="font-size: 16px; margin-bottom: 4px;">—</h3>
-          <div id="reqModalMeta" style="font-size: 12px; color: var(--muted); font-family: 'Inter', sans-serif;">—</div>
+          <h3 id="reqModalName" style="font-size:16px;margin-bottom:4px;">—</h3>
+          <div id="reqModalMeta" style="font-size:12px;color:var(--muted);font-family:'Inter',sans-serif;">—</div>
         </div>
         <button type="button" class="close-btn" id="reqModalClose">&times;</button>
       </div>
-
       <div class="req-detail-grid">
         <div class="req-field"><span>Email</span><strong id="reqModalEmail">—</strong></div>
         <div class="req-field"><span>Department</span><strong id="reqModalDept">—</strong></div>
@@ -271,48 +567,42 @@
         <div class="req-field"><span>Deadline</span><strong id="reqModalDead">—</strong></div>
       </div>
       <div class="req-field" style="margin-top:16px;">
-        <span>Design Brief & Notes</span>
-        <div id="reqModalNotes" style="margin-top:6px; font-size:13.5px; color:var(--ink); line-height:1.6; background:var(--bg); padding:12px; border-radius:8px; border:1px solid var(--line); white-space:pre-wrap;">—</div>
+        <span>Design Brief &amp; Notes</span>
+        <div id="reqModalNotes" style="margin-top:6px;font-size:13.5px;color:var(--ink);line-height:1.6;background:var(--bg);padding:12px;border-radius:8px;border:1px solid var(--line);white-space:pre-wrap;">—</div>
       </div>
-      <div class="req-field" id="reqModalFilesField" style="margin-top:16px; display:none;">
+      <div class="req-field" id="reqModalFilesField" style="margin-top:16px;display:none;">
         <span>Attached Files</span>
         <div class="req-file-list" id="reqModalFileList" style="margin-top:6px;"></div>
       </div>
-
-      <div class="modal-actions" style="margin-top: 24px; border-top: 1px solid var(--line); padding-top: 20px; align-items:center;">
+      <div class="modal-actions" style="margin-top:24px;border-top:1px solid var(--line);padding-top:20px;align-items:center;">
         <span id="reqModalStatusBadge"></span>
         <div style="flex:1"></div>
-        <button class="btn-primary" id="reqModalDoneBtn" style="flex:unset; width:auto; padding:8px 14px; font-size:12px; background:var(--ok);">Mark as Done</button>
-        <button class="btn-secondary" id="reqModalDeleteBtn" style="flex:unset; width:auto; padding:8px 14px; font-size:12px; color:var(--urgent); border-color:var(--urgent-bg);">Delete</button>
+        <button class="btn-primary" id="reqModalDoneBtn" style="flex:unset;width:auto;padding:8px 14px;font-size:12px;background:var(--ok);">Mark as Done</button>
+        <button class="btn-secondary" id="reqModalDeleteBtn" style="flex:unset;width:auto;padding:8px 14px;font-size:12px;color:var(--urgent);border-color:var(--urgent-bg);">Delete</button>
       </div>
     </div>
   </div>
 
-  <div id="confirmOverlay" class="overlay" style="z-index: 9500;">
-    <div class="modal-card" style="width: min(90vw, 340px); text-align: center; padding: 30px 24px;">
-      <h3 style="margin-bottom: 8px;">Hapus Request?</h3>
-      <p style="font-size: 13px; color: var(--muted); margin-bottom: 24px; line-height: 1.5;">Tindakan ini akan menghapus data secara permanen dan tidak dapat dibatalkan.</p>
+  <!-- Confirm Delete Modal -->
+  <div id="confirmOverlay" class="overlay" style="z-index:9500;">
+    <div class="modal-card" style="width:min(90vw,340px);text-align:center;padding:30px 24px;">
+      <h3 style="margin-bottom:8px;">Hapus Request?</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.5;">Tindakan ini akan menghapus data secara permanen dan tidak dapat dibatalkan.</p>
       <div class="modal-actions">
         <button class="btn-secondary" id="confirmCancelBtn">Batal</button>
-        <button class="btn-primary" id="confirmDeleteBtn" style="background: var(--urgent);">
+        <button class="btn-primary" id="confirmDeleteBtn" style="background:var(--urgent);">
           <span id="confirmDeleteLabel">Ya, Hapus</span>
         </button>
       </div>
     </div>
   </div>
 
-  <script src="config.js"></script>
-
   <script>
     // ══════════════════════════════════════════════════════════════════════
-    // KONFIGURASI URL APP SCRIPT
+    // CONFIG
     // ══════════════════════════════════════════════════════════════════════
-    // URL untuk Database Task & Reminder
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4nQtMFch9K-Pt4bsNKDeoaTxOtPKx12oNicJ55WHdsyRQH2wdNa0r0ftThDE4F9ligQ/exec';
-    
-    // URL untuk Database Design Request (mengambil dari config.js)
-    const REQ_SCRIPT_URL = CONFIG.GAS_WEB_APP_URL; 
-    // ══════════════════════════════════════════════════════════════════════
+    const REQ_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJWrSQiv6gPa2Gax9rzXRBZn57uxjUTqjf1UvFNa-7wzGmlwfCJuZ8cuDtBk3X68navQ/exec';
 
     /* ─── Clock ─── */
     function tickClock() {
@@ -323,15 +613,15 @@
     }
     tickClock(); setInterval(tickClock, 30000);
 
-    /* ─── Toast helpers ─── */
-    function showToast(id, msgId, msg, duration) {
+    /* ─── Toast ─── */
+    function showToast(id, msgId, msg, dur) {
       const el = document.getElementById(id);
       document.getElementById(msgId).textContent = msg;
       el.classList.add('show');
-      setTimeout(() => el.classList.remove('show'), duration || 3000);
+      setTimeout(() => el.classList.remove('show'), dur || 3000);
     }
-    function showOk(msg) { showToast('toastOk', 'toastOkMsg', msg, 2800); }
-    function showErr(msg) { showToast('toastErr', 'toastErrMsg', msg, 3500); }
+    function showOk(msg) { showToast('toastOk','toastOkMsg',msg,2800); }
+    function showErr(msg) { showToast('toastErr','toastErrMsg',msg,3500); }
 
     function esc(s) {
       if (!s) return '';
@@ -341,19 +631,15 @@
       if (!iso) return '—';
       const d = new Date(iso);
       if (isNaN(d)) return iso;
-      return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+      return d.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
     }
-
-    // Pecah isi kolom "File URL" jadi array link.
-    // Mendukung data lama (1 URL polos) maupun data baru (beberapa URL
-    // dipisah baris baru dari multi-file upload).
     function getFileUrls(row) {
       const raw = row['File URL'];
       if (!raw) return [];
       return String(raw).split('\n').map(s => s.trim()).filter(Boolean);
     }
 
-    /* ─── Type toggle (Left Panel) ─── */
+    /* ─── Type toggle ─── */
     const taskFields = document.getElementById('taskFields');
     const reminderFields = document.getElementById('reminderFields');
     const divLabel = document.getElementById('divLabel');
@@ -367,11 +653,11 @@
     }
     document.querySelectorAll('input[name="type"]').forEach(r => r.addEventListener('change', toggleType));
     toggleType();
-    
+
     function today() { return new Date().toISOString().split('T')[0]; }
     document.getElementById('remDate').value = today();
 
-    /* ─── Submit Form (Task & Reminder) ─── */
+    /* ─── Submit Form ─── */
     const mainForm = document.getElementById('mainForm');
     const submitBtn = document.getElementById('submitBtn');
     const btnLabel = document.getElementById('btnLabel');
@@ -395,27 +681,24 @@
         data.reminderName = document.getElementById('reminderName').value;
         data.date         = document.getElementById('remDate').value;
       }
-
       setSubmitLoading(true);
-      fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) })
-      .then(r => r.json())
-      .then(res => {
-        setSubmitLoading(false);
-        if (res.success) {
-          showOk(res.message || 'Berhasil disimpan');
-          mainForm.reset(); document.getElementById('typeTask').checked = true; document.getElementById('remDate').value = today();
-          toggleType(); loadItems();
-        } else showErr(res.message || 'Gagal menyimpan data');
-      })
-      .catch(err => { setSubmitLoading(false); showErr(err.message || String(err)); });
+      fetch(SCRIPT_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(data) })
+        .then(r => r.json())
+        .then(res => {
+          setSubmitLoading(false);
+          if (res.success) {
+            showOk(res.message || 'Berhasil disimpan');
+            mainForm.reset();
+            document.getElementById('typeTask').checked = true;
+            document.getElementById('remDate').value = today();
+            toggleType(); loadItems();
+          } else showErr(res.message || 'Gagal menyimpan data');
+        })
+        .catch(err => { setSubmitLoading(false); showErr(err.message || String(err)); });
     });
 
-    /* ─── Global State & Filter ─── */
-    let allItems = []; // Tasks & Reminders
-    let reqData = [];  // Design Requests
-    let activeFilter = 'Task List';
-    
-    // View wrappers
+    /* ─── Global State ─── */
+    let allItems = [], reqData = [], activeFilter = 'Task List';
     const boardListWrap = document.getElementById('boardListWrap');
     const calendarWrap  = document.getElementById('calendarWrap');
     const designReqWrap = document.getElementById('designReqWrap');
@@ -429,15 +712,9 @@
       document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
       activeFilter = chip.dataset.filter;
-
-      if (activeFilter === 'Design Request') {
-        switchToDesignReq();
-      } else if (activeFilter === 'Reminder') {
-        switchToCal();
-      } else {
-        switchToList();
-        renderList();
-      }
+      if (activeFilter === 'Design Request') switchToDesignReq();
+      else if (activeFilter === 'Reminder') switchToCal();
+      else { switchToList(); renderList(); }
     });
 
     function switchToList() {
@@ -445,52 +722,46 @@
       calendarWrap.classList.remove('show');
       designReqWrap.classList.remove('show');
       searchWrapBox.style.display = '';
-      boardSub.textContent = "Task yang belum selesai";
+      boardSub.textContent = 'Task yang belum selesai';
     }
-
     function switchToCal() {
       boardListWrap.classList.add('hide');
       calendarWrap.classList.add('show');
       designReqWrap.classList.remove('show');
       searchWrapBox.style.display = 'none';
-      boardSub.textContent = "Jadwal reminder tersimpan";
-      renderCalendar();
-      renderAgenda();
+      boardSub.textContent = 'Jadwal reminder tersimpan';
+      renderCalendar(); renderAgenda();
     }
-
     function switchToDesignReq() {
       boardListWrap.classList.add('hide');
       calendarWrap.classList.remove('show');
       designReqWrap.classList.add('show');
       searchWrapBox.style.display = 'none';
-      boardSub.textContent = "Antrian Design Request tim kreatif";
-      if (reqData.length === 0) loadDesignRequests();
-      else renderReqTable();
+      boardSub.textContent = 'Antrian Design Request tim kreatif';
+      if (reqData.length === 0) loadDesignRequests(); else renderReqTable();
     }
 
-    /* ─── TASKS & REMINDER LOGIC ─── */
+    /* ─── Task & Reminder Render ─── */
     const listEl = document.getElementById('list');
 
-    function priorityClass(p) { return { 'Low': 'pill-low', 'Medium': 'pill-medium', 'Urgent': 'pill-urgent' }[p] || ''; }
-    function statusClass(s) { return s === 'Not started' ? 'pill-not-started' : s === 'In progress' ? 'pill-in-progress' : ''; }
+    function priorityClass(p) { return {'Low':'pill-low','Medium':'pill-medium','Urgent':'pill-urgent'}[p]||''; }
+    function statusClass(s) { return s==='Not started'?'pill-not-started':s==='In progress'?'pill-in-progress':''; }
 
     function renderRow(item) {
       const isTask = item.type === 'Task List';
       let pills = '';
-      if (item.deadline) pills += '<span class="pill pill-date">' + esc(fmtDate(item.deadline)) + '</span>';
-      if (item.status) pills += '<span class="pill ' + statusClass(item.status) + '">' + esc(item.status) + '</span>';
-      if (item.priority) pills += '<span class="pill ' + priorityClass(item.priority) + '">' + esc(item.priority) + '</span>';
-      
-      let actions = '<div class="row-actions"><button type="button" class="btn-sm edit" data-edit-id="' + item.id + '">Edit</button>';
-      if (isTask && item.status !== 'Done') actions += '<button type="button" class="btn-sm done" data-done-id="' + item.id + '">Selesai</button>';
+      if (item.deadline) pills += '<span class="pill pill-date">'+esc(fmtDate(item.deadline))+'</span>';
+      if (item.status)   pills += '<span class="pill '+statusClass(item.status)+'">'+esc(item.status)+'</span>';
+      if (item.priority) pills += '<span class="pill '+priorityClass(item.priority)+'">'+esc(item.priority)+'</span>';
+      let actions = '<div class="row-actions"><button type="button" class="btn-sm edit" data-edit-id="'+item.id+'">Edit</button>';
+      if (isTask && item.status !== 'Done') actions += '<button type="button" class="btn-sm done" data-done-id="'+item.id+'">Selesai</button>';
       actions += '</div>';
-
       return `<div class="task-row" data-type="${esc(item.type)}" id="row-${item.id}" data-row-id="${item.id}">
         <div class="row-accent"></div>
         <div class="row-inner">
-          <div class="row-top"><div class="row-type-dot"></div><div class="row-title">${esc(item.taskName || '(tanpa nama)')}</div></div>
-          ${pills ? `<div class="row-pills">${pills}</div>` : ''}
-          ${item.note ? `<div class="row-note">${esc(item.note)}</div>` : ''}
+          <div class="row-top"><div class="row-type-dot"></div><div class="row-title">${esc(item.taskName||'(tanpa nama)')}</div></div>
+          ${pills?`<div class="row-pills">${pills}</div>`:''}
+          ${item.note?`<div class="row-note">${esc(item.note)}</div>`:''}
           ${actions}
         </div>
       </div>`;
@@ -498,25 +769,21 @@
 
     function renderList() {
       if (activeFilter === 'Design Request') return;
-      const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
-      let filtered = activeFilter === 'all' ? allItems : allItems.filter(i => i.type === activeFilter);
-      if (q) filtered = filtered.filter(i => (i.taskName||'').toLowerCase().includes(q) || (i.note||'').toLowerCase().includes(q) || (i.status||'').toLowerCase().includes(q));
-      if (activeFilter === 'Task List') filtered = filtered.sort((a, b) => (a.priority === 'Urgent' ? 0 : 1) - (b.priority === 'Urgent' ? 0 : 1));
-      
+      const q = (document.getElementById('searchInput').value||'').toLowerCase().trim();
+      let filtered = activeFilter==='all' ? allItems : allItems.filter(i => i.type===activeFilter);
+      if (q) filtered = filtered.filter(i => (i.taskName||'').toLowerCase().includes(q)||(i.note||'').toLowerCase().includes(q)||(i.status||'').toLowerCase().includes(q));
+      if (activeFilter==='Task List') filtered = filtered.sort((a,b)=>(a.priority==='Urgent'?0:1)-(b.priority==='Urgent'?0:1));
       countLabel.textContent = filtered.length + ' item';
-      if (!filtered.length) {
-        listEl.innerHTML = `<div class="state-box"><div class="state-icon">◌</div><div class="state-label">${q ? 'Tidak ada hasil' : 'Belum ada entri'}</div></div>`;
-        return;
-      }
+      if (!filtered.length) { listEl.innerHTML=`<div class="state-box"><div class="state-icon">◌</div><div class="state-label">${q?'Tidak ada hasil':'Belum ada entri'}</div></div>`; return; }
       listEl.innerHTML = filtered.map(renderRow).join('');
     }
 
     document.getElementById('searchInput').addEventListener('input', function() {
-      document.getElementById('searchClear').classList.toggle('visible', this.value.length > 0);
+      document.getElementById('searchClear').classList.toggle('visible', this.value.length>0);
       renderList();
     });
     document.getElementById('searchClear').addEventListener('click', function() {
-      document.getElementById('searchInput').value = ''; this.classList.remove('visible'); renderList();
+      document.getElementById('searchInput').value=''; this.classList.remove('visible'); renderList();
     });
 
     listEl.addEventListener('click', function(e) {
@@ -529,322 +796,217 @@
     });
 
     function markDone(id) {
-      const row = document.getElementById('row-' + id);
+      const row = document.getElementById('row-'+id);
       if (row) row.style.opacity = '.45';
-      fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'updateStatus', id: id, status: 'Done' }) })
-      .then(r => r.json()).then(res => {
-        if (res.success) { showOk('Task selesai'); loadItems(); } else { showErr('Gagal'); if (row) row.style.opacity = '1'; }
-      }).catch(err => { showErr(err.message); if (row) row.style.opacity = '1'; });
+      fetch(SCRIPT_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify({action:'updateStatus',id,status:'Done'}) })
+        .then(r=>r.json()).then(res=>{
+          if (res.success) { showOk('Task selesai'); loadItems(); }
+          else { showErr('Gagal'); if (row) row.style.opacity='1'; }
+        }).catch(err=>{ showErr(err.message); if(row) row.style.opacity='1'; });
     }
 
     function loadItems() {
-      fetch(SCRIPT_URL + '?action=getReminders')
-      .then(r => r.json())
-      .then(res => {
-        if (res.success) {
-          allItems = res.data || [];
-          renderList();
-          if (activeFilter === 'Reminder') { renderCalendar(); renderAgenda(); }
-        }
-        else throw new Error(res.message);
-      })
-      .catch(err => { listEl.innerHTML = `<div class="state-box state-error"><div class="state-icon">!</div><div class="state-label">Gagal muat data</div></div>`; });
+      fetch(SCRIPT_URL+'?action=getReminders')
+        .then(r=>r.json())
+        .then(res=>{
+          if (res.success) {
+            allItems = res.data||[];
+            renderList();
+            if (activeFilter==='Reminder') { renderCalendar(); renderAgenda(); }
+          } else throw new Error(res.message);
+        })
+        .catch(()=>{ listEl.innerHTML=`<div class="state-box state-error"><div class="state-icon">!</div><div class="state-label">Gagal muat data</div></div>`; });
     }
 
-    /* ─── CALENDAR LOGIC ─── */
-    let calYear = new Date().getFullYear(), calMonth = new Date().getMonth(), calSelectedDate = null;
-    const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-    const DOW_ID = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
-    function isoDate(y, m, d) { return y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
-    function itemsOnDate(iso) { return allItems.filter(i => (i.deadline || '') === iso && i.type === 'Reminder'); }
+    /* ─── Calendar ─── */
+    let calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calSelectedDate=null;
+    const MONTHS_ID=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    const DOW_ID=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+    function isoDate(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
+    function itemsOnDate(iso){return allItems.filter(i=>(i.deadline||'')===iso&&i.type==='Reminder');}
 
     function renderCalendar() {
-      document.getElementById('calMonthLabel').innerHTML = MONTHS_ID[calMonth] + ' <span>' + calYear + '</span>';
-      const todayIso = today(), firstDay = new Date(calYear, calMonth, 1), lastDay = new Date(calYear, calMonth + 1, 0);
-      let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
-      let html = '';
-      const prevLastDay = new Date(calYear, calMonth, 0).getDate();
-      for (let i = startDow - 1; i >= 0; i--) html += renderCalCell(prevLastDay - i, isoDate(calYear, calMonth - 1, prevLastDay - i), true, todayIso);
-      for (let d = 1; d <= lastDay.getDate(); d++) html += renderCalCell(d, isoDate(calYear, calMonth, d), false, todayIso);
-      const totalCells = startDow + lastDay.getDate(), rem = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
-      for (let d = 1; d <= rem; d++) html += renderCalCell(d, isoDate(calYear, calMonth + 1, d), true, todayIso);
-      
-      const calDaysEl = document.getElementById('calDays');
-      calDaysEl.innerHTML = html;
-      calDaysEl.querySelectorAll('.cal-cell').forEach(cell => {
-        cell.addEventListener('click', function() {
-          calSelectedDate = this.dataset.date;
-          calDaysEl.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected'));
+      document.getElementById('calMonthLabel').innerHTML = MONTHS_ID[calMonth]+' <span>'+calYear+'</span>';
+      const todayIso=today(), firstDay=new Date(calYear,calMonth,1), lastDay=new Date(calYear,calMonth+1,0);
+      let startDow=firstDay.getDay()===0?6:firstDay.getDay()-1, html='';
+      const prevLast=new Date(calYear,calMonth,0).getDate();
+      for(let i=startDow-1;i>=0;i--) html+=renderCalCell(prevLast-i,isoDate(calYear,calMonth-1,prevLast-i),true,todayIso);
+      for(let d=1;d<=lastDay.getDate();d++) html+=renderCalCell(d,isoDate(calYear,calMonth,d),false,todayIso);
+      const total=startDow+lastDay.getDate(), rem=total%7===0?0:7-(total%7);
+      for(let d=1;d<=rem;d++) html+=renderCalCell(d,isoDate(calYear,calMonth+1,d),true,todayIso);
+      const calDaysEl=document.getElementById('calDays');
+      calDaysEl.innerHTML=html;
+      calDaysEl.querySelectorAll('.cal-cell').forEach(cell=>{
+        cell.addEventListener('click',function(){
+          calSelectedDate=this.dataset.date;
+          calDaysEl.querySelectorAll('.cal-cell').forEach(c=>c.classList.remove('selected'));
           this.classList.add('selected'); showCalDetail(this.dataset.date);
         });
       });
-      if (calSelectedDate) { const sel = calDaysEl.querySelector(`[data-date="${calSelectedDate}"]`); if (sel) sel.classList.add('selected'); }
+      if(calSelectedDate){const sel=calDaysEl.querySelector(`[data-date="${calSelectedDate}"]`);if(sel)sel.classList.add('selected');}
     }
 
-    function renderCalCell(dayNum, iso, otherMonth, todayIso) {
-      const items = itemsOnDate(iso);
-      let cls = 'cal-cell' + (otherMonth ? ' other-month' : '') + (iso === todayIso ? ' today' : '') + (iso === calSelectedDate ? ' selected' : '');
-      let ev = items.slice(0, 2).map(i => `<div class="cal-event type-reminder"><span class="cal-event-dot"></span>${esc((i.taskName||'').substring(0,18))}</div>`).join('');
-      if (items.length > 2) ev += `<div class="cal-event-more">+${items.length - 2} lagi</div>`;
+    function renderCalCell(dayNum,iso,otherMonth,todayIso) {
+      const items=itemsOnDate(iso);
+      let cls='cal-cell'+(otherMonth?' other-month':'')+(iso===todayIso?' today':'')+(iso===calSelectedDate?' selected':'');
+      let ev=items.slice(0,2).map(i=>`<div class="cal-event type-reminder"><span class="cal-event-dot"></span>${esc((i.taskName||'').substring(0,18))}</div>`).join('');
+      if(items.length>2) ev+=`<div class="cal-event-more">+${items.length-2} lagi</div>`;
       return `<div class="${cls}" data-date="${iso}"><div class="cal-day-num">${dayNum}</div><div class="cal-events">${ev}</div></div>`;
     }
 
     function showCalDetail(iso) {
-      const items = itemsOnDate(iso), dEl = document.getElementById('calDetail');
-      document.getElementById('calDetailTitle').textContent = new Date(iso + 'T00:00:00').toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-      const lEl = document.getElementById('calDetailList');
-      if (!items.length) lEl.innerHTML = '<div class="state-box" style="padding:20px"><div class="state-label">Tidak ada reminder</div></div>';
-      else lEl.innerHTML = items.map(renderRow).join('');
+      const items=itemsOnDate(iso),dEl=document.getElementById('calDetail');
+      document.getElementById('calDetailTitle').textContent=new Date(iso+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+      const lEl=document.getElementById('calDetailList');
+      if(!items.length) lEl.innerHTML='<div class="state-box" style="padding:20px"><div class="state-label">Tidak ada reminder</div></div>';
+      else lEl.innerHTML=items.map(renderRow).join('');
       dEl.classList.add('show');
     }
 
-    document.getElementById('calDetailClose').addEventListener('click', () => { document.getElementById('calDetail').classList.remove('show'); calSelectedDate = null; document.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected')); });
-    document.getElementById('calPrev').addEventListener('click', () => { calMonth--; if(calMonth < 0){calMonth=11; calYear--;} renderCalendar(); renderAgenda(); document.getElementById('calDetail').classList.remove('show'); });
-    document.getElementById('calNext').addEventListener('click', () => { calMonth++; if(calMonth > 11){calMonth=0; calYear++;} renderCalendar(); renderAgenda(); document.getElementById('calDetail').classList.remove('show'); });
+    document.getElementById('calDetailClose').addEventListener('click',()=>{document.getElementById('calDetail').classList.remove('show');calSelectedDate=null;document.querySelectorAll('.cal-cell').forEach(c=>c.classList.remove('selected'));});
+    document.getElementById('calPrev').addEventListener('click',()=>{calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();renderAgenda();document.getElementById('calDetail').classList.remove('show');});
+    document.getElementById('calNext').addEventListener('click',()=>{calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();renderAgenda();document.getElementById('calDetail').classList.remove('show');});
 
-    /* ─── AGENDA LOGIC (mobile fallback untuk Reminder, dipakai saat kalender grid disembunyikan di layar kecil) ─── */
+    /* ─── Agenda ─── */
     function renderAgenda() {
-      const agendaEl = document.getElementById('agendaWrap');
-      if (!agendaEl) return;
-
-      // Ambil semua reminder di bulan yang sedang ditampilkan, urut tanggal naik
-      const monthPrefix = calYear + '-' + String(calMonth + 1).padStart(2, '0');
-      const items = allItems
-        .filter(i => i.type === 'Reminder' && (i.deadline || '').startsWith(monthPrefix))
-        .sort((a, b) => (a.deadline || '').localeCompare(b.deadline || ''));
-
-      if (!items.length) {
-        agendaEl.innerHTML = `<div class="agenda-empty">Belum ada reminder bulan ${MONTHS_ID[calMonth]}</div>`;
-        return;
-      }
-
-      const todayIso = today();
-      // Kelompokkan per tanggal
-      const byDate = {};
-      items.forEach(i => {
-        const d = i.deadline || '';
-        if (!byDate[d]) byDate[d] = [];
-        byDate[d].push(i);
-      });
-
-      agendaEl.innerHTML = Object.keys(byDate).sort().map(iso => {
-        const d = new Date(iso + 'T00:00:00');
-        const dayNum = d.getDate();
-        const dayName = DOW_ID[d.getDay()];
-        const isToday = iso === todayIso;
-        const itemsHtml = byDate[iso].map(i => `
-          <div class="agenda-item" data-row-id="${i.id}">
-            <span class="agenda-dot"></span>${esc(i.taskName || '(tanpa nama)')}
-          </div>
-        `).join('');
-        return `
-          <div class="agenda-row" data-date="${iso}">
-            <div class="agenda-date${isToday ? ' is-today' : ''}">
-              <div class="agenda-day-num">${dayNum}</div>
-              <div class="agenda-day-name">${dayName}</div>
-            </div>
-            <div class="agenda-items">${itemsHtml}</div>
-          </div>
-        `;
+      const agendaEl=document.getElementById('agendaWrap');
+      if(!agendaEl)return;
+      const monthPrefix=calYear+'-'+String(calMonth+1).padStart(2,'0');
+      const items=allItems.filter(i=>i.type==='Reminder'&&(i.deadline||'').startsWith(monthPrefix)).sort((a,b)=>(a.deadline||'').localeCompare(b.deadline||''));
+      if(!items.length){agendaEl.innerHTML=`<div class="agenda-empty">Belum ada reminder bulan ${MONTHS_ID[calMonth]}</div>`;return;}
+      const todayIso=today(),byDate={};
+      items.forEach(i=>{const d=i.deadline||'';if(!byDate[d])byDate[d]=[];byDate[d].push(i);});
+      agendaEl.innerHTML=Object.keys(byDate).sort().map(iso=>{
+        const d=new Date(iso+'T00:00:00'),dayNum=d.getDate(),dayName=DOW_ID[d.getDay()],isToday=iso===todayIso;
+        const itemsHtml=byDate[iso].map(i=>`<div class="agenda-item" data-row-id="${i.id}"><span class="agenda-dot"></span>${esc(i.taskName||'(tanpa nama)')}</div>`).join('');
+        return `<div class="agenda-row" data-date="${iso}"><div class="agenda-date${isToday?' is-today':''}"><div class="agenda-day-num">${dayNum}</div><div class="agenda-day-name">${dayName}</div></div><div class="agenda-items">${itemsHtml}</div></div>`;
       }).join('');
-
-      agendaEl.querySelectorAll('.agenda-item').forEach(el => {
-        el.addEventListener('click', function(e) {
-          e.stopPropagation();
-          openEdit(this.dataset.rowId);
-        });
-      });
-      agendaEl.querySelectorAll('.agenda-row').forEach(el => {
-        el.addEventListener('click', function() { showCalDetail(this.dataset.date); });
-      });
+      agendaEl.querySelectorAll('.agenda-item').forEach(el=>el.addEventListener('click',function(e){e.stopPropagation();openEdit(this.dataset.rowId);}));
+      agendaEl.querySelectorAll('.agenda-row').forEach(el=>el.addEventListener('click',function(){showCalDetail(this.dataset.date);}));
     }
 
-    /* ─── EDIT MODAL LOGIC (Tasks & Reminders) ─── */
-    const editOverlay = document.getElementById('editOverlay'), editForm = document.getElementById('editForm');
+    /* ─── Edit Modal ─── */
+    const editOverlay=document.getElementById('editOverlay'), editForm=document.getElementById('editForm');
     function openEdit(id) {
-      const item = allItems.find(i => String(i.id) === String(id)); if (!item) return;
-      document.getElementById('editId').value = item.id; document.getElementById('editType').value = item.type;
-      const isTask = item.type === 'Task List';
-      document.getElementById('editTitle').textContent = isTask ? 'Edit Task' : 'Edit Reminder';
-      document.getElementById('editTaskFields').classList.toggle('hidden', !isTask);
-      document.getElementById('editReminderFields').classList.toggle('hidden', isTask);
-      if (isTask) {
-        document.getElementById('editTaskName').value = item.taskName || ''; document.getElementById('editDeadline').value = item.deadline || '';
-        document.getElementById('editStatus').value = item.status || 'Not started'; document.getElementById('editPriority').value = item.priority || 'Low';
-        document.getElementById('editNote').value = item.note || '';
+      const item=allItems.find(i=>String(i.id)===String(id));if(!item)return;
+      document.getElementById('editId').value=item.id; document.getElementById('editType').value=item.type;
+      const isTask=item.type==='Task List';
+      document.getElementById('editTitle').textContent=isTask?'Edit Task':'Edit Reminder';
+      document.getElementById('editTaskFields').classList.toggle('hidden',!isTask);
+      document.getElementById('editReminderFields').classList.toggle('hidden',isTask);
+      if(isTask){
+        document.getElementById('editTaskName').value=item.taskName||''; document.getElementById('editDeadline').value=item.deadline||'';
+        document.getElementById('editStatus').value=item.status||'Not started'; document.getElementById('editPriority').value=item.priority||'Low';
+        document.getElementById('editNote').value=item.note||'';
       } else {
-        document.getElementById('editRemName').value = item.taskName || ''; document.getElementById('editRemDate').value = item.deadline || '';
+        document.getElementById('editRemName').value=item.taskName||''; document.getElementById('editRemDate').value=item.deadline||'';
       }
       editOverlay.classList.add('show');
     }
-    function closeEdit() { editOverlay.classList.remove('show'); }
-    document.getElementById('editClose').addEventListener('click', closeEdit); document.getElementById('editCancel').addEventListener('click', closeEdit);
+    function closeEdit(){editOverlay.classList.remove('show');}
+    document.getElementById('editClose').addEventListener('click',closeEdit);
+    document.getElementById('editCancel').addEventListener('click',closeEdit);
 
-    editForm.addEventListener('submit', function(e) {
+    editForm.addEventListener('submit',function(e){
       e.preventDefault();
-      const id = document.getElementById('editId').value, type = document.getElementById('editType').value, isTask = type === 'Task List';
-      const btn = document.getElementById('editSubmitBtn'), lbl = document.getElementById('editBtnLabel');
-      btn.disabled = true; lbl.innerHTML = '<span class="spinner-sm"></span> Menyimpan...';
-      const payload = { action: 'updateItem', id, type };
-      if (isTask) { payload.taskName = document.getElementById('editTaskName').value; payload.deadline = document.getElementById('editDeadline').value; payload.status = document.getElementById('editStatus').value; payload.priority = document.getElementById('editPriority').value; payload.note = document.getElementById('editNote').value; }
-      else { payload.reminderName = document.getElementById('editRemName').value; payload.date = document.getElementById('editRemDate').value; }
-      fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }).then(r=>r.json()).then(res=>{
-        btn.disabled=false; lbl.textContent='Simpan Perubahan'; if(res.success){closeEdit(); showOk('Perubahan tersimpan'); loadItems();} else showErr('Gagal menyimpan');
+      const id=document.getElementById('editId').value, type=document.getElementById('editType').value, isTask=type==='Task List';
+      const btn=document.getElementById('editSubmitBtn'), lbl=document.getElementById('editBtnLabel');
+      btn.disabled=true; lbl.innerHTML='<span class="spinner-sm"></span> Menyimpan...';
+      const payload={action:'updateItem',id,type};
+      if(isTask){payload.taskName=document.getElementById('editTaskName').value;payload.deadline=document.getElementById('editDeadline').value;payload.status=document.getElementById('editStatus').value;payload.priority=document.getElementById('editPriority').value;payload.note=document.getElementById('editNote').value;}
+      else{payload.reminderName=document.getElementById('editRemName').value;payload.date=document.getElementById('editRemDate').value;}
+      fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)}).then(r=>r.json()).then(res=>{
+        btn.disabled=false; lbl.textContent='Simpan Perubahan';
+        if(res.success){closeEdit();showOk('Perubahan tersimpan');loadItems();}else showErr('Gagal menyimpan');
       });
     });
 
-    /* ══════════════════════════════════════════════════════════════════════
-       DESIGN REQUEST LOGIC (Tabel + Data API)
-       ══════════════════════════════════════════════════════════════════════ */
-    let reqActiveIndex = null;
+    /* ─── Design Request ─── */
+    let reqActiveIndex=null;
 
     function loadDesignRequests() {
-      const tbody = document.getElementById('reqTableBody');
-      tbody.innerHTML = '<tr><td colspan="6" class="state-box"><div class="state-spinner"></div><div class="state-label">Memuat requests...</div></td></tr>';
-
+      const tbody=document.getElementById('reqTableBody');
+      tbody.innerHTML='<tr><td colspan="6" class="state-box"><div class="state-spinner"></div><div class="state-label">Memuat requests...</div></td></tr>';
       fetch(`${REQ_SCRIPT_URL}?action=getRequests`)
-        .then(res => res.json())
-        .then(data => {
-          reqData = data || [];
-          renderReqTable();
-        })
-        .catch(err => {
-          tbody.innerHTML = '<tr><td colspan="6" class="state-box"><div class="state-icon">!</div><div class="state-label">Gagal terhubung ke database Request.</div></td></tr>';
-        });
+        .then(res=>res.json())
+        .then(data=>{reqData=data||[];renderReqTable();})
+        .catch(()=>{tbody.innerHTML='<tr><td colspan="6" class="state-box"><div class="state-icon">!</div><div class="state-label">Gagal terhubung ke database Request.</div></td></tr>';});
     }
 
     function renderReqTable() {
-      const tbody = document.getElementById('reqTableBody');
-      tbody.innerHTML = '';
-      countLabel.textContent = reqData.length + ' item';
-
-      // Update stat strip
-      const total = reqData.length;
-      const pending = reqData.filter(r => r.Status === 'Pending').length;
-      const done = reqData.filter(r => r.Status === 'Done').length;
-      document.getElementById('reqStatsStrip').innerHTML = `
+      const tbody=document.getElementById('reqTableBody');
+      tbody.innerHTML='';
+      countLabel.textContent=reqData.length+' item';
+      const total=reqData.length, pending=reqData.filter(r=>r.Status==='Pending').length, done=reqData.filter(r=>r.Status==='Done').length;
+      document.getElementById('reqStatsStrip').innerHTML=`
         <div class="stat-pill"><span class="stat-num">${total}</span><span class="stat-label">Total</span></div>
         <div class="stat-pill"><span class="stat-num" style="color:var(--warn);">${pending}</span><span class="stat-label">Pending</span></div>
-        <div class="stat-pill"><span class="stat-num" style="color:var(--ok);">${done}</span><span class="stat-label">Done</span></div>
-      `;
-
-      if (reqData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="state-box"><div class="state-icon">◌</div><div class="state-label">Belum ada Design Request</div></td></tr>';
-        return;
-      }
-
-      reqData.forEach((row, idx) => {
-        const isPending = row.Status === 'Pending';
-        const overdue = isPending && new Date(row.Deadline) < new Date();
-        const tr = document.createElement('tr');
-        
-        tr.innerHTML = `
-          <td data-label="Requester">
-            <div style="font-weight:600; color:var(--ink); margin-bottom:2px;">${esc(row.Name || '—')}</div>
-            <div style="font-size:11px; color:var(--muted);">${esc(row.Email || '')}</div>
-          </td>
-          <td data-label="Dept">${esc(row.Department || '—')}</td>
+        <div class="stat-pill"><span class="stat-num" style="color:var(--ok);">${done}</span><span class="stat-label">Done</span></div>`;
+      if(!reqData.length){tbody.innerHTML='<tr><td colspan="6" class="state-box"><div class="state-icon">◌</div><div class="state-label">Belum ada Design Request</div></td></tr>';return;}
+      reqData.forEach((row,idx)=>{
+        const isPending=row.Status==='Pending', overdue=isPending&&new Date(row.Deadline)<new Date();
+        const tr=document.createElement('tr');
+        tr.innerHTML=`
+          <td data-label="Requester"><div style="font-weight:600;color:var(--ink);margin-bottom:2px;">${esc(row.Name||'—')}</div><div style="font-size:11px;color:var(--muted);">${esc(row.Email||'')}</div></td>
+          <td data-label="Dept">${esc(row.Department||'—')}</td>
           <td data-label="Submitted">${fmtDate(row['Date Submit'])}</td>
-          <td data-label="Deadline" style="${overdue ? 'color:var(--urgent); font-weight:600;' : ''}">${fmtDate(row.Deadline)}</td>
-          <td data-label="Status"><span class="pill ${isPending ? 'pill-medium' : 'pill-low'}">${esc(row.Status)}</span></td>
-          <td data-label="Action" style="text-align:right;">
-            <button class="btn-sm" style="border:1px solid var(--line-2);" onclick="event.stopPropagation(); openReqModal(${idx})">Lihat</button>
-          </td>
-        `;
-        tr.addEventListener('click', () => openReqModal(idx));
+          <td data-label="Deadline" style="${overdue?'color:var(--urgent);font-weight:600;':''}">${fmtDate(row.Deadline)}</td>
+          <td data-label="Status"><span class="pill ${isPending?'pill-medium':'pill-low'}">${esc(row.Status)}</span></td>
+          <td data-label="Action" style="text-align:right;"><button class="btn-sm" style="border:1px solid var(--line-2);" onclick="event.stopPropagation();openReqModal(${idx})">Lihat</button></td>`;
+        tr.addEventListener('click',()=>openReqModal(idx));
         tbody.appendChild(tr);
       });
     }
 
-    /* ─── MODAL DESIGN REQUEST ─── */
-    const reqModalOverlay = document.getElementById('reqModalOverlay');
-
+    const reqModalOverlay=document.getElementById('reqModalOverlay');
     function openReqModal(idx) {
-      const row = reqData[idx];
-      if (!row) return;
-      reqActiveIndex = idx;
-      const isPending = row.Status === 'Pending';
-
-      document.getElementById('reqModalName').textContent = row.Name || '—';
-      document.getElementById('reqModalMeta').textContent = `${row.Department || '—'} · Diajukan ${fmtDate(row['Date Submit'])}`;
-      document.getElementById('reqModalEmail').textContent = row.Email || '—';
-      document.getElementById('reqModalDept').textContent = row.Department || '—';
-      document.getElementById('reqModalSub').textContent = fmtDate(row['Date Submit']);
-      document.getElementById('reqModalDead').textContent = fmtDate(row.Deadline);
-      document.getElementById('reqModalNotes').textContent = row.Notes || '—';
-      
-      document.getElementById('reqModalStatusBadge').innerHTML = `<span class="pill ${isPending ? 'pill-medium' : 'pill-low'}">${esc(row.Status)}</span>`;
-
-      // File links (mendukung 1 atau banyak file)
-      const fileUrls = getFileUrls(row);
-      const filesField = document.getElementById('reqModalFilesField');
-      const fileListEl = document.getElementById('reqModalFileList');
-      if (fileUrls.length > 0) {
-        filesField.style.display = '';
-        fileListEl.innerHTML = fileUrls.map((url, i) => `
-          <a class="btn-secondary" href="${url}" target="_blank" rel="noopener">
-            ${fileUrls.length > 1 ? `Lihat File ${i + 1}` : 'Lihat File'}
-          </a>
-        `).join('');
-      } else {
-        filesField.style.display = 'none';
-        fileListEl.innerHTML = '';
-      }
-
-      document.getElementById('reqModalDoneBtn').style.display = isPending ? 'inline-block' : 'none';
+      const row=reqData[idx];if(!row)return;
+      reqActiveIndex=idx;
+      const isPending=row.Status==='Pending';
+      document.getElementById('reqModalName').textContent=row.Name||'—';
+      document.getElementById('reqModalMeta').textContent=`${row.Department||'—'} · Diajukan ${fmtDate(row['Date Submit'])}`;
+      document.getElementById('reqModalEmail').textContent=row.Email||'—';
+      document.getElementById('reqModalDept').textContent=row.Department||'—';
+      document.getElementById('reqModalSub').textContent=fmtDate(row['Date Submit']);
+      document.getElementById('reqModalDead').textContent=fmtDate(row.Deadline);
+      document.getElementById('reqModalNotes').textContent=row.Notes||'—';
+      document.getElementById('reqModalStatusBadge').innerHTML=`<span class="pill ${isPending?'pill-medium':'pill-low'}">${esc(row.Status)}</span>`;
+      const fileUrls=getFileUrls(row), filesField=document.getElementById('reqModalFilesField'), fileListEl=document.getElementById('reqModalFileList');
+      if(fileUrls.length>0){
+        filesField.style.display='';
+        fileListEl.innerHTML=fileUrls.map((url,i)=>`<a class="btn-secondary" href="${url}" target="_blank" rel="noopener">${fileUrls.length>1?`Lihat File ${i+1}`:'Lihat File'}</a>`).join('');
+      } else { filesField.style.display='none'; fileListEl.innerHTML=''; }
+      document.getElementById('reqModalDoneBtn').style.display=isPending?'inline-block':'none';
       reqModalOverlay.classList.add('show');
     }
+    document.getElementById('reqModalClose').addEventListener('click',()=>reqModalOverlay.classList.remove('show'));
+    reqModalOverlay.addEventListener('click',e=>{if(e.target===reqModalOverlay)reqModalOverlay.classList.remove('show');});
 
-    document.getElementById('reqModalClose').addEventListener('click', () => reqModalOverlay.classList.remove('show'));
-    reqModalOverlay.addEventListener('click', e => { if (e.target === reqModalOverlay) reqModalOverlay.classList.remove('show'); });
-
-    // Mark as Done (Request)
-    document.getElementById('reqModalDoneBtn').addEventListener('click', () => {
-      if (reqActiveIndex === null) return;
-      const btn = document.getElementById('reqModalDoneBtn');
-      btn.disabled = true; btn.textContent = 'Updating...';
-
+    document.getElementById('reqModalDoneBtn').addEventListener('click',()=>{
+      if(reqActiveIndex===null)return;
+      const btn=document.getElementById('reqModalDoneBtn');
+      btn.disabled=true; btn.textContent='Updating...';
       fetch(`${REQ_SCRIPT_URL}?action=markDone&rowIndex=${reqActiveIndex}`)
-        .then(() => {
-          reqData[reqActiveIndex].Status = 'Done';
-          renderReqTable();
-          showOk('Request ditandai selesai');
-          openReqModal(reqActiveIndex); // Refresh modal
-        })
-        .catch(err => showErr('Gagal mengupdate request'))
-        .finally(() => { btn.disabled = false; btn.textContent = 'Mark as Done'; });
+        .then(()=>{reqData[reqActiveIndex].Status='Done';renderReqTable();showOk('Request ditandai selesai');openReqModal(reqActiveIndex);})
+        .catch(()=>showErr('Gagal mengupdate request'))
+        .finally(()=>{btn.disabled=false;btn.textContent='Mark as Done';});
     });
 
-    /* ─── CONFIRM DELETE (Request) ─── */
-    const confirmOverlay = document.getElementById('confirmOverlay');
-    document.getElementById('reqModalDeleteBtn').addEventListener('click', () => {
-      confirmOverlay.classList.add('show');
-    });
-
-    document.getElementById('confirmCancelBtn').addEventListener('click', () => confirmOverlay.classList.remove('show'));
-
-    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
-      if (reqActiveIndex === null) return;
-      const btn = document.getElementById('confirmDeleteBtn');
-      const lbl = document.getElementById('confirmDeleteLabel');
-      btn.disabled = true; lbl.textContent = 'Menghapus...';
-
+    const confirmOverlay=document.getElementById('confirmOverlay');
+    document.getElementById('reqModalDeleteBtn').addEventListener('click',()=>confirmOverlay.classList.add('show'));
+    document.getElementById('confirmCancelBtn').addEventListener('click',()=>confirmOverlay.classList.remove('show'));
+    document.getElementById('confirmDeleteBtn').addEventListener('click',()=>{
+      if(reqActiveIndex===null)return;
+      const btn=document.getElementById('confirmDeleteBtn'),lbl=document.getElementById('confirmDeleteLabel');
+      btn.disabled=true; lbl.textContent='Menghapus...';
       fetch(`${REQ_SCRIPT_URL}?action=deleteRequest&rowIndex=${reqActiveIndex}`)
-        .then(() => {
-          reqData.splice(reqActiveIndex, 1);
-          reqActiveIndex = null;
-          renderReqTable();
-          confirmOverlay.classList.remove('show');
-          reqModalOverlay.classList.remove('show');
-          showOk('Request berhasil dihapus');
-        })
-        .catch(err => showErr('Gagal menghapus request'))
-        .finally(() => { btn.disabled = false; lbl.textContent = 'Ya, Hapus'; });
+        .then(()=>{reqData.splice(reqActiveIndex,1);reqActiveIndex=null;renderReqTable();confirmOverlay.classList.remove('show');reqModalOverlay.classList.remove('show');showOk('Request berhasil dihapus');})
+        .catch(()=>showErr('Gagal menghapus request'))
+        .finally(()=>{btn.disabled=false;lbl.textContent='Ya, Hapus';});
     });
 
     // Init
     loadItems();
-
   </script>
 </body>
 </html>
