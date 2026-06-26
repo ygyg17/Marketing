@@ -424,6 +424,7 @@
       searchWrapBox.style.display = 'none';
       boardSub.textContent = "Jadwal reminder tersimpan";
       renderCalendar();
+      renderAgenda();
     }
 
     function switchToDesignReq() {
@@ -509,7 +510,11 @@
       fetch(SCRIPT_URL + '?action=getReminders')
       .then(r => r.json())
       .then(res => {
-        if (res.success) { allItems = res.data || []; renderList(); if (activeFilter === 'Reminder') renderCalendar(); }
+        if (res.success) {
+          allItems = res.data || [];
+          renderList();
+          if (activeFilter === 'Reminder') { renderCalendar(); renderAgenda(); }
+        }
         else throw new Error(res.message);
       })
       .catch(err => { listEl.innerHTML = `<div class="state-box state-error"><div class="state-icon">!</div><div class="state-label">Gagal muat data</div></div>`; });
@@ -518,6 +523,7 @@
     /* ─── CALENDAR LOGIC ─── */
     let calYear = new Date().getFullYear(), calMonth = new Date().getMonth(), calSelectedDate = null;
     const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    const DOW_ID = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
     function isoDate(y, m, d) { return y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
     function itemsOnDate(iso) { return allItems.filter(i => (i.deadline || '') === iso && i.type === 'Reminder'); }
 
@@ -562,8 +568,65 @@
     }
 
     document.getElementById('calDetailClose').addEventListener('click', () => { document.getElementById('calDetail').classList.remove('show'); calSelectedDate = null; document.querySelectorAll('.cal-cell').forEach(c => c.classList.remove('selected')); });
-    document.getElementById('calPrev').addEventListener('click', () => { calMonth--; if(calMonth < 0){calMonth=11; calYear--;} renderCalendar(); document.getElementById('calDetail').classList.remove('show'); });
-    document.getElementById('calNext').addEventListener('click', () => { calMonth++; if(calMonth > 11){calMonth=0; calYear++;} renderCalendar(); document.getElementById('calDetail').classList.remove('show'); });
+    document.getElementById('calPrev').addEventListener('click', () => { calMonth--; if(calMonth < 0){calMonth=11; calYear--;} renderCalendar(); renderAgenda(); document.getElementById('calDetail').classList.remove('show'); });
+    document.getElementById('calNext').addEventListener('click', () => { calMonth++; if(calMonth > 11){calMonth=0; calYear++;} renderCalendar(); renderAgenda(); document.getElementById('calDetail').classList.remove('show'); });
+
+    /* ─── AGENDA LOGIC (mobile fallback untuk Reminder, dipakai saat kalender grid disembunyikan di layar kecil) ─── */
+    function renderAgenda() {
+      const agendaEl = document.getElementById('agendaWrap');
+      if (!agendaEl) return;
+
+      // Ambil semua reminder di bulan yang sedang ditampilkan, urut tanggal naik
+      const monthPrefix = calYear + '-' + String(calMonth + 1).padStart(2, '0');
+      const items = allItems
+        .filter(i => i.type === 'Reminder' && (i.deadline || '').startsWith(monthPrefix))
+        .sort((a, b) => (a.deadline || '').localeCompare(b.deadline || ''));
+
+      if (!items.length) {
+        agendaEl.innerHTML = `<div class="agenda-empty">Belum ada reminder bulan ${MONTHS_ID[calMonth]}</div>`;
+        return;
+      }
+
+      const todayIso = today();
+      // Kelompokkan per tanggal
+      const byDate = {};
+      items.forEach(i => {
+        const d = i.deadline || '';
+        if (!byDate[d]) byDate[d] = [];
+        byDate[d].push(i);
+      });
+
+      agendaEl.innerHTML = Object.keys(byDate).sort().map(iso => {
+        const d = new Date(iso + 'T00:00:00');
+        const dayNum = d.getDate();
+        const dayName = DOW_ID[d.getDay()];
+        const isToday = iso === todayIso;
+        const itemsHtml = byDate[iso].map(i => `
+          <div class="agenda-item" data-row-id="${i.id}">
+            <span class="agenda-dot"></span>${esc(i.taskName || '(tanpa nama)')}
+          </div>
+        `).join('');
+        return `
+          <div class="agenda-row" data-date="${iso}">
+            <div class="agenda-date${isToday ? ' is-today' : ''}">
+              <div class="agenda-day-num">${dayNum}</div>
+              <div class="agenda-day-name">${dayName}</div>
+            </div>
+            <div class="agenda-items">${itemsHtml}</div>
+          </div>
+        `;
+      }).join('');
+
+      agendaEl.querySelectorAll('.agenda-item').forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.stopPropagation();
+          openEdit(this.dataset.rowId);
+        });
+      });
+      agendaEl.querySelectorAll('.agenda-row').forEach(el => {
+        el.addEventListener('click', function() { showCalDetail(this.dataset.date); });
+      });
+    }
 
     /* ─── EDIT MODAL LOGIC (Tasks & Reminders) ─── */
     const editOverlay = document.getElementById('editOverlay'), editForm = document.getElementById('editForm');
@@ -645,15 +708,15 @@
         const tr = document.createElement('tr');
         
         tr.innerHTML = `
-          <td>
+          <td data-label="Requester">
             <div style="font-weight:600; color:var(--ink); margin-bottom:2px;">${esc(row.Name || '—')}</div>
             <div style="font-size:11px; color:var(--muted);">${esc(row.Email || '')}</div>
           </td>
-          <td>${esc(row.Department || '—')}</td>
-          <td>${fmtDate(row['Date Submit'])}</td>
-          <td style="${overdue ? 'color:var(--urgent); font-weight:600;' : ''}">${fmtDate(row.Deadline)}</td>
-          <td><span class="pill ${isPending ? 'pill-medium' : 'pill-low'}">${esc(row.Status)}</span></td>
-          <td style="text-align:right;">
+          <td data-label="Dept">${esc(row.Department || '—')}</td>
+          <td data-label="Submitted">${fmtDate(row['Date Submit'])}</td>
+          <td data-label="Deadline" style="${overdue ? 'color:var(--urgent); font-weight:600;' : ''}">${fmtDate(row.Deadline)}</td>
+          <td data-label="Status"><span class="pill ${isPending ? 'pill-medium' : 'pill-low'}">${esc(row.Status)}</span></td>
+          <td data-label="Action" style="text-align:right;">
             <button class="btn-sm" style="border:1px solid var(--line-2);" onclick="event.stopPropagation(); openReqModal(${idx})">Lihat</button>
           </td>
         `;
