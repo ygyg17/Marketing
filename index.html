@@ -8,6 +8,25 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* ── Multiple file links (Design Request modal) ───────────────── */
+    .req-file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .req-file-list .btn-secondary {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex: unset;
+      width: fit-content;
+      padding: 8px 14px;
+      font-size: 12px;
+    }
+  </style>
 </head>
 
 <body>
@@ -255,11 +274,14 @@
         <span>Design Brief & Notes</span>
         <div id="reqModalNotes" style="margin-top:6px; font-size:13.5px; color:var(--ink); line-height:1.6; background:var(--bg); padding:12px; border-radius:8px; border:1px solid var(--line); white-space:pre-wrap;">—</div>
       </div>
+      <div class="req-field" id="reqModalFilesField" style="margin-top:16px; display:none;">
+        <span>Attached Files</span>
+        <div class="req-file-list" id="reqModalFileList" style="margin-top:6px;"></div>
+      </div>
 
       <div class="modal-actions" style="margin-top: 24px; border-top: 1px solid var(--line); padding-top: 20px; align-items:center;">
         <span id="reqModalStatusBadge"></span>
         <div style="flex:1"></div>
-        <a id="reqModalFile" href="#" target="_blank" class="btn-secondary" style="text-decoration:none; display:none; flex:unset; padding:8px 14px; font-size:12px;">Lihat File</a>
         <button class="btn-primary" id="reqModalDoneBtn" style="flex:unset; width:auto; padding:8px 14px; font-size:12px; background:var(--ok);">Mark as Done</button>
         <button class="btn-secondary" id="reqModalDeleteBtn" style="flex:unset; width:auto; padding:8px 14px; font-size:12px; color:var(--urgent); border-color:var(--urgent-bg);">Delete</button>
       </div>
@@ -320,6 +342,15 @@
       const d = new Date(iso);
       if (isNaN(d)) return iso;
       return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    // Pecah isi kolom "File URL" jadi array link.
+    // Mendukung data lama (1 URL polos) maupun data baru (beberapa URL
+    // dipisah baris baru dari multi-file upload).
+    function getFileUrls(row) {
+      const raw = row['File URL'];
+      if (!raw) return [];
+      return String(raw).split('\n').map(s => s.trim()).filter(Boolean);
     }
 
     /* ─── Type toggle (Left Panel) ─── */
@@ -743,10 +774,22 @@
       document.getElementById('reqModalNotes').textContent = row.Notes || '—';
       
       document.getElementById('reqModalStatusBadge').innerHTML = `<span class="pill ${isPending ? 'pill-medium' : 'pill-low'}">${esc(row.Status)}</span>`;
-      
-      const fileLink = document.getElementById('reqModalFile');
-      if (row['File URL']) { fileLink.href = row['File URL']; fileLink.style.display = 'inline-flex'; } 
-      else { fileLink.style.display = 'none'; }
+
+      // File links (mendukung 1 atau banyak file)
+      const fileUrls = getFileUrls(row);
+      const filesField = document.getElementById('reqModalFilesField');
+      const fileListEl = document.getElementById('reqModalFileList');
+      if (fileUrls.length > 0) {
+        filesField.style.display = '';
+        fileListEl.innerHTML = fileUrls.map((url, i) => `
+          <a class="btn-secondary" href="${url}" target="_blank" rel="noopener">
+            ${fileUrls.length > 1 ? `Lihat File ${i + 1}` : 'Lihat File'}
+          </a>
+        `).join('');
+      } else {
+        filesField.style.display = 'none';
+        fileListEl.innerHTML = '';
+      }
 
       document.getElementById('reqModalDoneBtn').style.display = isPending ? 'inline-block' : 'none';
       reqModalOverlay.classList.add('show');
