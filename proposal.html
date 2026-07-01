@@ -184,8 +184,11 @@
         <div class="edit-field">
           <label>Proposal Status</label>
           <select id="f_ProposalStatus">
-            <option value="Not Started">Not Started</option>
-            <option value="In Progress">In Progress</option>
+            <option value="Not started">Not started</option>
+            <option value="not approved">not approved</option>
+            <option value="Mbak Eka">Mbak Eka</option>
+            <option value="In progress">In progress</option>
+            <option value="Cancel">Cancel</option>
             <option value="Done">Done</option>
           </select>
         </div>
@@ -193,8 +196,9 @@
           <label>Purchase Request</label>
           <select id="f_PurchaseRequest">
             <option value="">—</option>
-            <option value="Not Started">Not Started</option>
-            <option value="In Progress">In Progress</option>
+            <option value="Not started">Not started</option>
+            <option value="In progress">In progress</option>
+            <option value="Done GM">Done GM</option>
             <option value="Done">Done</option>
           </select>
         </div>
@@ -202,17 +206,19 @@
           <label>Vendor Form</label>
           <select id="f_VendorForm">
             <option value="">—</option>
-            <option value="Not Started">Not Started</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Done">Done</option>
+            <option value="Not required">Not required</option>
+            <option value="Not started">Not started</option>
+            <option value="In progress">In progress</option>
+            <option value="Done Purchasing">Done Purchasing</option>
           </select>
         </div>
         <div class="edit-field">
           <label>Payment</label>
           <select id="f_Payment">
             <option value="">—</option>
-            <option value="Not Started">Not Started</option>
-            <option value="In Progress">In Progress</option>
+            <option value="Not started">Not started</option>
+            <option value="In progress">In progress</option>
+            <option value="Deposit">Deposit</option>
             <option value="Done">Done</option>
           </select>
         </div>
@@ -305,7 +311,7 @@
         Name: raw.Name || raw.name || '(Tanpa Nama)',
         DatePropose: raw.DatePropose || raw['Date Propose'] || '',
         DateApproved: raw.DateApproved || raw['Date Approved'] || '',
-        ProposalStatus: raw.ProposalStatus || raw['Proposal Status'] || 'Not Started',
+        ProposalStatus: raw.ProposalStatus || raw['Proposal Status'] || 'Not started',
         PurchaseRequest: raw.PurchaseRequest || raw['Purchase Request'] || '',
         VendorForm: raw.VendorForm || raw['Vendor Form'] || '',
         Payment: raw.Payment || '',
@@ -367,11 +373,13 @@
 
     // ─── Table ───
     function statusPillClass(status) {
-      const s = (status || '').toLowerCase();
-      if (s.includes('done') || s.includes('approved')) return 'pill-low';
-      if (s.includes('progress')) return 'pill-in-progress';
-      if (s.includes('urgent') || s.includes('reject')) return 'pill-urgent';
-      return 'pill-not-started';
+      const s = (status || '').toLowerCase().trim();
+      if (s === 'cancel' || s === 'not approved') return 'pill-urgent';
+      if (s.startsWith('done')) return 'pill-low';           // Done, Done GM, Done Purchasing
+      if (s === 'deposit') return 'pill-medium';
+      if (s === 'in progress') return 'pill-in-progress';
+      if (s === 'not started' || s === 'not required') return 'pill-not-started';
+      return 'pill-not-started'; // fallback, mis. status custom seperti "Mbak Eka"
     }
 
     function fmtDate(d) {
@@ -419,7 +427,7 @@
       document.getElementById('f_Name').value = item.Name || '';
       document.getElementById('f_DatePropose').value = (item.DatePropose || '').slice(0, 10);
       document.getElementById('f_DateApproved').value = (item.DateApproved || '').slice(0, 10);
-      document.getElementById('f_ProposalStatus').value = item.ProposalStatus || 'Not Started';
+      document.getElementById('f_ProposalStatus').value = item.ProposalStatus || 'Not started';
       document.getElementById('f_PurchaseRequest').value = item.PurchaseRequest || '';
       document.getElementById('f_VendorForm').value = item.VendorForm || '';
       document.getElementById('f_Payment').value = item.Payment || '';
