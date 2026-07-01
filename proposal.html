@@ -269,12 +269,12 @@
 
     // ─── Clock ───
     function tickClock() {
-      const el = document.getElementById('topbarClock');
-      const now = new Date();
-      const d = now.toLocaleDateString('id-ID', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
-      const t = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      el.innerHTML = `${d}<br><b>${t}</b>`;
-    }
+  const el = document.getElementById('mastClock');
+  const now = new Date();
+  const d = now.toLocaleDateString('id-ID', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+  const t = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  el.innerHTML = `${d}<br><b>${t}</b>`;
+}
     tickClock();
     setInterval(tickClock, 1000);
 
