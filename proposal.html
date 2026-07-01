@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposal Status — The Seminyak Marketing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Halaman ini tidak pakai left-panel form, jadi body-wrap dibuat 1 kolom penuh */
+  .body-wrap.single { display: block; }
+  .right-panel { padding: 32px 28px 60px; }
+
+  /* Sort select kecil di filter bar, samain visual dengan chip/search */
+  .sort-select {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 6px 28px 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    margin-left: auto;
+  }
+  .sort-select:focus { outline: none; border-color: var(--gold); }
+
+  .req-file-link {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold);
+    text-decoration: none;
+    margin-right: 8px;
+  }
+  .req-file-link:hover { text-decoration: underline; }
+  .no-files { color: var(--muted); font-size: 12px; }
+
+  .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 18px; }
+  .page-btn {
+    min-width: 30px; height: 30px; padding: 0 8px;
+    border-radius: 7px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink-2);
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700;
+    cursor: pointer; transition: .15s ease;
+  }
+  .page-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+  .page-btn.active { background: var(--gold); border-color: var(--gold); color: #fff; }
+  .page-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  .status-select {
+    width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 9px 12px; font-size: 13px; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--ink);
+    outline: none;
+  }
+  .status-select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim); }
+</style>
+</head>
+<body data-active-page="proposal">
+
+  <div class="topbar">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <span class="topbar-title">The Seminyak Marketing</span>
+    <div class="topbar-div"></div>
+    <span class="topbar-title" style="color:var(--muted); font-weight:500;">Proposal Status</span>
+    <div class="topbar-clock" id="topbarClock"></div>
+  </div>
+
+  <div id="sidebar-container"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="body-wrap single">
+    <div class="right-panel">
+
+      <div class="board-header">
+        <div class="board-title-wrap">
+          <h2>Proposal Status</h2>
+          <div class="board-sub">Data live dari Notion — status proposal, purchase request, vendor form, hingga payment.</div>
+        </div>
+        <span class="count-badge" id="countBadge">0 proposal</span>
+      </div>
+
+      <div class="stats-strip" id="statsStrip"></div>
+
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+          <input type="text" id="searchInput" placeholder="Cari nama proposal...">
+          <button class="search-clear" id="searchClear">✕</button>
+        </div>
+        <div class="chips" id="statusChips"></div>
+        <select class="sort-select" id="sortSelect">
+          <option value="name-asc">Nama A–Z</option>
+          <option value="name-desc">Nama Z–A</option>
+          <option value="propose-desc" selected>Date Propose Terbaru</option>
+          <option value="propose-asc">Date Propose Terlama</option>
+          <option value="approved-desc">Date Approved Terbaru</option>
+        </select>
+      </div>
+
+      <div class="board">
+        <div class="table-wrapper">
+          <table class="req-table" id="reqTable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Date Propose</th>
+                <th>Date Approved</th>
+                <th>Proposal Status</th>
+                <th>Purchase Request</th>
+                <th>Vendor Form</th>
+                <th>Payment</th>
+                <th>Files</th>
+              </tr>
+            </thead>
+            <tbody id="reqTableBody">
+              <tr><td colspan="8"><div class="state-box"><div class="state-spinner"></div><div class="state-label">Memuat data...</div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="pagination" id="pagination"></div>
+
+    </div>
+  </div>
+
+  <!-- Detail / Update Status modal -->
+  <div class="overlay" id="detailOverlay">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="detailTitle">Detail Proposal</h3>
+        <button class="close-btn" id="detailClose">✕</button>
+      </div>
+      <div class="req-detail-grid" id="detailGrid"></div>
+
+      <div class="field" style="margin-top:18px;">
+        <label>Update Proposal Status</label>
+        <select class="status-select" id="statusUpdateSelect">
+          <option value="Not Started">Not Started</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Done">Done</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" id="detailCancel">Tutup</button>
+        <button class="btn-primary" id="detailSave" style="margin-top:0;">
+          <span id="saveBtnLabel">Simpan Status</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <span class="toast-icon" id="toastIcon">✓</span>
+    <span id="toastMsg"></span>
+  </div>
+
+  <script src="proposal-config.js"></script>
+  <script>
+    // ═══════════════════════════════════════════════
+    // Proposal Status Dashboard — Notion → Apps Script → GitHub Pages
+    //
+    // Backend (Google Apps Script) diharapkan expose:
+    //   GET  {GAS_WEB_APP_URL}?action=list
+    //        -> { ok: true, data: [ {
+    //              id, Name, DatePropose, DateApproved, ProposalStatus,
+    //              PurchaseRequest, VendorForm, Payment, Files, Invoice, Note
+    //           }, ... ] }
+    //
+    //   POST {GAS_WEB_APP_URL}  (Content-Type: text/plain;charset=utf-8, hindari CORS preflight)
+    //        body: { action: "updateStatus", id: "<page_id>", field: "ProposalStatus", value: "In Progress" }
+    //        -> { ok: true }
+    //
+    // Sesuaikan nama field di bawah kalau struktur JSON dari GAS berbeda.
+    // ═══════════════════════════════════════════════
+
+    let allItems = [];
+    let filteredItems = [];
+    let activeStatus = 'All';
+    let searchTerm = '';
+    let sortMode = 'propose-desc';
+    let currentPage = 1;
+    const PAGE_SIZE = 10;
+    let selectedItem = null;
+
+    // ─── Clock ───
+    function tickClock() {
+      const el = document.getElementById('topbarClock');
+      const now = new Date();
+      const d = now.toLocaleDateString('id-ID', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+      const t = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      el.innerHTML = `${d}<br><b>${t}</b>`;
+    }
+    tickClock();
+    setInterval(tickClock, 1000);
+
+    // ─── Fetch data ───
+    async function fetchProposals() {
+      try {
+        const url = `${CONFIG.GAS_WEB_APP_URL}?action=list`;
+        const res = await fetch(url, { method: 'GET' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.error || 'Gagal memuat data');
+        allItems = (json.data || []).map(normalizeItem);
+        buildStatusChips();
+        applyFilters();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('reqTableBody').innerHTML =
+          `<tr><td colspan="8"><div class="state-box state-error"><div class="state-icon">⚠</div><div class="state-label">Gagal memuat data: ${escapeHtml(err.message)}</div></div></td></tr>`;
+      }
+    }
+
+    function normalizeItem(raw) {
+      return {
+        id: raw.id || raw.ID || raw.pageId || '',
+        Name: raw.Name || raw.name || '(Tanpa Nama)',
+        DatePropose: raw.DatePropose || raw['Date Propose'] || '',
+        DateApproved: raw.DateApproved || raw['Date Approved'] || '',
+        ProposalStatus: raw.ProposalStatus || raw['Proposal Status'] || 'Not Started',
+        PurchaseRequest: raw.PurchaseRequest || raw['Purchase Request'] || '',
+        VendorForm: raw.VendorForm || raw['Vendor Form'] || '',
+        Payment: raw.Payment || '',
+        Files: raw.Files || [],
+        Invoice: raw.Invoice || [],
+        Note: raw.Note || ''
+      };
+    }
+
+    // ─── Stats ───
+    function buildStatusChips() {
+      const statuses = ['All', ...new Set(allItems.map(i => i.ProposalStatus).filter(Boolean))];
+      const wrap = document.getElementById('statusChips');
+      wrap.innerHTML = statuses.map(s =>
+        `<button class="chip ${s === activeStatus ? 'active' : ''}" data-status="${escapeHtml(s)}">${escapeHtml(s)}</button>`
+      ).join('');
+      wrap.querySelectorAll('.chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeStatus = btn.getAttribute('data-status');
+          currentPage = 1;
+          buildStatusChips();
+          applyFilters();
+        });
+      });
+    }
+
+    function renderStats() {
+      const total = allItems.length;
+      const counts = {};
+      allItems.forEach(i => { counts[i.ProposalStatus] = (counts[i.ProposalStatus] || 0) + 1; });
+      const pills = [{ label: 'Total', num: total }, ...Object.entries(counts).map(([label, num]) => ({ label, num }))];
+      document.getElementById('statsStrip').innerHTML = pills.map(p =>
+        `<div class="stat-pill"><span class="stat-num">${p.num}</span><span class="stat-label">${escapeHtml(p.label)}</span></div>`
+      ).join('');
+    }
+
+    // ─── Filter + sort ───
+    function applyFilters() {
+      filteredItems = allItems.filter(i => {
+        const matchStatus = activeStatus === 'All' || i.ProposalStatus === activeStatus;
+        const matchSearch = !searchTerm || i.Name.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchStatus && matchSearch;
+      });
+
+      filteredItems.sort((a, b) => {
+        switch (sortMode) {
+          case 'name-asc': return a.Name.localeCompare(b.Name);
+          case 'name-desc': return b.Name.localeCompare(a.Name);
+          case 'propose-asc': return new Date(a.DatePropose || 0) - new Date(b.DatePropose || 0);
+          case 'propose-desc': return new Date(b.DatePropose || 0) - new Date(a.DatePropose || 0);
+          case 'approved-desc': return new Date(b.DateApproved || 0) - new Date(a.DateApproved || 0);
+          default: return 0;
+        }
+      });
+
+      renderStats();
+      document.getElementById('countBadge').textContent = `${filteredItems.length} proposal`;
+      renderTable();
+      renderPagination();
+    }
+
+    // ─── Table ───
+    function statusPillClass(status) {
+      const s = (status || '').toLowerCase();
+      if (s.includes('done') || s.includes('approved')) return 'pill-low';
+      if (s.includes('progress')) return 'pill-in-progress';
+      if (s.includes('urgent') || s.includes('reject')) return 'pill-urgent';
+      return 'pill-not-started';
+    }
+
+    function fmtDate(d) {
+      if (!d) return '—';
+      const dt = new Date(d);
+      if (isNaN(dt.getTime())) return d;
+      return dt.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('reqTableBody');
+      if (filteredItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8"><div class="state-box"><div class="state-icon">📭</div><div class="state-label">Tidak ada proposal</div></div></td></tr>`;
+        return;
+      }
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = filteredItems.slice(start, start + PAGE_SIZE);
+
+      tbody.innerHTML = pageItems.map(item => {
+        const fileCount = (item.Files || []).length + (item.Invoice || []).length;
+        return `
+        <tr data-id="${escapeHtml(item.id)}">
+          <td data-label="Name"><strong>${escapeHtml(item.Name)}</strong></td>
+          <td data-label="Date Propose">${fmtDate(item.DatePropose)}</td>
+          <td data-label="Date Approved">${fmtDate(item.DateApproved)}</td>
+          <td data-label="Proposal Status"><span class="pill ${statusPillClass(item.ProposalStatus)}">${escapeHtml(item.ProposalStatus)}</span></td>
+          <td data-label="Purchase Request">${item.PurchaseRequest ? `<span class="pill ${statusPillClass(item.PurchaseRequest)}">${escapeHtml(item.PurchaseRequest)}</span>` : '—'}</td>
+          <td data-label="Vendor Form">${item.VendorForm ? `<span class="pill ${statusPillClass(item.VendorForm)}">${escapeHtml(item.VendorForm)}</span>` : '—'}</td>
+          <td data-label="Payment">${item.Payment ? `<span class="pill ${statusPillClass(item.Payment)}">${escapeHtml(item.Payment)}</span>` : '—'}</td>
+          <td data-label="Files">${fileCount > 0 ? `<span class="pill pill-date">${fileCount} file</span>` : '<span class="no-files">—</span>'}</td>
+        </tr>`;
+      }).join('');
+
+      tbody.querySelectorAll('tr[data-id]').forEach(row => {
+        row.addEventListener('click', () => openDetail(row.getAttribute('data-id')));
+      });
+    }
+
+    // ─── Pagination ───
+    function renderPagination() {
+      const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
+      if (currentPage > totalPages) currentPage = totalPages;
+      const wrap = document.getElementById('pagination');
+      if (totalPages <= 1) { wrap.innerHTML = ''; return; }
+
+      let html = `<button class="page-btn" id="prevPage" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+      for (let p = 1; p <= totalPages; p++) {
+        html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
+      }
+      html += `<button class="page-btn" id="nextPage" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+      wrap.innerHTML = html;
+
+      wrap.querySelectorAll('[data-page]').forEach(btn => {
+        btn.addEventListener('click', () => { currentPage = parseInt(btn.getAttribute('data-page'), 10); renderTable(); renderPagination(); });
+      });
+      const prev = document.getElementById('prevPage');
+      const next = document.getElementById('nextPage');
+      if (prev) prev.addEventListener('click', () => { currentPage--; renderTable(); renderPagination(); });
+      if (next) next.addEventListener('click', () => { currentPage++; renderTable(); renderPagination(); });
+    }
+
+    // ─── Detail modal ───
+    function openDetail(id) {
+      selectedItem = allItems.find(i => i.id === id);
+      if (!selectedItem) return;
+
+      document.getElementById('detailTitle').textContent = selectedItem.Name;
+
+      const fileLinks = (list, label) => (list && list.length)
+        ? list.map((url, idx) => `<a class="req-file-link" href="${escapeAttr(url)}" target="_blank" rel="noopener">${label} ${idx + 1} ↗</a>`).join('')
+        : '<span class="no-files">Belum ada</span>';
+
+      document.getElementById('detailGrid').innerHTML = `
+        <div class="req-field"><span>Date Propose</span><strong>${fmtDate(selectedItem.DatePropose)}</strong></div>
+        <div class="req-field"><span>Date Approved</span><strong>${fmtDate(selectedItem.DateApproved)}</strong></div>
+        <div class="req-field"><span>Purchase Request</span><strong>${escapeHtml(selectedItem.PurchaseRequest || '—')}</strong></div>
+        <div class="req-field"><span>Vendor Form</span><strong>${escapeHtml(selectedItem.VendorForm || '—')}</strong></div>
+        <div class="req-field"><span>Payment</span><strong>${escapeHtml(selectedItem.Payment || '—')}</strong></div>
+        <div class="req-field"><span>Proposal Status</span><strong>${escapeHtml(selectedItem.ProposalStatus)}</strong></div>
+        <div class="req-field" style="grid-column:1 / -1;"><span>Files</span><div>${fileLinks(selectedItem.Files, 'File')}</div></div>
+        <div class="req-field" style="grid-column:1 / -1;"><span>Invoice</span><div>${fileLinks(selectedItem.Invoice, 'Invoice')}</div></div>
+        <div class="req-field" style="grid-column:1 / -1;"><span>Note</span><strong>${escapeHtml(selectedItem.Note || '—')}</strong></div>
+      `;
+
+      document.getElementById('statusUpdateSelect').value = selectedItem.ProposalStatus || 'Not Started';
+      document.getElementById('detailOverlay').classList.add('show');
+    }
+
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('show');
+      selectedItem = null;
+    }
+    document.getElementById('detailClose').addEventListener('click', closeDetail);
+    document.getElementById('detailCancel').addEventListener('click', closeDetail);
+    document.getElementById('detailOverlay').addEventListener('click', (e) => { if (e.target.id === 'detailOverlay') closeDetail(); });
+
+    document.getElementById('detailSave').addEventListener('click', async () => {
+      if (!selectedItem) return;
+      const newStatus = document.getElementById('statusUpdateSelect').value;
+      const saveBtn = document.getElementById('detailSave');
+      const label = document.getElementById('saveBtnLabel');
+      saveBtn.disabled = true;
+      label.textContent = 'Menyimpan...';
+      try {
+        const res = await fetch(CONFIG.GAS_WEB_APP_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // hindari CORS preflight ke GAS
+          body: JSON.stringify({ action: 'updateStatus', id: selectedItem.id, field: 'ProposalStatus', value: newStatus })
+        });
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.error || 'Gagal update status');
+        selectedItem.ProposalStatus = newStatus;
+        const idx = allItems.findIndex(i => i.id === selectedItem.id);
+        if (idx > -1) allItems[idx].ProposalStatus = newStatus;
+        showToast('Status berhasil diperbarui', 'ok');
+        buildStatusChips();
+        applyFilters();
+        closeDetail();
+      } catch (err) {
+        console.error(err);
+        showToast('Gagal menyimpan: ' + err.message, 'err');
+      } finally {
+        saveBtn.disabled = false;
+        label.textContent = 'Simpan Status';
+      }
+    });
+
+    // ─── Search ───
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
+    let searchTimer = null;
+    searchInput.addEventListener('input', () => {
+      searchClear.classList.toggle('visible', !!searchInput.value);
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        searchTerm = searchInput.value.trim();
+        currentPage = 1;
+        applyFilters();
+      }, 250);
+    });
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchTerm = '';
+      searchClear.classList.remove('visible');
+      currentPage = 1;
+      applyFilters();
+    });
+
+    // ─── Sort ───
+    document.getElementById('sortSelect').addEventListener('change', (e) => {
+      sortMode = e.target.value;
+      applyFilters();
+    });
+
+    // ─── Toast ───
+    let toastTimer = null;
+    function showToast(msg, type) {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toastIcon');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.className = 'toast show ' + (type === 'err' ? 'toast-err' : 'toast-ok');
+      icon.textContent = type === 'err' ? '✕' : '✓';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+
+    // ─── Helpers ───
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+    function escapeAttr(str) { return escapeHtml(str); }
+
+    fetchProposals();
+  </script>
+
+  <script src="sidebar-loader.js"></script>
+</body>
+</html>
