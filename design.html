@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body data-active-page="design">
+
+  <nav class="topbar">
+    <button type="button" class="sidebar-menu-btn" id="sidebarMenuBtn" aria-label="Buka menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <img class="topbar-logo" src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
+    <div class="topbar-div"></div>
+    <span class="topbar-title">Design Requests</span>
+    <div class="topbar-clock" id="mastClock">—</div>
+  </nav>
+
+  <div id="sidebar-container"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="body-wrap" style="grid-template-columns: 1fr;">
+    <div class="right-panel" style="padding-top: 40px; max-width: 1200px; margin: 0 auto; width: 100%;">
+      
+      <div class="board-header">
+        <div class="board-title-wrap">
+          <h2 id="boardMainTitle">Antrian Design Request</h2>
+          <div class="board-sub" id="boardSubTitle">Daftar permintaan desain dari semua departemen</div>
+        </div>
+        <span class="count-badge" id="countLabel">memuat...</span>
+      </div>
+
+      <div class="stats-strip" id="reqStatsStrip"></div>
+
+      <div class="board">
+        <div class="table-wrapper">
+          <table class="req-table">
+            <thead>
+              <tr>
+                <th>Requester</th><th>Dept</th><th>Submitted</th><th>Deadline</th><th>Status</th>
+                <th style="text-align:right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="reqTableBody">
+              <tr><td colspan="6" class="state-box"><div class="state-spinner"></div><div class="state-label">Memuat requests...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastOk" class="toast toast-ok"><span class="toast-icon">✓</span><span id="toastOkMsg">Berhasil disimpan</span></div>
+  <div id="toastErr" class="toast toast-err"><span class="toast-icon">✕</span><span id="toastErrMsg">Terjadi kesalahan</span></div>
+
+  <div id="reqModalOverlay" class="overlay">
+    <div class="modal-card" style="width:min(92vw,560px);">
+      <div class="modal-head" style="margin-bottom:16px;">
+        <div>
+          <h3 id="reqModalName" style="font-size:16px;margin-bottom:4px;">—</h3>
+          <div id="reqModalMeta" style="font-size:12px;color:var(--muted);font-family:'Inter',sans-serif;">—</div>
+        </div>
+        <button type="button" class="close-btn" id="reqModalClose">&times;</button>
+      </div>
+      <div class="req-detail-grid">
+        <div class="req-field"><span>Email</span><strong id="reqModalEmail">—</strong></div>
+        <div class="req-field"><span>Department</span><strong id="reqModalDept">—</strong></div>
+        <div class="req-field"><span>Submitted</span><strong id="reqModalSub">—</strong></div>
+        <div class="req-field"><span>Deadline</span><strong id="reqModalDead">—</strong></div>
+      </div>
+      <div class="req-field" style="margin-top:16px;">
+        <span>Design Brief &amp; Notes</span>
+        <div id="reqModalNotes" style="margin-top:6px;font-size:13.5px;color:var(--ink);line-height:1.6;background:var(--bg);padding:12px;border-radius:8px;border:1px solid var(--line);white-space:pre-wrap;">—</div>
+      </div>
+      <div class="req-field" id="reqModalFilesField" style="margin-top:16px;display:none;">
+        <span>Attached Files</span>
+        <div class="req-file-list" id="reqModalFileList" style="margin-top:6px;"></div>
+      </div>
+      <div class="modal-actions" style="margin-top:24px;border-top:1px solid var(--line);padding-top:20px;align-items:center;">
+        <span id="reqModalStatusBadge"></span>
+        <div style="flex:1"></div>
+        <button class="btn-primary" id="reqModalDoneBtn" style="flex:unset;width:auto;padding:8px 14px;font-size:12px;background:var(--ok);">Mark as Done</button>
+        <button class="btn-secondary" id="reqModalDeleteBtn" style="flex:unset;width:auto;padding:8px 14px;font-size:12px;color:var(--urgent);border-color:var(--urgent-bg);">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmOverlay" class="overlay" style="z-index:9500;">
+    <div class="modal-card" style="width:min(90vw,340px);text-align:center;padding:30px 24px;">
+      <h3 style="margin-bottom:8px;">Hapus Request?</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.5;">Tindakan ini akan menghapus data secara permanen dan tidak dapat dibatalkan.</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="confirmCancelBtn">Batal</button>
+        <button class="btn-primary" id="confirmDeleteBtn" style="background:var(--urgent);">
+          <span id="confirmDeleteLabel">Ya, Hapus</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const REQ_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJWrSQiv6gPa2Gax9rzXRBZn57uxjUTqjf1UvFNa-7wzGmlwfCJuZ8cuDtBk3X68navQ/exec';
+
+    /* ─── Clock ─── */
+    function tickClock() {
+      const now = new Date();
+      const d = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+      const t = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('mastClock').innerHTML = d + '&nbsp;&nbsp;<b>' + t + '</b>';
+    }
+    tickClock(); setInterval(tickClock, 30000);
+
+    /* ─── Utils ─── */
+    function showToast(id, msgId, msg, dur) {
+      const el = document.getElementById(id);
+      document.getElementById(msgId).textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), dur || 3000);
+    }
+    function showOk(msg) { showToast('toastOk','toastOkMsg',msg,2800); }
+    function showErr(msg) { showToast('toastErr','toastErrMsg',msg,3500); }
+
+    function esc(s) { return !s ? '' : String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (isNaN(d)) return iso;
+      return d.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+    }
+    function getFileUrls(row) {
+      const raw = row['File URL'];
+      if (!raw) return [];
+      return String(raw).split('\n').map(s => s.trim()).filter(Boolean);
+    }
+
+    /* ─── Design Request Logic ─── */
+    let reqData = [];
+    let reqActiveIndex = null;
+    const countLabel = document.getElementById('countLabel');
+
+    function loadDesignRequests() {
+      const tbody = document.getElementById('reqTableBody');
+      fetch(`${REQ_SCRIPT_URL}?action=getRequests`)
+        .then(res => res.json())
+        .then(data => { reqData = data || []; renderReqTable(); })
+        .catch(() => { tbody.innerHTML='<tr><td colspan="6" class="state-box"><div class="state-icon">!</div><div class="state-label">Gagal terhubung ke database Request.</div></td></tr>'; });
+    }
+
+    function renderReqTable() {
+      const tbody = document.getElementById('reqTableBody');
+      tbody.innerHTML = '';
+      countLabel.textContent = reqData.length + ' item';
+      
+      const total = reqData.length;
+      const pending = reqData.filter(r => r.Status === 'Pending').length;
+      const done = reqData.filter(r => r.Status === 'Done').length;
+      
+      document.getElementById('reqStatsStrip').innerHTML = `
+        <div class="stat-pill"><span class="stat-num">${total}</span><span class="stat-label">Total</span></div>
+        <div class="stat-pill"><span class="stat-num" style="color:var(--warn);">${pending}</span><span class="stat-label">Pending</span></div>
+        <div class="stat-pill"><span class="stat-num" style="color:var(--ok);">${done}</span><span class="stat-label">Done</span></div>`;
+        
+      if(!reqData.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="state-box"><div class="state-icon">◌</div><div class="state-label">Belum ada Design Request</div></td></tr>';
+        return;
+      }
+      
+      reqData.forEach((row, idx) => {
+        const isPending = row.Status === 'Pending';
+        const overdue = isPending && new Date(row.Deadline) < new Date();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td data-label="Requester"><div style="font-weight:600;color:var(--ink);margin-bottom:2px;">${esc(row.Name||'—')}</div><div style="font-size:11px;color:var(--muted);">${esc(row.Email||'')}</div></td>
+          <td data-label="Dept">${esc(row.Department||'—')}</td>
+          <td data-label="Submitted">${fmtDate(row['Date Submit'])}</td>
+          <td data-label="Deadline" style="${overdue ? 'color:var(--urgent);font-weight:600;' : ''}">${fmtDate(row.Deadline)}</td>
+          <td data-label="Status"><span class="pill ${isPending ? 'pill-medium' : 'pill-low'}">${esc(row.Status)}</span></td>
+          <td data-label="Action" style="text-align:right;"><button class="btn-sm" style="border:1px solid var(--line-2);" onclick="event.stopPropagation();openReqModal(${idx})">Lihat</button></td>`;
+        tr.addEventListener('click', () => openReqModal(idx));
+        tbody.appendChild(tr);
+      });
+    }
+
+    const reqModalOverlay = document.getElementById('reqModalOverlay');
+    function openReqModal(idx) {
+      const row = reqData[idx];
+      if (!row) return;
+      reqActiveIndex = idx;
+      const isPending = row.Status === 'Pending';
+      
+      document.getElementById('reqModalName').textContent = row.Name || '—';
+      document.getElementById('reqModalMeta').textContent = `${row.Department||'—'} · Diajukan ${fmtDate(row['Date Submit'])}`;
+      document.getElementById('reqModalEmail').textContent = row.Email || '—';
+      document.getElementById('reqModalDept').textContent = row.Department || '—';
+      document.getElementById('reqModalSub').textContent = fmtDate(row['Date Submit']);
+      document.getElementById('reqModalDead').textContent = fmtDate(row.Deadline);
+      document.getElementById('reqModalNotes').textContent = row.Notes || '—';
+      document.getElementById('reqModalStatusBadge').innerHTML = `<span class="pill ${isPending?'pill-medium':'pill-low'}">${esc(row.Status)}</span>`;
+      
+      const fileUrls = getFileUrls(row);
+      const filesField = document.getElementById('reqModalFilesField');
+      const fileListEl = document.getElementById('reqModalFileList');
+      
+      if(fileUrls.length > 0) {
+        filesField.style.display = '';
+        fileListEl.innerHTML = fileUrls.map((url,i) => `<a class="btn-secondary" href="${url}" target="_blank" rel="noopener">${fileUrls.length>1?`Lihat File ${i+1}`:'Lihat File'}</a>`).join('');
+      } else { 
+        filesField.style.display = 'none'; 
+        fileListEl.innerHTML = ''; 
+      }
+      
+      document.getElementById('reqModalDoneBtn').style.display = isPending ? 'inline-block' : 'none';
+      reqModalOverlay.classList.add('show');
+    }
+    
+    document.getElementById('reqModalClose').addEventListener('click', () => reqModalOverlay.classList.remove('show'));
+    reqModalOverlay.addEventListener('click', e => { if(e.target === reqModalOverlay) reqModalOverlay.classList.remove('show'); });
+
+    document.getElementById('reqModalDoneBtn').addEventListener('click', () => {
+      if(reqActiveIndex === null) return;
+      const btn = document.getElementById('reqModalDoneBtn');
+      btn.disabled = true; btn.textContent = 'Updating...';
+      fetch(`${REQ_SCRIPT_URL}?action=markDone&rowIndex=${reqActiveIndex}`)
+        .then(() => { reqData[reqActiveIndex].Status = 'Done'; renderReqTable(); showOk('Request ditandai selesai'); openReqModal(reqActiveIndex); })
+        .catch(() => showErr('Gagal mengupdate request'))
+        .finally(() => { btn.disabled = false; btn.textContent = 'Mark as Done'; });
+    });
+
+    const confirmOverlay = document.getElementById('confirmOverlay');
+    document.getElementById('reqModalDeleteBtn').addEventListener('click', () => confirmOverlay.classList.add('show'));
+    document.getElementById('confirmCancelBtn').addEventListener('click', () => confirmOverlay.classList.remove('show'));
+    
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+      if(reqActiveIndex === null) return;
+      const btn = document.getElementById('confirmDeleteBtn');
+      const lbl = document.getElementById('confirmDeleteLabel');
+      btn.disabled = true; lbl.textContent = 'Menghapus...';
+      fetch(`${REQ_SCRIPT_URL}?action=deleteRequest&rowIndex=${reqActiveIndex}`)
+        .then(() => {
+          reqData.splice(reqActiveIndex, 1);
+          reqActiveIndex = null;
+          renderReqTable();
+          confirmOverlay.classList.remove('show');
+          reqModalOverlay.classList.remove('show');
+          showOk('Request berhasil dihapus');
+        })
+        .catch(() => showErr('Gagal menghapus request'))
+        .finally(() => { btn.disabled = false; lbl.textContent = 'Ya, Hapus'; });
+    });
+
+    // Init
+    loadDesignRequests();
+  </script>
+
+  <script src="sidebar-loader.js"></script>
+</body>
+</html>
