@@ -21,10 +21,14 @@
   }
   .btn-add:hover { background: var(--gold-hover); }
 
-  /* ─── FILTER BAR: dipecah jadi 2 baris biar rapi ─── */
-  .filter-bar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  /* ─── FILTER BAR: dipecah jadi 3 baris biar rapi ─── */
+  .filter-bar { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
   .filter-row-1 { display: flex; align-items: center; gap: 10px; }
   .filter-row-1 .search-wrap { flex: 0 0 220px; }
+  
+  .filter-row-3 { display: flex; align-items: center; gap: 10px; }
+  .filter-label { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
   .sort-select {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10.5px;
@@ -37,18 +41,18 @@
     background: var(--surface);
     color: var(--muted);
     cursor: pointer;
-    margin-left: auto;
     appearance: none; -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2378716c' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 10px center;
   }
+  #sortSelect { margin-left: auto; }
   .sort-select:focus { outline: none; border-color: var(--gold); }
   .chips { display: flex; gap: 8px; flex-wrap: wrap; }
 
   @media (max-width: 700px) {
     .filter-row-1 { flex-wrap: wrap; }
     .filter-row-1 .search-wrap { flex: 1 1 100%; }
-    .sort-select { margin-left: 0; }
+    #sortSelect { margin-left: 0; }
   }
 
   .req-file-link {
@@ -114,8 +118,6 @@
         </div>
       </div>
 
-      <div class="stats-strip" id="statsStrip"></div>
-
       <div class="filter-bar">
         <div class="filter-row-1">
           <div class="search-wrap">
@@ -131,7 +133,15 @@
             <option value="name-desc">Nama Z–A</option>
           </select>
         </div>
+        
         <div class="chips" id="statusChips"></div>
+
+        <div class="filter-row-3">
+          <span class="filter-label">Tahun Propose:</span>
+          <select class="sort-select" id="yearSelect">
+            <option value="All">Semua Tahun</option>
+          </select>
+        </div>
       </div>
 
       <div class="board">
@@ -160,7 +170,6 @@
     </div>
   </div>
 
-  <!-- Edit / Create modal -->
   <div class="overlay" id="detailOverlay">
     <div class="modal-card" style="width:min(92vw, 560px);">
       <div class="modal-head">
@@ -252,28 +261,13 @@
 
   <script src="proposal-config.js"></script>
   <script>
-    // ═══════════════════════════════════════════════
-    // Proposal Status Dashboard — Notion → Apps Script → GitHub Pages
-    //
-    // Backend (Google Apps Script) diharapkan expose:
-    //   GET  {GAS_WEB_APP_URL}?action=list
-    //        -> { ok: true, data: [ {
-    //              id, Name, DatePropose, DateApproved, ProposalStatus,
-    //              PurchaseRequest, VendorForm, Payment, Files: [...], Invoice: [...], Note
-    //           }, ... ] }
-    //
-    //   POST {GAS_WEB_APP_URL}  (Content-Type: text/plain;charset=utf-8, hindari CORS preflight)
-    //        Edit item : { action: "updateItem", id: "<page_id>", fields: { ...semua property... } }
-    //        Item baru : { action: "createItem", fields: { ...semua property... } }
-    //        -> { ok: true, id?: "<page_id_baru>" }
-    // ═══════════════════════════════════════════════
-
     let allItems = [];
     let filteredItems = [];
     let activeStatus = 'All';
+    let activeYear = 'All'; // State untuk filter tahun
     let searchTerm = '';
     let sortMode = 'propose-desc';
-    let modalMode = 'edit'; // 'edit' | 'create'
+    let modalMode = 'edit';
     let editingId = null;
 
     // ─── Clock ───
@@ -297,6 +291,7 @@
         if (!json.ok) throw new Error(json.error || 'Gagal memuat data');
         allItems = (json.data || []).map(normalizeItem);
         buildStatusChips();
+        buildYearSelect(); // Membangun filter dropdown tahun
         applyFilters();
       } catch (err) {
         console.error(err);
@@ -321,7 +316,7 @@
       };
     }
 
-    // ─── Stats ───
+    // ─── Filter Status & Tahun ───
     function buildStatusChips() {
       const statuses = ['All', ...new Set(allItems.map(i => i.ProposalStatus).filter(Boolean))];
       const wrap = document.getElementById('statusChips');
@@ -337,22 +332,37 @@
       });
     }
 
-    function renderStats() {
-      const total = allItems.length;
-      const counts = {};
-      allItems.forEach(i => { counts[i.ProposalStatus] = (counts[i.ProposalStatus] || 0) + 1; });
-      const pills = [{ label: 'Total', num: total }, ...Object.entries(counts).map(([label, num]) => ({ label, num }))];
-      document.getElementById('statsStrip').innerHTML = pills.map(p =>
-        `<div class="stat-pill"><span class="stat-num">${p.num}</span><span class="stat-label">${escapeHtml(p.label)}</span></div>`
-      ).join('');
+    function buildYearSelect() {
+      const years = new Set();
+      allItems.forEach(i => {
+        if (i.DatePropose) {
+          const y = new Date(i.DatePropose).getFullYear();
+          if (!isNaN(y)) years.add(y);
+        }
+      });
+      const sortedYears = Array.from(years).sort((a, b) => b - a);
+      const select = document.getElementById('yearSelect');
+      
+      // Pertahankan pilihan user jika ada opsi tahun baru setelah disave
+      select.innerHTML = '<option value="All">Semua Tahun</option>' +
+        sortedYears.map(y => `<option value="${y}" ${activeYear === String(y) ? 'selected' : ''}>${y}</option>`).join('');
     }
 
     // ─── Filter + sort ───
     function applyFilters() {
       filteredItems = allItems.filter(i => {
+        // Filter Status
         const matchStatus = activeStatus === 'All' || i.ProposalStatus === activeStatus;
+        // Filter Pencarian
         const matchSearch = !searchTerm || i.Name.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchStatus && matchSearch;
+        // Filter Tahun
+        let matchYear = true;
+        if (activeYear !== 'All') {
+          const y = i.DatePropose ? new Date(i.DatePropose).getFullYear().toString() : '';
+          matchYear = (y === activeYear);
+        }
+        
+        return matchStatus && matchSearch && matchYear;
       });
 
       filteredItems.sort((a, b) => {
@@ -366,7 +376,6 @@
         }
       });
 
-      renderStats();
       document.getElementById('countBadge').textContent = `${filteredItems.length} proposal`;
       renderTable();
     }
@@ -375,11 +384,11 @@
     function statusPillClass(status) {
       const s = (status || '').toLowerCase().trim();
       if (s === 'cancel' || s === 'not approved') return 'pill-urgent';
-      if (s.startsWith('done')) return 'pill-low';           // Done, Done GM, Done Purchasing
+      if (s.startsWith('done')) return 'pill-low';
       if (s === 'deposit') return 'pill-medium';
       if (s === 'in progress') return 'pill-in-progress';
       if (s === 'not started' || s === 'not required') return 'pill-not-started';
-      return 'pill-not-started'; // fallback, mis. status custom seperti "Mbak Eka"
+      return 'pill-not-started'; 
     }
 
     function fmtDate(d) {
@@ -389,7 +398,6 @@
       return dt.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
-    // List penuh, urut turun ke bawah, tanpa pagination (1 2 3)
     function renderTable() {
       const tbody = document.getElementById('reqTableBody');
       const endNote = document.getElementById('listEndNote');
@@ -496,7 +504,7 @@
 
         const res = await fetch(CONFIG.GAS_WEB_APP_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // hindari CORS preflight ke GAS
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
         const json = await res.json();
@@ -512,6 +520,7 @@
         }
 
         buildStatusChips();
+        buildYearSelect(); // Update filter tahun kalau-kalau ada entri tahun baru
         applyFilters();
         closeDetail();
       } catch (err) {
@@ -542,9 +551,14 @@
       applyFilters();
     });
 
-    // ─── Sort ───
+    // ─── Sort & Filter Change Events ───
     document.getElementById('sortSelect').addEventListener('change', (e) => {
       sortMode = e.target.value;
+      applyFilters();
+    });
+    
+    document.getElementById('yearSelect').addEventListener('change', (e) => {
+      activeYear = e.target.value;
       applyFilters();
     });
 
