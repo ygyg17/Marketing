@@ -6,6 +6,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="sidebar.css">
 
   <style>
     :root {
@@ -329,14 +330,20 @@
   </style>
 </head>
 
-<body>
+<body data-active-page="task">
 
   <nav class="topbar">
+    <button type="button" class="sidebar-menu-btn" id="sidebarMenuBtn" aria-label="Buka menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
     <img class="topbar-logo" src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
     <div class="topbar-div"></div>
     <span class="topbar-title">Marketing Desk</span>
     <div class="topbar-clock" id="mastClock">—</div>
   </nav>
+
+  <div id="sidebar-container"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <div class="body-wrap">
 
@@ -1008,5 +1015,7 @@
     // Init
     loadItems();
   </script>
+
+  <script src="sidebar-loader.js"></script>
 </body>
 </html>
