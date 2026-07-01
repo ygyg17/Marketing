@@ -12,22 +12,44 @@
   .body-wrap.single { display: block; }
   .right-panel { padding: 32px 28px 60px; }
 
-  /* Sort select kecil di filter bar, samain visual dengan chip/search */
+  .board-header .header-actions { display: flex; align-items: center; gap: 10px; }
+  .btn-add {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 16px; background: var(--gold); color: #fff; border: none;
+    border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: background .15s; white-space: nowrap;
+  }
+  .btn-add:hover { background: var(--gold-hover); }
+
+  /* ─── FILTER BAR: dipecah jadi 2 baris biar rapi ─── */
+  .filter-bar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .filter-row-1 { display: flex; align-items: center; gap: 10px; }
+  .filter-row-1 .search-wrap { flex: 0 0 220px; }
   .sort-select {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10.5px;
     font-weight: 700;
     letter-spacing: .06em;
     text-transform: uppercase;
-    padding: 6px 28px 6px 12px;
+    padding: 7px 30px 7px 12px;
     border-radius: 20px;
     border: 1px solid var(--line);
     background: var(--surface);
     color: var(--muted);
     cursor: pointer;
     margin-left: auto;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2378716c' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
   }
   .sort-select:focus { outline: none; border-color: var(--gold); }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  @media (max-width: 700px) {
+    .filter-row-1 { flex-wrap: wrap; }
+    .filter-row-1 .search-wrap { flex: 1 1 100%; }
+    .sort-select { margin-left: 0; }
+  }
 
   .req-file-link {
     display: inline-block;
@@ -41,24 +63,26 @@
   .req-file-link:hover { text-decoration: underline; }
   .no-files { color: var(--muted); font-size: 12px; }
 
-  .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 18px; }
-  .page-btn {
-    min-width: 30px; height: 30px; padding: 0 8px;
-    border-radius: 7px; border: 1px solid var(--line);
-    background: var(--surface); color: var(--ink-2);
-    font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700;
-    cursor: pointer; transition: .15s ease;
+  .list-end-note {
+    text-align: center; padding: 18px 0 4px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
   }
-  .page-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
-  .page-btn.active { background: var(--gold); border-color: var(--gold); color: #fff; }
-  .page-btn:disabled { opacity: .4; cursor: not-allowed; }
 
-  .status-select {
+  /* ─── Edit / Create form fields ─── */
+  .edit-field { display: flex; flex-direction: column; gap: 6px; }
+  .edit-field label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .edit-field input, .edit-field select, .edit-field textarea {
     width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
-    padding: 9px 12px; font-size: 13px; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--ink);
-    outline: none;
+    padding: 9px 12px; font-size: 13px; font-family: 'Inter', sans-serif; font-weight: 500; color: var(--ink);
+    outline: none; transition: border-color .15s, box-shadow .15s;
   }
-  .status-select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim); }
+  .edit-field input:focus, .edit-field select:focus, .edit-field textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim); background: var(--surface); }
+  .edit-field textarea { min-height: 56px; resize: vertical; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; line-height: 1.5; }
+  .edit-field .hint { font-size: 10.5px; color: var(--muted); }
+  .edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .edit-grid .full { grid-column: 1 / -1; }
+  @media (max-width: 520px) { .edit-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body data-active-page="proposal">
@@ -84,25 +108,30 @@
           <h2>Proposal Status</h2>
           <div class="board-sub">Data live dari Notion — status proposal, purchase request, vendor form, hingga payment.</div>
         </div>
-        <span class="count-badge" id="countBadge">0 proposal</span>
+        <div class="header-actions">
+          <span class="count-badge" id="countBadge">0 proposal</span>
+          <button class="btn-add" id="btnAddNew">+ Proposal Baru</button>
+        </div>
       </div>
 
       <div class="stats-strip" id="statsStrip"></div>
 
       <div class="filter-bar">
-        <div class="search-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
-          <input type="text" id="searchInput" placeholder="Cari nama proposal...">
-          <button class="search-clear" id="searchClear">✕</button>
+        <div class="filter-row-1">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+            <input type="text" id="searchInput" placeholder="Cari nama proposal...">
+            <button class="search-clear" id="searchClear">✕</button>
+          </div>
+          <select class="sort-select" id="sortSelect">
+            <option value="propose-desc" selected>Date Propose Terbaru</option>
+            <option value="propose-asc">Date Propose Terlama</option>
+            <option value="approved-desc">Date Approved Terbaru</option>
+            <option value="name-asc">Nama A–Z</option>
+            <option value="name-desc">Nama Z–A</option>
+          </select>
         </div>
         <div class="chips" id="statusChips"></div>
-        <select class="sort-select" id="sortSelect">
-          <option value="name-asc">Nama A–Z</option>
-          <option value="name-desc">Nama Z–A</option>
-          <option value="propose-desc" selected>Date Propose Terbaru</option>
-          <option value="propose-asc">Date Propose Terlama</option>
-          <option value="approved-desc">Date Approved Terbaru</option>
-        </select>
       </div>
 
       <div class="board">
@@ -126,34 +155,85 @@
           </table>
         </div>
       </div>
-
-      <div class="pagination" id="pagination"></div>
+      <div class="list-end-note" id="listEndNote"></div>
 
     </div>
   </div>
 
-  <!-- Detail / Update Status modal -->
+  <!-- Edit / Create modal -->
   <div class="overlay" id="detailOverlay">
-    <div class="modal-card">
+    <div class="modal-card" style="width:min(92vw, 560px);">
       <div class="modal-head">
         <h3 id="detailTitle">Detail Proposal</h3>
         <button class="close-btn" id="detailClose">✕</button>
       </div>
-      <div class="req-detail-grid" id="detailGrid"></div>
 
-      <div class="field" style="margin-top:18px;">
-        <label>Update Proposal Status</label>
-        <select class="status-select" id="statusUpdateSelect">
-          <option value="Not Started">Not Started</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Done">Done</option>
-        </select>
+      <div class="edit-grid">
+        <div class="edit-field full">
+          <label>Name</label>
+          <input type="text" id="f_Name" placeholder="Nama proposal">
+        </div>
+        <div class="edit-field">
+          <label>Date Propose</label>
+          <input type="date" id="f_DatePropose">
+        </div>
+        <div class="edit-field">
+          <label>Date Approved</label>
+          <input type="date" id="f_DateApproved">
+        </div>
+        <div class="edit-field">
+          <label>Proposal Status</label>
+          <select id="f_ProposalStatus">
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label>Purchase Request</label>
+          <select id="f_PurchaseRequest">
+            <option value="">—</option>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label>Vendor Form</label>
+          <select id="f_VendorForm">
+            <option value="">—</option>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label>Payment</label>
+          <select id="f_Payment">
+            <option value="">—</option>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+        <div class="edit-field full">
+          <label>Files (link, 1 per baris)</label>
+          <textarea id="f_Files" placeholder="https://drive.google.com/..."></textarea>
+        </div>
+        <div class="edit-field full">
+          <label>Invoice (link, 1 per baris)</label>
+          <textarea id="f_Invoice" placeholder="https://drive.google.com/..."></textarea>
+        </div>
+        <div class="edit-field full">
+          <label>Note</label>
+          <textarea id="f_Note" placeholder="Catatan tambahan..."></textarea>
+        </div>
       </div>
 
       <div class="modal-actions">
-        <button class="btn-secondary" id="detailCancel">Tutup</button>
+        <button class="btn-secondary" id="detailCancel">Batal</button>
         <button class="btn-primary" id="detailSave" style="margin-top:0;">
-          <span id="saveBtnLabel">Simpan Status</span>
+          <span id="saveBtnLabel">Simpan</span>
         </button>
       </div>
     </div>
@@ -173,14 +253,13 @@
     //   GET  {GAS_WEB_APP_URL}?action=list
     //        -> { ok: true, data: [ {
     //              id, Name, DatePropose, DateApproved, ProposalStatus,
-    //              PurchaseRequest, VendorForm, Payment, Files, Invoice, Note
+    //              PurchaseRequest, VendorForm, Payment, Files: [...], Invoice: [...], Note
     //           }, ... ] }
     //
     //   POST {GAS_WEB_APP_URL}  (Content-Type: text/plain;charset=utf-8, hindari CORS preflight)
-    //        body: { action: "updateStatus", id: "<page_id>", field: "ProposalStatus", value: "In Progress" }
-    //        -> { ok: true }
-    //
-    // Sesuaikan nama field di bawah kalau struktur JSON dari GAS berbeda.
+    //        Edit item : { action: "updateItem", id: "<page_id>", fields: { ...semua property... } }
+    //        Item baru : { action: "createItem", fields: { ...semua property... } }
+    //        -> { ok: true, id?: "<page_id_baru>" }
     // ═══════════════════════════════════════════════
 
     let allItems = [];
@@ -188,9 +267,8 @@
     let activeStatus = 'All';
     let searchTerm = '';
     let sortMode = 'propose-desc';
-    let currentPage = 1;
-    const PAGE_SIZE = 10;
-    let selectedItem = null;
+    let modalMode = 'edit'; // 'edit' | 'create'
+    let editingId = null;
 
     // ─── Clock ───
     function tickClock() {
@@ -247,7 +325,6 @@
       wrap.querySelectorAll('.chip').forEach(btn => {
         btn.addEventListener('click', () => {
           activeStatus = btn.getAttribute('data-status');
-          currentPage = 1;
           buildStatusChips();
           applyFilters();
         });
@@ -286,7 +363,6 @@
       renderStats();
       document.getElementById('countBadge').textContent = `${filteredItems.length} proposal`;
       renderTable();
-      renderPagination();
     }
 
     // ─── Table ───
@@ -305,16 +381,18 @@
       return dt.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
+    // List penuh, urut turun ke bawah, tanpa pagination (1 2 3)
     function renderTable() {
       const tbody = document.getElementById('reqTableBody');
+      const endNote = document.getElementById('listEndNote');
+
       if (filteredItems.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8"><div class="state-box"><div class="state-icon">📭</div><div class="state-label">Tidak ada proposal</div></div></td></tr>`;
+        endNote.textContent = '';
         return;
       }
-      const start = (currentPage - 1) * PAGE_SIZE;
-      const pageItems = filteredItems.slice(start, start + PAGE_SIZE);
 
-      tbody.innerHTML = pageItems.map(item => {
+      tbody.innerHTML = filteredItems.map(item => {
         const fileCount = (item.Files || []).length + (item.Invoice || []).length;
         return `
         <tr data-id="${escapeHtml(item.id)}">
@@ -329,88 +407,102 @@
         </tr>`;
       }).join('');
 
+      endNote.textContent = `— ${filteredItems.length} proposal ditampilkan —`;
+
       tbody.querySelectorAll('tr[data-id]').forEach(row => {
-        row.addEventListener('click', () => openDetail(row.getAttribute('data-id')));
+        row.addEventListener('click', () => openEditModal(row.getAttribute('data-id')));
       });
     }
 
-    // ─── Pagination ───
-    function renderPagination() {
-      const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
-      if (currentPage > totalPages) currentPage = totalPages;
-      const wrap = document.getElementById('pagination');
-      if (totalPages <= 1) { wrap.innerHTML = ''; return; }
-
-      let html = `<button class="page-btn" id="prevPage" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
-      for (let p = 1; p <= totalPages; p++) {
-        html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
-      }
-      html += `<button class="page-btn" id="nextPage" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
-      wrap.innerHTML = html;
-
-      wrap.querySelectorAll('[data-page]').forEach(btn => {
-        btn.addEventListener('click', () => { currentPage = parseInt(btn.getAttribute('data-page'), 10); renderTable(); renderPagination(); });
-      });
-      const prev = document.getElementById('prevPage');
-      const next = document.getElementById('nextPage');
-      if (prev) prev.addEventListener('click', () => { currentPage--; renderTable(); renderPagination(); });
-      if (next) next.addEventListener('click', () => { currentPage++; renderTable(); renderPagination(); });
+    // ─── Edit / Create modal ───
+    function fillForm(item) {
+      document.getElementById('f_Name').value = item.Name || '';
+      document.getElementById('f_DatePropose').value = (item.DatePropose || '').slice(0, 10);
+      document.getElementById('f_DateApproved').value = (item.DateApproved || '').slice(0, 10);
+      document.getElementById('f_ProposalStatus').value = item.ProposalStatus || 'Not Started';
+      document.getElementById('f_PurchaseRequest').value = item.PurchaseRequest || '';
+      document.getElementById('f_VendorForm').value = item.VendorForm || '';
+      document.getElementById('f_Payment').value = item.Payment || '';
+      document.getElementById('f_Files').value = (item.Files || []).join('\n');
+      document.getElementById('f_Invoice').value = (item.Invoice || []).join('\n');
+      document.getElementById('f_Note').value = item.Note || '';
     }
 
-    // ─── Detail modal ───
-    function openDetail(id) {
-      selectedItem = allItems.find(i => i.id === id);
-      if (!selectedItem) return;
+    function readForm() {
+      return {
+        Name: document.getElementById('f_Name').value.trim(),
+        DatePropose: document.getElementById('f_DatePropose').value || '',
+        DateApproved: document.getElementById('f_DateApproved').value || '',
+        ProposalStatus: document.getElementById('f_ProposalStatus').value,
+        PurchaseRequest: document.getElementById('f_PurchaseRequest').value,
+        VendorForm: document.getElementById('f_VendorForm').value,
+        Payment: document.getElementById('f_Payment').value,
+        Files: document.getElementById('f_Files').value.split('\n').map(s => s.trim()).filter(Boolean),
+        Invoice: document.getElementById('f_Invoice').value.split('\n').map(s => s.trim()).filter(Boolean),
+        Note: document.getElementById('f_Note').value.trim()
+      };
+    }
 
-      document.getElementById('detailTitle').textContent = selectedItem.Name;
+    function openEditModal(id) {
+      const item = allItems.find(i => i.id === id);
+      if (!item) return;
+      modalMode = 'edit';
+      editingId = id;
+      document.getElementById('detailTitle').textContent = 'Edit Proposal';
+      document.getElementById('saveBtnLabel').textContent = 'Simpan Perubahan';
+      fillForm(item);
+      document.getElementById('detailOverlay').classList.add('show');
+    }
 
-      const fileLinks = (list, label) => (list && list.length)
-        ? list.map((url, idx) => `<a class="req-file-link" href="${escapeAttr(url)}" target="_blank" rel="noopener">${label} ${idx + 1} ↗</a>`).join('')
-        : '<span class="no-files">Belum ada</span>';
-
-      document.getElementById('detailGrid').innerHTML = `
-        <div class="req-field"><span>Date Propose</span><strong>${fmtDate(selectedItem.DatePropose)}</strong></div>
-        <div class="req-field"><span>Date Approved</span><strong>${fmtDate(selectedItem.DateApproved)}</strong></div>
-        <div class="req-field"><span>Purchase Request</span><strong>${escapeHtml(selectedItem.PurchaseRequest || '—')}</strong></div>
-        <div class="req-field"><span>Vendor Form</span><strong>${escapeHtml(selectedItem.VendorForm || '—')}</strong></div>
-        <div class="req-field"><span>Payment</span><strong>${escapeHtml(selectedItem.Payment || '—')}</strong></div>
-        <div class="req-field"><span>Proposal Status</span><strong>${escapeHtml(selectedItem.ProposalStatus)}</strong></div>
-        <div class="req-field" style="grid-column:1 / -1;"><span>Files</span><div>${fileLinks(selectedItem.Files, 'File')}</div></div>
-        <div class="req-field" style="grid-column:1 / -1;"><span>Invoice</span><div>${fileLinks(selectedItem.Invoice, 'Invoice')}</div></div>
-        <div class="req-field" style="grid-column:1 / -1;"><span>Note</span><strong>${escapeHtml(selectedItem.Note || '—')}</strong></div>
-      `;
-
-      document.getElementById('statusUpdateSelect').value = selectedItem.ProposalStatus || 'Not Started';
+    function openCreateModal() {
+      modalMode = 'create';
+      editingId = null;
+      document.getElementById('detailTitle').textContent = 'Proposal Baru';
+      document.getElementById('saveBtnLabel').textContent = 'Buat Proposal';
+      fillForm({});
       document.getElementById('detailOverlay').classList.add('show');
     }
 
     function closeDetail() {
       document.getElementById('detailOverlay').classList.remove('show');
-      selectedItem = null;
+      editingId = null;
     }
+    document.getElementById('btnAddNew').addEventListener('click', openCreateModal);
     document.getElementById('detailClose').addEventListener('click', closeDetail);
     document.getElementById('detailCancel').addEventListener('click', closeDetail);
     document.getElementById('detailOverlay').addEventListener('click', (e) => { if (e.target.id === 'detailOverlay') closeDetail(); });
 
     document.getElementById('detailSave').addEventListener('click', async () => {
-      if (!selectedItem) return;
-      const newStatus = document.getElementById('statusUpdateSelect').value;
+      const fields = readForm();
+      if (!fields.Name) { showToast('Nama proposal wajib diisi', 'err'); return; }
+
       const saveBtn = document.getElementById('detailSave');
       const label = document.getElementById('saveBtnLabel');
       saveBtn.disabled = true;
       label.textContent = 'Menyimpan...';
+
       try {
+        const payload = modalMode === 'create'
+          ? { action: 'createItem', fields }
+          : { action: 'updateItem', id: editingId, fields };
+
         const res = await fetch(CONFIG.GAS_WEB_APP_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // hindari CORS preflight ke GAS
-          body: JSON.stringify({ action: 'updateStatus', id: selectedItem.id, field: 'ProposalStatus', value: newStatus })
+          body: JSON.stringify(payload)
         });
         const json = await res.json();
-        if (!json.ok) throw new Error(json.error || 'Gagal update status');
-        selectedItem.ProposalStatus = newStatus;
-        const idx = allItems.findIndex(i => i.id === selectedItem.id);
-        if (idx > -1) allItems[idx].ProposalStatus = newStatus;
-        showToast('Status berhasil diperbarui', 'ok');
+        if (!json.ok) throw new Error(json.error || 'Gagal menyimpan');
+
+        if (modalMode === 'create') {
+          allItems.push(normalizeItem(Object.assign({ id: json.id }, fields)));
+          showToast('Proposal baru berhasil dibuat', 'ok');
+        } else {
+          const idx = allItems.findIndex(i => i.id === editingId);
+          if (idx > -1) allItems[idx] = normalizeItem(Object.assign({ id: editingId }, fields));
+          showToast('Perubahan berhasil disimpan', 'ok');
+        }
+
         buildStatusChips();
         applyFilters();
         closeDetail();
@@ -419,7 +511,7 @@
         showToast('Gagal menyimpan: ' + err.message, 'err');
       } finally {
         saveBtn.disabled = false;
-        label.textContent = 'Simpan Status';
+        label.textContent = modalMode === 'create' ? 'Buat Proposal' : 'Simpan Perubahan';
       }
     });
 
@@ -432,7 +524,6 @@
       clearTimeout(searchTimer);
       searchTimer = setTimeout(() => {
         searchTerm = searchInput.value.trim();
-        currentPage = 1;
         applyFilters();
       }, 250);
     });
@@ -440,7 +531,6 @@
       searchInput.value = '';
       searchTerm = '';
       searchClear.classList.remove('visible');
-      currentPage = 1;
       applyFilters();
     });
 
@@ -466,7 +556,6 @@
     function escapeHtml(str) {
       return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
     }
-    function escapeAttr(str) { return escapeHtml(str); }
 
     fetchProposals();
   </script>
