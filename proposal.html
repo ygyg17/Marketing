@@ -21,18 +21,26 @@
   }
   .btn-add:hover { background: var(--gold-hover); }
 
-  /* ─── FILTER BAR: Sejajar 1 Baris ─── */
+  /* ─── FILTER BAR: Sejajar Kesamping (Kiri), Tidak Memenuhi Layar Penuh ─── */
   .filter-bar { 
     display: flex; 
     flex-direction: row; 
     flex-wrap: wrap; 
     align-items: center; 
-    gap: 10px; 
+    justify-content: flex-start; /* Merapat ke kiri */
+    gap: 12px; 
     margin-bottom: 20px; 
   }
-  .filter-bar .search-wrap { flex: 0 0 220px; }
+  
+  .filter-bar .search-wrap { 
+    flex: 0 0 240px; /* Ukuran tetap, tidak akan melar ke kanan */
+    max-width: 240px;
+  }
   
   .sort-select {
+    flex: 0 0 auto; /* Menjaga dropdown sesuai ukuran isinya */
+    width: max-content;
+    min-width: 140px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 10.5px;
     font-weight: 700;
@@ -49,14 +57,6 @@
     background-repeat: no-repeat; background-position: right 10px center;
   }
   .sort-select:focus { outline: none; border-color: var(--gold); }
-  
-  /* Mendorong select box agar merapat ke kanan */
-  #sortSelect { margin-left: auto; }
-
-  @media (max-width: 700px) {
-    .filter-bar .search-wrap { flex: 1 1 100%; }
-    #sortSelect { margin-left: 0; }
-  }
 
   .req-file-link {
     display: inline-block;
@@ -261,7 +261,7 @@
   <script>
     let allItems = [];
     let filteredItems = [];
-    let activeYear = '2026'; // Menjadikan 2026 sebagai filter default saat pertama kali dimuat
+    let activeYear = '2026'; // Menjadikan 2026 sebagai filter default saat dimuat
     let searchTerm = '';
     let sortMode = 'propose-desc';
     let modalMode = 'edit';
@@ -315,7 +315,7 @@
     // ─── Dynamic Year Filter ───
     function buildYearSelect() {
       const years = new Set();
-      years.add('2026'); // Memaksa tahun 2026 agar selalu ada di dalam pilihan
+      years.add('2026'); // Memaksa tahun 2026 agar selalu ada di dalam pilihan tanpa peduli isi data
 
       allItems.forEach(i => {
         if (i.DatePropose) {
