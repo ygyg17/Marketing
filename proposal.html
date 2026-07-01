@@ -21,14 +21,17 @@
   }
   .btn-add:hover { background: var(--gold-hover); }
 
-  /* ─── FILTER BAR: dipecah jadi 3 baris biar rapi ─── */
-  .filter-bar { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }
-  .filter-row-1 { display: flex; align-items: center; gap: 10px; }
-  .filter-row-1 .search-wrap { flex: 0 0 220px; }
+  /* ─── FILTER BAR: Sejajar 1 Baris ─── */
+  .filter-bar { 
+    display: flex; 
+    flex-direction: row; 
+    flex-wrap: wrap; 
+    align-items: center; 
+    gap: 10px; 
+    margin-bottom: 20px; 
+  }
+  .filter-bar .search-wrap { flex: 0 0 220px; }
   
-  .filter-row-3 { display: flex; align-items: center; gap: 10px; }
-  .filter-label { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-
   .sort-select {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10.5px;
@@ -45,13 +48,13 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2378716c' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 10px center;
   }
-  #sortSelect { margin-left: auto; }
   .sort-select:focus { outline: none; border-color: var(--gold); }
-  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  
+  /* Mendorong select box agar merapat ke kanan */
+  #sortSelect { margin-left: auto; }
 
   @media (max-width: 700px) {
-    .filter-row-1 { flex-wrap: wrap; }
-    .filter-row-1 .search-wrap { flex: 1 1 100%; }
+    .filter-bar .search-wrap { flex: 1 1 100%; }
     #sortSelect { margin-left: 0; }
   }
 
@@ -119,29 +122,23 @@
       </div>
 
       <div class="filter-bar">
-        <div class="filter-row-1">
-          <div class="search-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
-            <input type="text" id="searchInput" placeholder="Cari nama proposal...">
-            <button class="search-clear" id="searchClear">✕</button>
-          </div>
-          <select class="sort-select" id="sortSelect">
-            <option value="propose-desc" selected>Date Propose Terbaru</option>
-            <option value="propose-asc">Date Propose Terlama</option>
-            <option value="approved-desc">Date Approved Terbaru</option>
-            <option value="name-asc">Nama A–Z</option>
-            <option value="name-desc">Nama Z–A</option>
-          </select>
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+          <input type="text" id="searchInput" placeholder="Cari nama proposal...">
+          <button class="search-clear" id="searchClear">✕</button>
         </div>
         
-        <div class="chips" id="statusChips"></div>
-
-        <div class="filter-row-3">
-          <span class="filter-label">Tahun Propose:</span>
-          <select class="sort-select" id="yearSelect">
-            <option value="All">Semua Tahun</option>
-          </select>
-        </div>
+        <select class="sort-select" id="sortSelect">
+          <option value="propose-desc" selected>Date Propose Terbaru</option>
+          <option value="propose-asc">Date Propose Terlama</option>
+          <option value="approved-desc">Date Approved Terbaru</option>
+          <option value="name-asc">Nama A–Z</option>
+          <option value="name-desc">Nama Z–A</option>
+        </select>
+        
+        <select class="sort-select" id="yearSelect">
+          <option value="All">Semua Tahun</option>
+        </select>
       </div>
 
       <div class="board">
@@ -170,6 +167,7 @@
     </div>
   </div>
 
+  <!-- Edit / Create modal -->
   <div class="overlay" id="detailOverlay">
     <div class="modal-card" style="width:min(92vw, 560px);">
       <div class="modal-head">
@@ -263,8 +261,7 @@
   <script>
     let allItems = [];
     let filteredItems = [];
-    let activeStatus = 'All';
-    let activeYear = 'All'; // State untuk filter tahun
+    let activeYear = '2026'; // Menjadikan 2026 sebagai filter default saat pertama kali dimuat
     let searchTerm = '';
     let sortMode = 'propose-desc';
     let modalMode = 'edit';
@@ -290,7 +287,6 @@
         const json = await res.json();
         if (!json.ok) throw new Error(json.error || 'Gagal memuat data');
         allItems = (json.data || []).map(normalizeItem);
-        buildStatusChips();
         buildYearSelect(); // Membangun filter dropdown tahun
         applyFilters();
       } catch (err) {
@@ -316,45 +312,32 @@
       };
     }
 
-    // ─── Filter Status & Tahun ───
-    function buildStatusChips() {
-      const statuses = ['All', ...new Set(allItems.map(i => i.ProposalStatus).filter(Boolean))];
-      const wrap = document.getElementById('statusChips');
-      wrap.innerHTML = statuses.map(s =>
-        `<button class="chip ${s === activeStatus ? 'active' : ''}" data-status="${escapeHtml(s)}">${escapeHtml(s)}</button>`
-      ).join('');
-      wrap.querySelectorAll('.chip').forEach(btn => {
-        btn.addEventListener('click', () => {
-          activeStatus = btn.getAttribute('data-status');
-          buildStatusChips();
-          applyFilters();
-        });
-      });
-    }
-
+    // ─── Dynamic Year Filter ───
     function buildYearSelect() {
       const years = new Set();
+      years.add('2026'); // Memaksa tahun 2026 agar selalu ada di dalam pilihan
+
       allItems.forEach(i => {
         if (i.DatePropose) {
           const y = new Date(i.DatePropose).getFullYear();
-          if (!isNaN(y)) years.add(y);
+          if (!isNaN(y)) years.add(y.toString());
         }
       });
-      const sortedYears = Array.from(years).sort((a, b) => b - a);
+      
+      // Mengurutkan tahun dari yang terbesar/terbaru ke terlama
+      const sortedYears = Array.from(years).sort((a, b) => parseInt(b) - parseInt(a));
       const select = document.getElementById('yearSelect');
       
-      // Pertahankan pilihan user jika ada opsi tahun baru setelah disave
       select.innerHTML = '<option value="All">Semua Tahun</option>' +
-        sortedYears.map(y => `<option value="${y}" ${activeYear === String(y) ? 'selected' : ''}>${y}</option>`).join('');
+        sortedYears.map(y => `<option value="${y}" ${activeYear === y ? 'selected' : ''}>${y}</option>`).join('');
     }
 
     // ─── Filter + sort ───
     function applyFilters() {
       filteredItems = allItems.filter(i => {
-        // Filter Status
-        const matchStatus = activeStatus === 'All' || i.ProposalStatus === activeStatus;
         // Filter Pencarian
         const matchSearch = !searchTerm || i.Name.toLowerCase().includes(searchTerm.toLowerCase());
+        
         // Filter Tahun
         let matchYear = true;
         if (activeYear !== 'All') {
@@ -362,7 +345,7 @@
           matchYear = (y === activeYear);
         }
         
-        return matchStatus && matchSearch && matchYear;
+        return matchSearch && matchYear;
       });
 
       filteredItems.sort((a, b) => {
@@ -519,7 +502,6 @@
           showToast('Perubahan berhasil disimpan', 'ok');
         }
 
-        buildStatusChips();
         buildYearSelect(); // Update filter tahun kalau-kalau ada entri tahun baru
         applyFilters();
         closeDetail();
