@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body data-active-page="link">
+
+  <nav class="topbar">
+    <button type="button" class="sidebar-menu-btn" id="sidebarMenuBtn" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <img class="topbar-logo" src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
+    <div class="topbar-div"></div>
+    <span class="topbar-title">Link Bank</span>
+    <div class="topbar-clock" id="mastClock">—</div>
+  </nav>
+
+  <div id="sidebar-container"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="body-wrap">
+    
+    <div class="left-panel">
+      <div class="left-inner">
+        <div class="panel-eyebrow" id="formModeText">New Input</div>
+        <h1 class="panel-heading" id="formTitle">Add New Link</h1>
+        <p class="panel-sub">Keep all important links in one place for easy access by the team.</p>
+
+        <form id="linkForm">
+          <input type="hidden" id="editLinkId">
+          
+          <div class="field-row">
+            <div class="field">
+              <label for="inputLinkName">Name <span class="opt-tag" style="color:var(--urgent);">*</span></label>
+              <input id="inputLinkName" type="text" placeholder="e.g., Menu Restaurant Bawah" required autocomplete="off">
+            </div>
+            
+            <div class="field">
+              <label for="inputLinkCat">Category <span class="opt-tag" style="color:var(--urgent);">*</span></label>
+              <div style="display:flex; gap:8px;">
+                <select id="inputLinkCat" required style="flex:1;">
+                  <option value="">— Select Category —</option>
+                </select>
+                <button type="button" class="btn-secondary" style="flex:unset; padding:0 14px;" onclick="addNewCategory()">+ New</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="field">
+            <label for="inputLinkUrl">URL Link <span class="opt-tag" style="color:var(--urgent);">*</span></label>
+            <input id="inputLinkUrl" type="url" placeholder="https://..." required autocomplete="off">
+          </div>
+
+          <button type="submit" class="btn-primary" id="btnSubmitLink">
+            <span id="btnLabel">Save Link</span>
+          </button>
+          <button type="button" class="btn-secondary" id="btnCancelEdit" style="display:none; width:100%; margin-top:8px;" onclick="cancelEditLink()">Cancel Edit</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="board-header">
+        <div class="board-title-wrap">
+          <h2 id="boardMainTitle">All Links</h2>
+          <div class="board-sub">Saved links organized by category</div>
+        </div>
+        <span class="count-badge" id="linkCountBadge">loading...</span>
+      </div>
+
+      <div class="filter-bar">
+        <div class="chips" id="linkFilterBar">
+          </div>
+        <div class="search-wrap" id="searchWrapBox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input id="searchInput" type="text" placeholder="Search links...">
+          <button type="button" class="search-clear" id="searchClear">&times;</button>
+        </div>
+      </div>
+
+      <div class="board">
+        <div class="table-wrapper">
+          <table class="req-table">
+            <thead>
+              <tr>
+                <th>Link Name</th>
+                <th>Category</th>
+                <th>URL</th>
+                <th style="text-align:right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="linkTableBody">
+              <tr><td colspan="4" class="state-box"><div class="state-spinner"></div><div class="state-label">Loading links...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastOk" class="toast toast-ok"><span class="toast-icon">✓</span><span id="toastOkMsg">Success</span></div>
+  <div id="toastErr" class="toast toast-err"><span class="toast-icon">✕</span><span id="toastErrMsg">Error occurred</span></div>
+
+  <div id="confirmOverlay" class="overlay" style="z-index:9500;">
+    <div class="modal-card" style="width:min(90vw,340px);text-align:center;padding:30px 24px;">
+      <h3 style="margin-bottom:8px;">Delete Link?</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.5;">This will permanently remove the data. This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="confirmCancelBtn" onclick="closeConfirm()">Cancel</button>
+        <button class="btn-primary" id="confirmDeleteBtn" style="background:var(--urgent);" onclick="executeDelete()">
+          <span id="confirmDeleteLabel">Yes, Delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script>
+    const SCRIPT_URL = (typeof CONFIG !== 'undefined' && CONFIG.GAS_WEB_APP_URL) 
+      ? CONFIG.GAS_WEB_APP_URL 
+      : 'https://script.google.com/macros/s/AKfycbwJWrSQiv6gPa2Gax9rzXRBZn57uxjUTqjf1UvFNa-7wzGmlwfCJuZ8cuDtBk3X68navQ/exec';
+
+    /* ─── Jam ─── */
+    function tickClock() {
+      const now = new Date();
+      const d = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      const t = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('mastClock').innerHTML = d + '&nbsp;&nbsp;<b>' + t + '</b>';
+    }
+    tickClock(); setInterval(tickClock, 30000);
+
+    /* ─── Utils ─── */
+    function showToast(id, msgId, msg, dur) {
+      const el = document.getElementById(id);
+      document.getElementById(msgId).textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), dur || 3000);
+    }
+    function showOk(msg) { showToast('toastOk','toastOkMsg',msg,2800); }
+    function showErr(msg) { showToast('toastErr','toastErrMsg',msg,3500); }
+    function esc(s) { return !s ? '' : String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function escAttr(s) { return String(s).replace(/'/g, "\\'"); }
+
+    /* ─── State ─── */
+    let allLinks = [];
+    let linkCategories = ["General", "Food & Beverage", "Kahyangan Spa", "Others"];
+    let activeFilter = 'All';
+    let deleteId = null;
+
+    /* ─── Load Data ─── */
+    function loadCategories() {
+      fetch(`${SCRIPT_URL}?action=getCategories`)
+        .then(res => res.json())
+        .then(cats => {
+          if(Array.isArray(cats)) linkCategories = cats;
+          renderCategoryUI();
+        })
+        .catch(() => renderCategoryUI()); 
+    }
+
+    function loadLinks() {
+      const tbody = document.getElementById('linkTableBody');
+      tbody.innerHTML = '<tr><td colspan="4" class="state-box"><div class="state-spinner"></div><div class="state-label">Loading links...</div></td></tr>';
+
+      fetch(`${SCRIPT_URL}?action=getLinks&category=All`)
+        .then(res => res.json())
+        .then(links => {
+          allLinks = Array.isArray(links) ? links : [];
+          renderLinkTable();
+        })
+        .catch(() => {
+          tbody.innerHTML = '<tr><td colspan="4" class="state-box"><div class="state-icon">!</div><div class="state-label" style="color:var(--urgent);">Failed to load links.</div></td></tr>';
+        });
+    }
+
+    /* ─── Render UI ─── */
+    function renderCategoryUI() {
+      const select = document.getElementById('inputLinkCat');
+      const currentVal = select.value;
+      select.innerHTML = '<option value="">— Select Category —</option>';
+      linkCategories.forEach(cat => {
+        select.innerHTML += `<option value="${escAttr(cat)}">${esc(cat)}</option>`;
+      });
+      if (currentVal) select.value = currentVal;
+
+      const filterBar = document.getElementById('linkFilterBar');
+      let html = `<div class="chip ${activeFilter === 'All' ? 'active' : ''}" data-cat="All">All</div>`;
+      linkCategories.forEach(cat => {
+        html += `<div class="chip ${activeFilter === cat ? 'active' : ''}" data-cat="${escAttr(cat)}">${esc(cat)}</div>`;
+      });
+      filterBar.innerHTML = html;
+    }
+
+    document.getElementById('linkFilterBar').addEventListener('click', function(e) {
+      const chip = e.target.closest('.chip');
+      if (!chip) return;
+      document.querySelectorAll('#linkFilterBar .chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeFilter = chip.dataset.cat;
+      renderLinkTable();
+    });
+
+    function renderLinkTable() {
+      const tbody = document.getElementById('linkTableBody');
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      
+      let filtered = activeFilter === 'All' ? allLinks : allLinks.filter(l => l.category === activeFilter);
+      
+      if (q) {
+        filtered = filtered.filter(l => 
+          (l.name || '').toLowerCase().includes(q) || 
+          (l.link || '').toLowerCase().includes(q)
+        );
+      }
+
+      document.getElementById('linkCountBadge').textContent = filtered.length + ' links';
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="4" class="state-box"><div class="state-icon">◌</div><div class="state-label">${q ? 'No results found' : 'No links in this category'}</div></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => `
+        <tr>
+          <td data-label="Link Name"><div style="font-weight:600;color:var(--ink);">${esc(item.name)}</div></td>
+          <td data-label="Category"><span class="pill pill-date">${esc(item.category)}</span></td>
+          <td data-label="URL">
+            <a href="${esc(item.link)}" target="_blank" rel="noopener" style="color:var(--gold); font-size:12.5px; text-decoration:none; word-break:break-all;">
+              ${esc(item.link)}
+            </a>
+          </td>
+          <td data-label="Action" style="text-align:right;">
+            <div style="display:flex; gap:6px; justify-content:flex-end;">
+              <button class="btn-sm" id="cpbtn-${escAttr(item.id)}" onclick="copyLink('${escAttr(item.link)}', '${escAttr(item.id)}')">Copy</button>
+              <button class="btn-sm edit" onclick="startEditLink('${escAttr(item.id)}')">Edit</button>
+              <button class="btn-sm" style="color:var(--urgent); border-color:var(--urgent-bg);" onclick="openDeleteConfirm('${escAttr(item.id)}')">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    /* ─── Search Bar Logic ─── */
+    document.getElementById('searchInput').addEventListener('input', function() {
+      document.getElementById('searchClear').classList.toggle('visible', this.value.length > 0);
+      renderLinkTable();
+    });
+    document.getElementById('searchClear').addEventListener('click', function() {
+      document.getElementById('searchInput').value = '';
+      this.classList.remove('visible');
+      renderLinkTable();
+    });
+
+    /* ─── Form Handlers ─── */
+    function addNewCategory() {
+      const newCat = prompt("Enter new category name:");
+      if (!newCat || newCat.trim() === '') return;
+      const catName = newCat.trim();
+
+      if (!linkCategories.some(c => c.toLowerCase() === catName.toLowerCase())) {
+        linkCategories.push(catName);
+        renderCategoryUI();
+        showOk(`Category "${catName}" added.`);
+      }
+      document.getElementById('inputLinkCat').value = catName;
+    }
+
+    document.getElementById('linkForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const id       = document.getElementById('editLinkId').value;
+      const name     = document.getElementById('inputLinkName').value.trim();
+      const link     = document.getElementById('inputLinkUrl').value.trim();
+      const category = document.getElementById('inputLinkCat').value;
+      const btn      = document.getElementById('btnSubmitLink');
+      const btnLbl   = document.getElementById('btnLabel');
+
+      btn.disabled = true;
+      btnLbl.innerHTML = '<span class="spinner-sm"></span> Saving...';
+
+      const action = id ? 'updateLink' : 'addLink';
+      const payload = id ? { action, id, name, link, category } : { action, name, link, category };
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          showOk(id ? 'Link updated successfully' : 'Link saved successfully');
+          cancelEditLink();
+          loadLinks();
+        } else {
+          showErr(result.message || 'Error saving link');
+        }
+      })
+      .catch(() => showErr('Network connection error'))
+      .finally(() => {
+        btn.disabled = false;
+        btnLbl.textContent = 'Save Link';
+      });
+    });
+
+    function startEditLink(id) {
+      const item = allLinks.find(l => l.id === id);
+      if (!item) return;
+
+      document.getElementById('editLinkId').value  = item.id;
+      document.getElementById('inputLinkName').value = item.name;
+      document.getElementById('inputLinkUrl').value  = item.link;
+      document.getElementById('inputLinkCat').value  = item.category;
+
+      document.getElementById('formModeText').textContent = 'Edit Data';
+      document.getElementById('formTitle').textContent = 'Update Link';
+      document.getElementById('btnLabel').textContent = 'Update Link';
+      document.getElementById('btnCancelEdit').style.display = 'block';
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelEditLink() {
+      document.getElementById('linkForm').reset();
+      document.getElementById('editLinkId').value  = '';
+      document.getElementById('formModeText').textContent = 'New Input';
+      document.getElementById('formTitle').textContent = 'Add New Link';
+      document.getElementById('btnLabel').textContent = 'Save Link';
+      document.getElementById('btnCancelEdit').style.display = 'none';
+    }
+
+    function copyLink(url, id) {
+      navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById('cpbtn-' + id);
+        if (btn) {
+          const original = btn.textContent;
+          btn.textContent = 'Copied!';
+          btn.style.background = 'var(--gold-dim)';
+          btn.style.color = 'var(--gold)';
+          btn.style.borderColor = 'var(--gold)';
+          setTimeout(() => {
+            btn.textContent = original;
+            btn.style = '';
+          }, 2000);
+        }
+      }).catch(() => showErr('Failed to copy link'));
+    }
+
+    /* ─── Delete Handlers ─── */
+    const confirmOverlay = document.getElementById('confirmOverlay');
+    
+    function openDeleteConfirm(id) {
+      deleteId = id;
+      confirmOverlay.classList.add('show');
+    }
+
+    function closeConfirm() {
+      deleteId = null;
+      confirmOverlay.classList.remove('show');
+    }
+
+    function executeDelete() {
+      if (!deleteId) return;
+      const btn = document.getElementById('confirmDeleteBtn');
+      const lbl = document.getElementById('confirmDeleteLabel');
+      
+      btn.disabled = true;
+      lbl.textContent = 'Deleting...';
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'deleteLink', id: deleteId })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          showOk('Link deleted successfully');
+          loadLinks();
+        } else {
+          showErr('Failed to delete link');
+        }
+      })
+      .catch(() => showErr('Network connection error'))
+      .finally(() => {
+        btn.disabled = false;
+        lbl.textContent = 'Yes, Delete';
+        closeConfirm();
+      });
+    }
+
+    // Initialize
+    loadCategories();
+    loadLinks();
+  </script>
+
+  <script src="sidebar-loader.js"></script>
+</body>
+</html>
