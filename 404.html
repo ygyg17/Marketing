@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 — Page Not Found</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --ink: #1c1917;
+    --ink-2: #44403c;
+    --muted: #78716c;
+    --line: #e7e5e4;
+    --line-2: #d6d3d1;
+    --gold: #BA8F2E;
+    --gold-hover: #9c7726;
+    --gold-dim: rgba(186,143,46,0.10);
+    --gold-border: rgba(186,143,46,0.30);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+  }
+  .code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    margin-bottom: 24px;
+  }
+  .glyph {
+    font-size: 64px;
+    font-weight: 700;
+    letter-spacing: -.03em;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .glyph span { color: var(--line-2); }
+  h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+    letter-spacing: -.01em;
+  }
+  p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 380px;
+    margin-bottom: 32px;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+  .btn-primary {
+    padding: 12px 22px;
+    background: var(--gold);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: .01em;
+    transition: background .18s;
+  }
+  .btn-primary:hover { background: var(--gold-hover); }
+  .btn-secondary {
+    padding: 12px 22px;
+    background: var(--surface);
+    color: var(--ink-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: .01em;
+    transition: background .15s, border-color .15s;
+  }
+  .btn-secondary:hover { background: var(--bg); border-color: var(--line-2); }
+
+  .quicklinks {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px;
+    width: min(90vw, 320px);
+  }
+  .quicklinks a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-2);
+    text-decoration: none;
+    transition: background .15s, color .15s;
+  }
+  .quicklinks a:hover { background: var(--bg); color: var(--ink); }
+  .quicklinks .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--line-2); flex-shrink: 0;
+  }
+  .quicklinks a:hover .dot { background: var(--gold); }
+
+  .footer-note {
+    margin-top: 36px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+  <div class="wrap">
+    <div class="code">Error 404</div>
+    <div class="glyph">404<span>.</span></div>
+    <h1>Page not found</h1>
+    <p>The page you're looking for doesn't exist or may have been moved. Double-check the URL, or head back using one of the links below.</p>
+
+    <div class="actions">
+      <a href="index.html" class="btn-primary">Back to Home</a>
+      <a href="javascript:history.back()" class="btn-secondary">Go Back</a>
+    </div>
+
+    <div class="quicklinks">
+      <a href="task.html"><span class="dot"></span>Task Reminder</a>
+      <a href="design.html"><span class="dot"></span>Design Request</a>
+      <a href="link.html"><span class="dot"></span>Link List</a>
+      <a href="proposal.html"><span class="dot"></span>Proposal Status</a>
+      <a href="administration.html"><span class="dot"></span>Administration</a>
+    </div>
+
+    <div class="footer-note">The Seminyak · Marketing Desk</div>
+  </div>
+
+</body>
+</html>
