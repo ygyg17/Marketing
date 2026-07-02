@@ -96,14 +96,24 @@
       } catch (e) { /* body bukan JSON, biarkan apa adanya */ }
     }
 
+    console.log('[auth debug] authFetch calling:', url, options);
     return fetch(url, options).then(function (res) {
+      console.log('[auth debug] HTTP status:', res.status);
       return res.json().then(function (data) {
+        console.log('[auth debug] response JSON:', data);
         if (data && data.authError) {
+          console.log('[auth debug] authError true -> redirecting to login. error msg:', data.error);
           goToLogin();
           throw new Error('Session expired');
         }
         return data;
+      }).catch(function (parseErr) {
+        console.log('[auth debug] failed to parse response as JSON:', parseErr);
+        throw parseErr;
       });
+    }).catch(function (fetchErr) {
+      console.log('[auth debug] fetch itself failed (network/CORS?):', fetchErr);
+      throw fetchErr;
     });
   }
 
