@@ -208,6 +208,7 @@
 
   // ─── API ───
   function apiGet() {
+    console.log('[admin debug] apiGet called. window.SeminyakAuth exists?', !!window.SeminyakAuth, 'GAS_URL:', GAS_URL);
     if (window.SeminyakAuth) return window.SeminyakAuth.authFetch(GAS_URL, { method: 'GET' });
     return fetch(GAS_URL, { method: 'GET' }).then(function (r) { return r.json(); });
   }
