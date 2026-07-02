@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script src="config.js"></script>
+<script src="auth.js"></script>
 <style>
   /* Page-specific tweaks (kecil, tidak perlu masuk styles.css global) */
   .admin-topline { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
@@ -47,6 +49,7 @@
   <img class="topbar-logo" src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
   <div class="topbar-div"></div>
   <span class="topbar-title">Administration</span>
+  <div id="authUserBox"></div>
   <span class="topbar-clock" id="topbarClock"></span>
 </div>
 
@@ -172,7 +175,6 @@
 
 <div class="toast" id="toast"><span class="toast-icon" id="toastIcon"></span><span id="toastMsg"></span></div>
 
-<script src="config.js"></script>
 <script>
 (function () {
   const GAS_URL = (typeof CONFIG !== 'undefined' && CONFIG.ADMIN_GAS_WEB_APP_URL) || '';
@@ -206,9 +208,15 @@
 
   // ─── API ───
   function apiGet() {
+    if (window.SeminyakAuth) return window.SeminyakAuth.authFetch(GAS_URL, { method: 'GET' });
     return fetch(GAS_URL, { method: 'GET' }).then(function (r) { return r.json(); });
   }
   function apiPost(payload) {
+    if (window.SeminyakAuth) return window.SeminyakAuth.authFetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
     return fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
