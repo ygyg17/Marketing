@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — The Seminyak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  body { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; }
+  .login-card { width:100%; max-width:360px; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:32px 28px; box-shadow:0 20px 40px rgba(0,0,0,.06); }
+  .login-logo { display:block; height:30px; object-fit:contain; margin:0 auto 22px; }
+  .login-title { font-size:18px; font-weight:700; color:var(--ink); text-align:center; margin-bottom:4px; }
+  .login-sub { font-size:12.5px; color:var(--muted); text-align:center; margin-bottom:26px; }
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-size:11.5px; font-weight:600; color:var(--ink-2); margin-bottom:7px; }
+  .login-error { display:none; background:var(--urgent-bg); color:var(--urgent); font-size:12.5px; font-weight:500; padding:10px 12px; border-radius:8px; margin-bottom:16px; }
+  .login-error.show { display:block; }
+</style>
+</head>
+<body>
+
+<div class="login-card">
+  <img class="login-logo" src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
+  <div class="login-title">Sign in</div>
+  <div class="login-sub">Marketing Internal Tools</div>
+
+  <div class="login-error" id="loginError"></div>
+
+  <form id="loginForm">
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="username" autocomplete="username" required>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="password" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn-primary" id="loginBtn">
+      <span id="loginBtnLabel">Sign in</span>
+    </button>
+  </form>
+</div>
+
+<script src="config.js"></script>
+<script>
+(function () {
+  var AUTH_URL = (typeof CONFIG !== 'undefined' && CONFIG.AUTH_GAS_WEB_APP_URL) || '';
+  var form = document.getElementById('loginForm');
+  var errBox = document.getElementById('loginError');
+  var btn = document.getElementById('loginBtn');
+  var btnLabel = document.getElementById('loginBtnLabel');
+
+  // Kalau sudah login, langsung lempar ke halaman tujuan (atau index)
+  var existing = localStorage.getItem('seminyak_session');
+  var redirectTo = new URLSearchParams(location.search).get('redirect') || 'index.html';
+  if (existing) {
+    try {
+      var s = JSON.parse(existing);
+      if (s.expiresAt && s.expiresAt > Date.now()) {
+        location.href = redirectTo;
+      }
+    } catch (e) {}
+  }
+
+  function showError(msg) {
+    errBox.textContent = msg;
+    errBox.classList.add('show');
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    errBox.classList.remove('show');
+
+    if (!AUTH_URL) { showError('AUTH_GAS_WEB_APP_URL belum diisi di config.js'); return; }
+
+    var username = document.getElementById('username').value.trim();
+    var password = document.getElementById('password').value;
+
+    btn.disabled = true;
+    btnLabel.innerHTML = '<span class="spinner-sm"></span>';
+
+    fetch(AUTH_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'login', username: username, password: password })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.error || 'Login gagal');
+        localStorage.setItem('seminyak_session', JSON.stringify({
+          token: res.token,
+          name: res.name,
+          username: res.username,
+          role: res.role,
+          expiresAt: Date.now() + (res.ttlSeconds || 28800) * 1000
+        }));
+        location.href = redirectTo;
+      })
+      .catch(function (err) {
+        showError(String(err.message || err));
+      })
+      .finally(function () {
+        btn.disabled = false;
+        btnLabel.textContent = 'Sign in';
+      });
+  });
+})();
+</script>
+</body>
+</html>
