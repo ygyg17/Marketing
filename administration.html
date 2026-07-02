@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration — The Seminyak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Page-specific tweaks (kecil, tidak perlu masuk styles.css global) */
+  .admin-topline { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+  .status-tabs { display:flex; gap:6px; margin-bottom:16px; }
+  .status-tab { font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:8px 16px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--muted); cursor:pointer; transition:.15s ease; }
+  .status-tab:hover { border-color:var(--line-2); color:var(--ink-2); }
+  .status-tab.active { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .btn-add { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; background:var(--gold); color:#fff; border:none; border-radius:8px; font-family:'Inter',sans-serif; font-size:13px; font-weight:600; cursor:pointer; transition:background .18s; white-space:nowrap; }
+  .btn-add:hover { background:var(--gold-hover); }
+  .file-link { display:inline-flex; align-items:center; gap:5px; font-size:12.5px; font-weight:600; color:var(--gold); text-decoration:none; }
+  .file-link:hover { text-decoration:underline; }
+  .file-none { font-size:12px; color:var(--muted); font-family:'JetBrains Mono', monospace; }
+  .status-badge { display:inline-flex; align-items:center; gap:6px; font-family:'JetBrains Mono', monospace; font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:4px 10px; border-radius:20px; }
+  .status-badge.in-progress { background:var(--gold-dim); color:var(--gold); border:1px solid var(--gold-border); }
+  .status-badge.done { background:var(--ok-bg); color:var(--ok); }
+  .status-badge .b-date { font-weight:500; opacity:.75; margin-left:2px; }
+  .file-drop { border:1.5px dashed var(--line-2); border-radius:8px; padding:16px; text-align:center; cursor:pointer; transition:.15s ease; font-size:12.5px; color:var(--muted); }
+  .file-drop:hover, .file-drop.drag { border-color:var(--gold); background:var(--gold-dim); color:var(--gold); }
+  .file-drop input { display:none; }
+  .file-picked { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12.5px; color:var(--ink-2); background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:8px 10px; margin-top:8px; }
+  .file-picked button { background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; line-height:1; }
+  .req-table tbody tr td:first-child { font-weight:600; color:var(--ink); }
+  .type-pill-td { font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+</style>
+</head>
+<body data-active-page="administration">
+
+<div class="topbar">
+  <button class="sidebar-menu-btn" id="sidebarMenuBtn" aria-label="Menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <img class="topbar-logo" src="https://cdn-5d8995b3f911c90950a6130b.closte.com/wp-content/uploads/2024/08/the-seminyak-logo-aug24v1.png" alt="The Seminyak">
+  <div class="topbar-div"></div>
+  <span class="topbar-title">Administration</span>
+  <span class="topbar-clock" id="topbarClock"></span>
+</div>
+
+<div id="sidebar-container"></div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="body-wrap" style="grid-template-columns: 1fr;">
+  <div class="right-panel">
+
+    <div class="admin-topline">
+      <div class="board-title-wrap">
+        <h2>Administration List</h2>
+        <div class="board-sub">Dokumen &amp; approval tracking — BS, PR, Design, Proposal, Others</div>
+      </div>
+      <button class="btn-add" id="openAddBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Input Baru
+      </button>
+    </div>
+
+    <div class="chips" id="typeChips">
+      <div class="chip active" data-type="ALL">All</div>
+      <div class="chip" data-type="BS">BS</div>
+      <div class="chip" data-type="PR">PR</div>
+      <div class="chip" data-type="Design">Design</div>
+      <div class="chip" data-type="Proposal">Proposal</div>
+      <div class="chip" data-type="Others">Others</div>
+    </div>
+
+    <div class="status-tabs" id="statusTabs">
+      <div class="status-tab active" data-status="In Progress">In Progress</div>
+      <div class="status-tab" data-status="Done">Done</div>
+    </div>
+
+    <div class="board">
+      <div class="table-wrapper">
+        <table class="req-table" id="reqTable">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Name</th>
+              <th>Sign</th>
+              <th>Status</th>
+              <th>File</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="5"><div class="state-box"><div class="state-spinner"></div><div class="state-label">Loading data...</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── ADD / EDIT MODAL ─── -->
+<div class="overlay" id="formOverlay">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="formTitle">Input Baru</h3>
+      <button class="close-btn" id="formCloseBtn">&times;</button>
+    </div>
+
+    <form id="entryForm">
+      <input type="hidden" id="f-rowIndex">
+      <input type="hidden" id="f-rowId">
+
+      <div class="field">
+        <label>Type</label>
+        <select id="f-type" required>
+          <option value="" disabled selected>Pilih type</option>
+          <option value="BS">BS</option>
+          <option value="PR">PR</option>
+          <option value="Design">Design</option>
+          <option value="Proposal">Proposal</option>
+          <option value="Others">Others</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Name</label>
+        <input type="text" id="f-name" placeholder="Nama dokumen / keperluan" required>
+      </div>
+
+      <div class="field">
+        <label>Sign</label>
+        <select id="f-sign" required>
+          <option value="" disabled selected>Pilih penandatangan</option>
+          <option value="DOF">DOF</option>
+          <option value="GM">GM</option>
+          <option value="Director">Director</option>
+          <option value="Purchasing">Purchasing</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Status</label>
+        <select id="f-status">
+          <option value="In Progress">In Progress</option>
+          <option value="Done">Done</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>File <span class="opt-tag">optional</span></label>
+        <div class="file-drop" id="fileDrop">
+          <span id="fileDropLabel">Klik atau drag file ke sini</span>
+          <input type="file" id="f-file">
+        </div>
+        <div id="filePickedWrap"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" id="formCancelBtn">Cancel</button>
+        <button type="submit" class="btn-primary" id="formSubmitBtn">
+          <span id="formSubmitLabel">Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="toast-icon" id="toastIcon"></span><span id="toastMsg"></span></div>
+
+<script src="config.js"></script>
+<script>
+(function () {
+  const GAS_URL = (typeof CONFIG !== 'undefined' && CONFIG.ADMIN_GAS_WEB_APP_URL) || '';
+
+  const state = { items: [], typeFilter: 'ALL', statusFilter: 'In Progress', pickedFile: null };
+
+  const tableBody = document.getElementById('tableBody');
+  const typeChips = document.getElementById('typeChips');
+  const statusTabs = document.getElementById('statusTabs');
+
+  // ─── Clock ───
+  function tickClock() {
+    const el = document.getElementById('topbarClock');
+    if (!el) return;
+    const now = new Date();
+    const opts = { weekday: 'short', day: '2-digit', month: 'short' };
+    el.innerHTML = now.toLocaleDateString('en-GB', opts) + ' &nbsp; <b>' +
+      now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + '</b>';
+  }
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  // ─── Toast ───
+  function showToast(msg, ok) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastIcon').textContent = ok ? '✓' : '✕';
+    document.getElementById('toastMsg').textContent = msg;
+    toast.className = 'toast show ' + (ok ? 'toast-ok' : 'toast-err');
+    setTimeout(function () { toast.className = 'toast'; }, 3200);
+  }
+
+  // ─── API ───
+  function apiGet() {
+    return fetch(GAS_URL, { method: 'GET' }).then(function (r) { return r.json(); });
+  }
+  function apiPost(payload) {
+    return fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).then(function (r) { return r.json(); });
+  }
+
+  // ─── Load & render ───
+  function load() {
+    if (!GAS_URL) {
+      tableBody.innerHTML = '<tr><td colspan="5"><div class="state-box state-error"><div class="state-icon">⚠</div><div class="state-label">Error</div></div></td></tr>';
+      return;
+    }
+    tableBody.innerHTML = '<tr><td colspan="5"><div class="state-box"><div class="state-spinner"></div><div class="state-label">Loading data...</div></div></td></tr>';
+    apiGet().then(function (res) {
+      if (!res.ok) throw new Error(res.error || 'Failed to load');
+      state.items = res.items || [];
+      render();
+    }).catch(function (err) {
+      tableBody.innerHTML = '<tr><td colspan="5"><div class="state-box state-error"><div class="state-icon">⚠</div><div class="state-label">' + escapeHtml(String(err.message || err)) + '</div></div></td></tr>';
+    });
+  }
+
+  function render() {
+    const filtered = state.items.filter(function (item) {
+      const typeOk = state.typeFilter === 'ALL' || item.type === state.typeFilter;
+      const statusOk = item.status === state.statusFilter;
+      return typeOk && statusOk;
+    });
+
+    if (filtered.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="5"><div class="state-box"><div class="state-icon">📋</div><div class="state-label">No entries</div></div></td></tr>';
+      return;
+    }
+
+    tableBody.innerHTML = filtered.map(function (item) {
+      const statusClass = item.status === 'Done' ? 'done' : 'in-progress';
+      const doneDateStr = item.doneDate ? formatDate_(item.doneDate) : '';
+      const fileCell = item.fileUrl
+        ? '<a class="file-link" href="' + escapeAttr(item.fileUrl) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">📎 ' + escapeHtml(item.fileName || 'File') + '</a>'
+        : '<span class="file-none">—</span>';
+
+      return '<tr data-row="' + item.rowIndex + '">' +
+        '<td data-label="Type"><span class="type-pill-td">' + escapeHtml(item.type) + '</span></td>' +
+        '<td data-label="Name">' + escapeHtml(item.name) + '</td>' +
+        '<td data-label="Sign">' + escapeHtml(item.sign) + '</td>' +
+        '<td data-label="Status"><span class="status-badge ' + statusClass + '">' + escapeHtml(item.status) +
+          (doneDateStr ? '<span class="b-date">· ' + doneDateStr + '</span>' : '') + '</span></td>' +
+        '<td data-label="File">' + fileCell + '</td>' +
+        '</tr>';
+    }).join('');
+
+    Array.prototype.forEach.call(tableBody.querySelectorAll('tr[data-row]'), function (tr) {
+      tr.addEventListener('click', function () {
+        const rowIndex = Number(tr.getAttribute('data-row'));
+        const item = state.items.find(function (i) { return i.rowIndex === rowIndex; });
+        if (item) openEdit(item);
+      });
+    });
+  }
+
+  function formatDate_(iso) {
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  }
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+
+  // ─── Filters ───
+  typeChips.addEventListener('click', function (e) {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    Array.prototype.forEach.call(typeChips.querySelectorAll('.chip'), function (c) { c.classList.remove('active'); });
+    chip.classList.add('active');
+    state.typeFilter = chip.getAttribute('data-type');
+    render();
+  });
+
+  statusTabs.addEventListener('click', function (e) {
+    const tab = e.target.closest('.status-tab');
+    if (!tab) return;
+    Array.prototype.forEach.call(statusTabs.querySelectorAll('.status-tab'), function (t) { t.classList.remove('active'); });
+    tab.classList.add('active');
+    state.statusFilter = tab.getAttribute('data-status');
+    render();
+  });
+
+  // ─── Modal open/close ───
+  const formOverlay = document.getElementById('formOverlay');
+  const entryForm = document.getElementById('entryForm');
+  const fTitle = document.getElementById('formTitle');
+  const fSubmitLabel = document.getElementById('formSubmitLabel');
+
+  function resetForm() {
+    entryForm.reset();
+    document.getElementById('f-rowIndex').value = '';
+    document.getElementById('f-rowId').value = '';
+    state.pickedFile = null;
+    document.getElementById('filePickedWrap').innerHTML = '';
+    document.getElementById('fileDropLabel').textContent = 'Klik atau drag file ke sini';
+  }
+
+  function openAdd() {
+    resetForm();
+    fTitle.textContent = 'Input Baru';
+    fSubmitLabel.textContent = 'Save';
+    formOverlay.classList.add('show');
+  }
+
+  function openEdit(item) {
+    resetForm();
+    fTitle.textContent = 'Edit Entry';
+    fSubmitLabel.textContent = 'Update';
+    document.getElementById('f-rowIndex').value = item.rowIndex;
+    document.getElementById('f-rowId').value = item.rowId;
+    document.getElementById('f-type').value = item.type;
+    document.getElementById('f-name').value = item.name;
+    document.getElementById('f-sign').value = item.sign;
+    document.getElementById('f-status').value = item.status;
+    if (item.fileUrl) {
+      document.getElementById('fileDropLabel').textContent = 'Ganti file (opsional)';
+    }
+    formOverlay.classList.add('show');
+  }
+
+  function closeForm() { formOverlay.classList.remove('show'); }
+
+  document.getElementById('openAddBtn').addEventListener('click', openAdd);
+  document.getElementById('formCloseBtn').addEventListener('click', closeForm);
+  document.getElementById('formCancelBtn').addEventListener('click', closeForm);
+  formOverlay.addEventListener('click', function (e) { if (e.target === formOverlay) closeForm(); });
+
+  // ─── File picker ───
+  const fileDrop = document.getElementById('fileDrop');
+  const fileInput = document.getElementById('f-file');
+  const filePickedWrap = document.getElementById('filePickedWrap');
+
+  fileDrop.addEventListener('click', function () { fileInput.click(); });
+  fileDrop.addEventListener('dragover', function (e) { e.preventDefault(); fileDrop.classList.add('drag'); });
+  fileDrop.addEventListener('dragleave', function () { fileDrop.classList.remove('drag'); });
+  fileDrop.addEventListener('drop', function (e) {
+    e.preventDefault();
+    fileDrop.classList.remove('drag');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', function () {
+    if (fileInput.files && fileInput.files[0]) handleFile(fileInput.files[0]);
+  });
+
+  function handleFile(file) {
+    const reader = new FileReader();
+    reader.onload = function () {
+      state.pickedFile = {
+        name: file.name,
+        mimeType: file.type || 'application/octet-stream',
+        data: reader.result.split(',')[1]
+      };
+      filePickedWrap.innerHTML = '<div class="file-picked"><span>📎 ' + escapeHtml(file.name) + '</span><button type="button" id="removeFileBtn">&times;</button></div>';
+      document.getElementById('removeFileBtn').addEventListener('click', function (e) {
+        e.stopPropagation();
+        state.pickedFile = null;
+        filePickedWrap.innerHTML = '';
+        fileInput.value = '';
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ─── Submit ───
+  entryForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const submitBtn = document.getElementById('formSubmitBtn');
+    const rowIndex = document.getElementById('f-rowIndex').value;
+    const rowId = document.getElementById('f-rowId').value;
+
+    const payload = {
+      action: rowIndex ? 'update' : 'create',
+      type: document.getElementById('f-type').value,
+      name: document.getElementById('f-name').value.trim(),
+      sign: document.getElementById('f-sign').value,
+      status: document.getElementById('f-status').value
+    };
+    if (rowIndex) { payload.rowIndex = rowIndex; payload.rowId = rowId; }
+    if (state.pickedFile) payload.file = state.pickedFile;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-sm"></span>';
+
+    apiPost(payload).then(function (res) {
+      if (!res.ok) throw new Error(res.error || 'Failed');
+      showToast(rowIndex ? 'Entry updated' : 'Entry added', true);
+      closeForm();
+      load();
+    }).catch(function (err) {
+      showToast(String(err.message || err), false);
+    }).finally(function () {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span id="formSubmitLabel">' + (rowIndex ? 'Update' : 'Save') + '</span>';
+    });
+  });
+
+  load();
+})();
+</script>
+<script src="sidebar-loader.js"></script>
+</body>
+</html>
