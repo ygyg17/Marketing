@@ -16,12 +16,21 @@
 
   function getSession() {
     var raw = localStorage.getItem(SESSION_KEY);
+    console.log('[auth debug] raw localStorage value:', raw);
     if (!raw) return null;
     try {
       var s = JSON.parse(raw);
-      if (!s.token || !s.expiresAt || s.expiresAt <= Date.now()) return null;
+      console.log('[auth debug] parsed session:', s, 'now:', Date.now());
+      if (!s.token || !s.expiresAt || s.expiresAt <= Date.now()) {
+        console.log('[auth debug] session INVALID because:',
+          !s.token ? 'no token' : !s.expiresAt ? 'no/NaN expiresAt' : 'expired');
+        return null;
+      }
       return s;
-    } catch (e) { return null; }
+    } catch (e) {
+      console.log('[auth debug] JSON parse failed:', e);
+      return null;
+    }
   }
 
   function goToLogin() {
